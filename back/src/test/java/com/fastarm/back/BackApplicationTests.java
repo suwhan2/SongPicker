@@ -1,10 +1,10 @@
-package com.fastarm.songpicker;
+package com.fastarm.back;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SongpickerApplicationTests {
+class BackApplicationTests {
 
     @Test
     void contextLoads() {

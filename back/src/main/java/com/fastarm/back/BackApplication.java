@@ -1,13 +1,13 @@
-package com.fastarm.songpicker;
+package com.fastarm.back;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SongpickerApplication {
+public class BackApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SongpickerApplication.class, args);
+        SpringApplication.run(BackApplication.class, args);
     }
 
 }
