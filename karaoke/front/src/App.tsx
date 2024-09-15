@@ -1,12 +1,11 @@
-// import { useState } from 'react';
-
 import './App.css';
+import LandingPage from './Pages/LandingPage';
 
 function App() {
   return (
-    <>
-      <p>노래방 화면입니다.</p>
-    </>
+    <div className="w-screen h-screen bg-gradient-to-b from-blue to-purple">
+      <LandingPage/>
+    </div>
   );
 }
 
