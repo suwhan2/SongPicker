@@ -12,13 +12,14 @@ const PayingPage = () => {
 
         {/* 결제 카테고리 버튼 */}
         <div className="flex w-fit h-fit grid grid-cols-2 gap-11">
-            {PayingData.map(item => {
+            {PayingData.map((item, i) => {
               return (
                 <PayingButton
                   categoryColor={item.categoryColor}
                   categoryText={item.categoryText}
                   amountText={item.amountText}
                   moneyText={item.moneyText}
+                  key={`payingButton-${i}`}
                 />
               );
             })}
