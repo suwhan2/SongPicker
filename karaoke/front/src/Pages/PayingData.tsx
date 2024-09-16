@@ -1,6 +1,6 @@
 import { PayingInfo } from "../shared/Types";
 
-export const PayingData: PayingInfo[] = [
+export const PayingCategory: PayingInfo[] = [
   {
     categoryColor: '#9747FF',
     categoryText: '곡 수',
