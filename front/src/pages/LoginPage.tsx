@@ -1,6 +1,6 @@
 import React from 'react';
 import SubTopNavbar from '../components/molecules/commons/SubTopNavbar';
-import LoginTemplate from '../components/templates/login/LoginTemplate';
+import LoginTemplate from '../components/template/login/LoginTemplate';
 
 const LoginPage = () => {
   return (
