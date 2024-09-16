@@ -1,6 +1,4 @@
-type TextProps = {
-    text: string
-}
+import { TextProps } from "../shared/Types"
 
 const Text48 = (props: TextProps) => {
   return (

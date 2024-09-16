@@ -1,9 +1,4 @@
-export type PayingInfo = {
-  categoryColor: string;
-  categoryText: string;
-  amountText: string;
-  moneyText: string;
-};
+import { PayingInfo } from "../shared/Types";
 
 export const PayingData: PayingInfo[] = [
   {
