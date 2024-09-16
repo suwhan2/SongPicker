@@ -7,7 +7,8 @@ export default {
       'purple': '#9747FF',
       'pink': '#FF24BD',
       'blue': '#575ED2',
-      'white': '#ffffff'
+      'white': '#ffffff',
+      'black': '#000000'
     },
     fontFamily: {
       sans: ['Pretendard', 'sans-serif'],
