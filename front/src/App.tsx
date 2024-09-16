@@ -7,6 +7,9 @@ import GroupPage from './pages/GroupPage'
 import ProfilePage from './pages/ProfilePage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
+import MemberSelectPage from './pages/LinkPages/MemberSelectPage';
+import GroupSelectPage from './pages/LinkPages/GroupSelectPage';
+import QrScanPage from './pages/LinkPages/QrScanPage';
 import TopNavbar from './components/organisms/commons/TopNavbar'
 import BottomNavbar from './components/organisms/commons/BottomNavbar'
 import './App.css'
@@ -18,13 +21,16 @@ const App = () => {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+
           <Route
             path="*"
             element={
               <>
-                <TopNavbar />
                 <Routes>
                   <Route path="/" element={<MainPage />} />
+                  <Route path="/member-select" element={<MemberSelectPage />} />
+                  <Route path="/group-select" element={<GroupSelectPage />} />
+                  <Route path="/qr-scan" element={<QrScanPage />} />
                   <Route path="/search" element={<SearchPage />} />
                   <Route path="/theme" element={<ThemePage />} />
                   <Route path="/group" element={<GroupPage />} />
