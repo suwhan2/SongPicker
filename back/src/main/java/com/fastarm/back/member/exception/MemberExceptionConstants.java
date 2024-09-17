@@ -1,0 +1,21 @@
+package com.fastarm.back.member.exception;
+
+import com.fastarm.back.common.exception.ExceptionConstants;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
+@AllArgsConstructor
+public enum MemberExceptionConstants implements ExceptionConstants {
+
+    LOGIN_DUPLICATE("ME001", "로그인 아이디 중복 검사 실패", HttpStatus.CONFLICT),
+    NICKNAME_DUPLICATE("ME003", "닉네임 중복 검사 실패", HttpStatus.CONFLICT),
+    PHONE_DUPLICATE("ME004", "전화번호 중복 검사 실패", HttpStatus.CONFLICT),
+    NOT_CHECK_PHONE_DUPLICATE("ME008", "전화번호 중복 검사 미실시", HttpStatus.BAD_REQUEST),
+    LOGIN_ID_PHONE_MISMATCH("ME007", "로그인 아이디 전화번호 불일치", HttpStatus.BAD_REQUEST);
+
+    final String code;
+    final String message;
+    final HttpStatus httpStatus;
+}
