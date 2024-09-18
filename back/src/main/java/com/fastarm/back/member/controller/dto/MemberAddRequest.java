@@ -3,7 +3,7 @@ package com.fastarm.back.member.controller.dto;
 import com.fastarm.back.member.dto.MemberAddDto;
 import com.fastarm.back.member.enums.Gender;
 import com.fastarm.back.member.enums.Role;
-import com.fastarm.back.member.valication.annotation.*;
+import com.fastarm.back.member.validation.annotation.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

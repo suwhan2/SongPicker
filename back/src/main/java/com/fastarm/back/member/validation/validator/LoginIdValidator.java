@@ -1,6 +1,6 @@
-package com.fastarm.back.member.valication.validator;
+package com.fastarm.back.member.validation.validator;
 
-import com.fastarm.back.member.valication.annotation.LoginId;
+import com.fastarm.back.member.validation.annotation.LoginId;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

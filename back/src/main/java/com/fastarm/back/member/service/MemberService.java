@@ -7,6 +7,7 @@ import com.fastarm.back.member.exception.*;
 import com.fastarm.back.member.repository.MemberRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder bcryptPasswordEncoder;
 
     @Transactional(readOnly = true)
     public void checkId(String loginId) {
@@ -40,7 +42,8 @@ public class MemberService {
     @Transactional
     public void addMember(MemberAddDto memberAddDto) {
         if (checkSignupPreAuth(memberAddDto)) {
-            memberRepository.save(memberAddDto.toEntity());
+            String encodedPassword = bcryptPasswordEncoder.encode(memberAddDto.getPassword());
+            memberRepository.save(memberAddDto.toEntity(encodedPassword));
         }
     }
 
