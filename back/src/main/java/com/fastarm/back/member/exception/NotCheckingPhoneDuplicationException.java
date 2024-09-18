@@ -7,3 +7,4 @@ public class NotCheckingPhoneDuplicationException extends CustomException {
         super(MemberExceptionConstants.NOT_CHECK_PHONE_DUPLICATE);
     }
 }
+

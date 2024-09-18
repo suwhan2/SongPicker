@@ -21,3 +21,4 @@ public class LoginIdValidator implements ConstraintValidator<LoginId, String> {
         return matcher.matches();
     }
 }
+

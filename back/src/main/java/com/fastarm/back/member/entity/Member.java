@@ -67,3 +67,4 @@ public class Member {
         isWithdraw = false;
     }
 }
+

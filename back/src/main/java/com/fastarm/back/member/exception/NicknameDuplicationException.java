@@ -7,3 +7,4 @@ public class NicknameDuplicationException extends CustomException {
         super(MemberExceptionConstants.NICKNAME_DUPLICATE);
     }
 }
+

@@ -7,3 +7,4 @@ public class NotCheckNicknameDuplicationException extends CustomException {
         super(MemberExceptionConstants.NOT_CHECK_NICKNAME_DUPLICATE);
     }
 }
+

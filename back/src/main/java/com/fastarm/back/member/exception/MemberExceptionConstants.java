@@ -22,3 +22,4 @@ public enum MemberExceptionConstants implements ExceptionConstants {
     final String message;
     final HttpStatus httpStatus;
 }
+

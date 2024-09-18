@@ -25,3 +25,4 @@ public class NameValidator implements ConstraintValidator<Name, String> {
         return koreanMatcher.matches() || englishMatcher.matches();
     }
 }
+

@@ -7,3 +7,4 @@ public class PhoneDuplicationException extends CustomException {
         super(MemberExceptionConstants.PHONE_DUPLICATE);
     }
 }
+

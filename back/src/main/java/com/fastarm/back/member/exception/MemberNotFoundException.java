@@ -7,3 +7,4 @@ public class MemberNotFoundException extends CustomException {
         super(MemberExceptionConstants.MEMBER_NOT_FOUND);
     }
 }
+

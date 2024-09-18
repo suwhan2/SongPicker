@@ -7,3 +7,4 @@ public class LoginIdPhoneMismatchException extends CustomException {
         super(MemberExceptionConstants.LOGIN_ID_PHONE_MISMATCH);
     }
 }
+

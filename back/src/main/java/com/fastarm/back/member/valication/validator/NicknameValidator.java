@@ -21,3 +21,4 @@ public class NicknameValidator implements ConstraintValidator<Nickname, String> 
         return matcher.matches();
     }
 }
+

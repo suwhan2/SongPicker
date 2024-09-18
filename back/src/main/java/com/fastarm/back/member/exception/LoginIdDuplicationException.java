@@ -7,3 +7,4 @@ public class LoginIdDuplicationException extends CustomException {
         super(MemberExceptionConstants.LOGIN_DUPLICATE);
     }
 }
+
