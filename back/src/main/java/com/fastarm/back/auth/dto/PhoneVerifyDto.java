@@ -1,6 +1,6 @@
 package com.fastarm.back.auth.dto;
 
-import com.fastarm.back.member.valication.annotation.Phone;
+import com.fastarm.back.member.validation.annotation.Phone;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
