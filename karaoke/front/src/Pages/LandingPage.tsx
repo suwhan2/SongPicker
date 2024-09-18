@@ -3,6 +3,7 @@ import Button from '../atoms/Button';
 import Text72 from '../atoms/Text72';
 
 const LandingPage = () => {
+
   return (
     <div className="w-full h-full">
       <div className="flex-c h-full content-center space-y-9">
