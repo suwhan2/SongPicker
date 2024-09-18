@@ -2,17 +2,17 @@ package com.fastarm.back.member.controller;
 
 import com.fastarm.back.common.constants.RedisSessionConstants;
 import com.fastarm.back.common.controller.dto.ApiResponse;
+import com.fastarm.back.member.controller.dto.MemberAddRequest;
 import com.fastarm.back.member.service.MemberService;
 import com.fastarm.back.member.valication.annotation.LoginId;
 import com.fastarm.back.member.valication.annotation.Nickname;
 import com.fastarm.back.member.valication.annotation.Phone;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,5 +40,11 @@ public class MemberController {
         memberService.checkPhone(phone);
         session.setAttribute(RedisSessionConstants.CHECK_PHONE, phone);
         return ResponseEntity.ok(new ApiResponse<>("ME103", "전화번호 중복 검사 성공", null));
+    }
+
+    @PostMapping
+    public ResponseEntity<?> memberAdd(@Valid @RequestBody MemberAddRequest request, HttpSession session) {
+        memberService.addMember(request.toDto(session));
+        return new ResponseEntity<>(new ApiResponse<>("ME100", "회원가입 성공", null), HttpStatus.CREATED);
     }
 }

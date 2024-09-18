@@ -1,5 +1,6 @@
 package com.fastarm.back.member.entity;
 
+import com.fastarm.back.member.enums.Gender;
 import com.fastarm.back.member.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 public class Member {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, length = 16, nullable = false)
@@ -41,6 +43,9 @@ public class Member {
 
     @Column(length = 11, nullable = false)
     private String phone;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @Column(length = 256)
     private String profileImage;
