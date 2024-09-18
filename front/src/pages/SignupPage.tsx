@@ -14,6 +14,12 @@ const SignupPage = () => {
   const [signupData, setSignupData] = useState({
     loginId: '',
     password: '',
+    name: '',
+    nickname: '',
+    birth: '',
+    phone: '',
+    gender: '',
+    role: 'USER'
   });
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -23,10 +29,13 @@ const SignupPage = () => {
       e.preventDefault();
     }
     if (currentStep < 4 && isValid) {
+      if (currentStep === 2) {
+        // 회원가입 API 호출 대신 콘솔에 데이터 출력
+        console.log('회원가입 데이터:', signupData);
+      }
       setCurrentStep(currentStep + 1);
       setIsValid(false);
     } else if (currentStep === 4) {
-      console.log('회원가입 데이터:', signupData);
       navigate('/login');
     }
   };
@@ -36,6 +45,16 @@ const SignupPage = () => {
   }, []);
   
   const handleBasicInfoSubmit = useCallback((formData: { loginId: string; password: string }) => {
+    setSignupData(prevData => ({ ...prevData, ...formData }));
+  }, []);
+
+  const handleUserInfoSubmit = useCallback((formData: {
+    name: string;
+    nickname: string;
+    birth: string;
+    phone: string;
+    gender: 'MALE' | 'FEMALE';
+  }) => {
     setSignupData(prevData => ({ ...prevData, ...formData }));
   }, []);
 
@@ -91,7 +110,7 @@ const SignupPage = () => {
       <div ref={scrollRef} className="flex-grow overflow-y-auto">
         <div ref={contentRef} className="max-w-[440px] w-full mx-auto p-6">
           <SignupStepText text={getStepText(currentStep)} />
-          <form onSubmit={(e) => e.preventDefault()} className="mt-11">
+          <form onSubmit={(e) => e.preventDefault()} className="mt-12">
             {currentStep === 1 && (
               <BasicInfoForm 
                 onValidation={handleValidation} 
@@ -102,6 +121,7 @@ const SignupPage = () => {
             {currentStep === 2 && (
               <UserInfoSignupForm
                 onValidChange={handleValidation}
+                onSubmit={handleUserInfoSubmit}
               />
             )}
             {currentStep === 3 && <div>곡 선택 (제작 중...)</div>}

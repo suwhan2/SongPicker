@@ -3,33 +3,35 @@ import SignupInput from '../../atoms/signup/SignupInput';
 import SignupButton from '../../atoms/signup/SignupButton';
 
 type UserInfoPhoneSignupFormProps = {
-  onVerify: () => void; // 인증을 위한 상태 변경
-  onResetAuthCode: () => void; // 인증번호 초기화 콜백
+  onVerify: () => void;
+  onResetAuthCode: () => void;
+  onChange: (phone: string) => void;
 };
 
-const UserInfoPhoneSignupForm = ({ onVerify, onResetAuthCode }: UserInfoPhoneSignupFormProps) => {
+const UserInfoPhoneSignupForm = ({ onVerify, onResetAuthCode, onChange }: UserInfoPhoneSignupFormProps) => {
   const [phone, setPhone] = useState('');
   const [isAvailable, setIsAvailable] = useState(false);
-  const [showAuthCodeForm, setShowAuthCodeForm] = useState(false); // 인증번호 폼 표시 여부
+  const [showAuthCodeForm, setShowAuthCodeForm] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
     setPhone(value);
-    setIsAvailable(value.length === 11); // 번호가 11자리인지 확인
+    setIsAvailable(value.length === 11);
+    onChange(value);
   };
 
   const handleVerify = () => {
     if (isAvailable) {
-      setShowAuthCodeForm(true); // 인증번호 폼을 띄움
-      onVerify(); // 부모 컴포넌트에 인증 상태 전달
+      setShowAuthCodeForm(true);
+      onVerify();
     }
   };
 
   const handleRetry = () => {
-    setShowAuthCodeForm(false); // 인증번호 폼을 숨김
-    setPhone(''); // 입력된 휴대폰 번호 초기화
-    setIsAvailable(false); // 인증 가능 상태 초기화
-    onResetAuthCode(); // 인증번호를 초기화하는 콜백 호출
+    setShowAuthCodeForm(false);
+    setPhone('');
+    setIsAvailable(false);
+    onResetAuthCode();
   };
 
   return (
@@ -45,7 +47,7 @@ const UserInfoPhoneSignupForm = ({ onVerify, onResetAuthCode }: UserInfoPhoneSig
           onChange={handleChange}
           className="flex-grow"
           maxLength={11}
-          disabled={showAuthCodeForm} // 인증번호 폼이 뜨면 번호 수정 불가
+          disabled={showAuthCodeForm}
         />
         <div className="ml-[18px]">
           {!showAuthCodeForm && (

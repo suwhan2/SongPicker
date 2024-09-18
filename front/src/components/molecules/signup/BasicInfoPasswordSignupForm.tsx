@@ -10,23 +10,19 @@ type BasicInfoPasswordFormProps = {
 
 const BasicInfoPasswordForm = ({ password, onChange, onValidation }: BasicInfoPasswordFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
-  
-  // 각 조건의 상태를 관리
   const [isLengthValid, setIsLengthValid] = useState(false);
   const [isContentValid, setIsContentValid] = useState(false);
 
   useEffect(() => {
     const lengthValid = password.length >= 8 && password.length <= 16;
-    const contentValid = /[A-Za-z]/.test(password) && /\d/.test(password) && /[@$!%*?&]/.test(password);
+    const contentValid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])/.test(password);
 
     setIsLengthValid(lengthValid);
     setIsContentValid(contentValid);
 
-    // 두 조건이 모두 만족하면 전체 valid 상태 true
     onValidation(lengthValid && contentValid);
   }, [password, onValidation]);
 
-  // 두 조건이 모두 만족하면 메시지를 보여주지 않음
   const allValid = isLengthValid && isContentValid;
 
   return (
@@ -50,16 +46,18 @@ const BasicInfoPasswordForm = ({ password, onChange, onValidation }: BasicInfoPa
         </div>
       </div>
 
-      {/* 두 조건이 모두 충족되지 않았을 때만 메시지를 표시 */}
-      {!allValid && (
+      {password.length > 0 && !allValid && (
         <ul className="list-disc list-inside text-sm mt-2 space-y-1">
           <li className={isLengthValid ? 'text-green-500' : 'text-red-500'}>
-            최소 8자리 이상, 최대 16자리 이하
+            최소 8자, 최대 16자
           </li>
           <li className={isContentValid ? 'text-green-500' : 'text-red-500'}>
-            영문자, 숫자, 특수문자 포함
+            하나 이상의 영문자, 숫자 및 특수문자 포함
           </li>
         </ul>
+      )}
+      {allValid && (
+        <p className="text-green-500 text-sm mt-2">올바른 비밀번호 형식입니다.</p>
       )}
     </div>
   );

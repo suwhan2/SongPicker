@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import UserInfoImgSignupForm from '../../molecules/signup/UserInfoImgSignupForm';
 import UserInfoNameSignupForm from '../../molecules/signup/UserInfoNameSignupForm';
 import UserInfoNicknameSignupForm from '../../molecules/signup/UserInfoNicknameSignupForm';
 import UserInfoPhoneSignupForm from '../../molecules/signup/UserInfoPhoneSignupForm';
@@ -9,17 +8,25 @@ import UserInfoGenderSignupForm from '../../molecules/signup/UserInfoGenderSignu
 
 type UserInfoSignupFormProps = {
   onValidChange: (isValid: boolean) => void;
+  onSubmit: (formData: {
+    name: string;
+    nickname: string;
+    birth: string;
+    phone: string;
+    gender: 'MALE' | 'FEMALE';
+  }) => void;
 };
 
-const UserInfoSignupForm = ({ onValidChange }: UserInfoSignupFormProps) => {
+const UserInfoSignupForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps) => {
   const [showAuthCode, setShowAuthCode] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [isAuthCodeVerified, setIsAuthCodeVerified] = useState(false);
-  const [resetAuthCode, setResetAuthCode] = useState(false); // 인증번호 초기화 여부 상태
+  const [resetAuthCode, setResetAuthCode] = useState(false);
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState('');
   const [birth, setBirth] = useState('');
-  const [gender, setGender] = useState<'male' | 'female' | null>(null);
+  const [phone, setPhone] = useState('');
+  const [gender, setGender] = useState<'MALE' | 'FEMALE' | null>(null);
 
   useEffect(() => {
     const isValid = isPhoneVerified && 
@@ -29,34 +36,43 @@ const UserInfoSignupForm = ({ onValidChange }: UserInfoSignupFormProps) => {
                     birth.trim() !== '' && 
                     gender !== null;
     onValidChange(isValid);
-  }, [isPhoneVerified, isAuthCodeVerified, name, nickname, birth, gender, onValidChange]);
+
+    if (isValid) {
+      onSubmit({
+        name,
+        nickname,
+        birth,
+        phone,
+        gender: gender as 'MALE' | 'FEMALE',
+      });
+    }
+  }, [isPhoneVerified, isAuthCodeVerified, name, nickname, birth, phone, gender, onValidChange, onSubmit]);
 
   const handlePhoneVerification = () => {
-    setShowAuthCode(true); // 인증번호 폼 표시
-    setIsPhoneVerified(true); // 휴대폰 인증 완료 상태
+    setShowAuthCode(true);
+    setIsPhoneVerified(true);
   };
 
   const handleAuthCodeVerification = () => {
-    setIsAuthCodeVerified(true); // 인증번호 확인 완료
+    setIsAuthCodeVerified(true);
   };
 
   const handleResetAuthCode = () => {
-    setShowAuthCode(false); // 인증번호 폼을 숨기고 휴대폰 입력 단계로 복귀
-    setResetAuthCode(true); // 인증번호 리셋 상태 설정
-    setTimeout(() => setResetAuthCode(false), 0); // 한 번 리셋한 후 바로 false로 다시 설정
-    setIsPhoneVerified(false); // 휴대폰 인증도 다시 하도록 상태 초기화
+    setShowAuthCode(false);
+    setResetAuthCode(true);
+    setTimeout(() => setResetAuthCode(false), 0);
+    setIsPhoneVerified(false);
   };
 
   const handleGenderChange = (selectedGender: 'male' | 'female') => {
-    setGender(selectedGender);
+    setGender(selectedGender === 'male' ? 'MALE' : 'FEMALE');
   };
 
   return (
     <div className="flex flex-col space-y-12 min-w-72 w-full">
-      <UserInfoImgSignupForm />
       <UserInfoNameSignupForm onChange={setName} />
       <UserInfoNicknameSignupForm onChange={setNickname} />
-      <UserInfoPhoneSignupForm onVerify={handlePhoneVerification} onResetAuthCode={handleResetAuthCode} />
+      <UserInfoPhoneSignupForm onVerify={handlePhoneVerification} onResetAuthCode={handleResetAuthCode} onChange={setPhone} />
       {showAuthCode && (
         <UserInfoAuthCodeSignupForm onVerify={handleAuthCodeVerification} resetAuthCode={resetAuthCode} />
       )}
