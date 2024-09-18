@@ -21,7 +21,10 @@ const LoginForm = () => {
     }
   }, [errorMessage])
 
-  const handleLogin = () => {
+  const handleLogin = (e: React.MouseEvent) => {
+
+    e.preventDefault()
+    
     if (!userId && !userPassword) {
       setErrorMessage('아이디와 비밀번호를 입력해주세요.')
     } else if (!userId) {
