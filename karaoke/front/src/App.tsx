@@ -1,12 +1,12 @@
-// import { useState } from 'react';
-
 import './App.css';
+import LandingPage from './pages/LandingPage';
+import PayingPage from './pages/PayingPage';
 
 function App() {
   return (
-    <>
-      <p>노래방 화면입니다.</p>
-    </>
+    
+      <PayingPage/>
+    
   );
 }
 
