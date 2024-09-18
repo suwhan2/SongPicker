@@ -21,29 +21,29 @@ public class SongService {
     //private final PersonalSingHistoryRepository personalSingHistoryRepository;
     //private final GroupSingHistoryRepository groupSingHistoryRepository;
 
-    @Transactional
-    public List<SongRecommendDto> recommendMySong(Long memberId){
-        List<PersonalSingHistory> myHistory  = personalSingHistoryRepository.findAllByMemberId(memberId);
-
-        List<Song> sangList = new ArrayList<>();
-        for(PersonalSingHistory history : myHistory){
-            Song song = songRepository.findById(history.getSongId).orElseThrow(NotFoundSongDetailException::new);
-            sangList.add(song);
-        }
-        return runRecommendationAlgorithm(sangList);
-    }
-
-    @Transactional
-    public List<SongRecommendDto> recommendGroupSong(Long groupId){
-        List<GroupSingHistory> myHistory  = groupSingHistoryRepository.findAllByMemberId(groupId);
-
-        List<Song> sangList = new ArrayList<>();
-        for(GroupSingHistory history : myHistory){
-            Song song = songRepository.findById(history.getSongId).orElseThrow(NotFoundSongDetailException::new);
-            sangList.add(song);
-        }
-        return runRecommendationAlgorithm(sangList);
-    }
+//    @Transactional
+//    public List<SongRecommendDto> recommendMySong(Long memberId){
+//        List<PersonalSingHistory> myHistory  = personalSingHistoryRepository.findAllByMemberId(memberId);
+//
+//        List<Song> sangList = new ArrayList<>();
+//        for(PersonalSingHistory history : myHistory){
+//            Song song = songRepository.findById(history.getSongId).orElseThrow(NotFoundSongDetailException::new);
+//            sangList.add(song);
+//        }
+//        return runRecommendationAlgorithm(sangList);
+//    }
+//
+//    @Transactional
+//    public List<SongRecommendDto> recommendGroupSong(Long groupId){
+//        List<GroupSingHistory> myHistory  = groupSingHistoryRepository.findAllByMemberId(groupId);
+//
+//        List<Song> sangList = new ArrayList<>();
+//        for(GroupSingHistory history : myHistory){
+//            Song song = songRepository.findById(history.getSongId).orElseThrow(NotFoundSongDetailException::new);
+//            sangList.add(song);
+//        }
+//        return runRecommendationAlgorithm(sangList);
+//    }
 
     private List<SongRecommendDto> runRecommendationAlgorithm(List<Song> sangList){
         List<SongRecommendDto> recommendedSongs = new ArrayList<>();
