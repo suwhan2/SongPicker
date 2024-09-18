@@ -1,11 +1,12 @@
 import './App.css';
-import LandingPage from './Pages/LandingPage';
+import LandingPage from './pages/LandingPage';
+import PayingPage from './pages/PayingPage';
 
 function App() {
   return (
-    <div className="w-screen h-screen bg-gradient-to-b from-blue to-purple">
-      <LandingPage/>
-    </div>
+    
+      <PayingPage/>
+    
   );
 }
 
