@@ -14,7 +14,7 @@ const SignupGenderButton = ({ onClick, isSelected, label }:GenderButtonProps) =>
       onClick={onClick}
       className={`
         flex items-center justify-center
-        w-[68px] h-[35px] px-2 py-2 
+        w-full h-[35px] px-2 py-2 
         rounded-md text-sm text-white 
         transition-colors whitespace-nowrap
         ${isSelected ? 'bg-[#AAAAAA]' : 'bg-primary hover:bg-secondary'}
