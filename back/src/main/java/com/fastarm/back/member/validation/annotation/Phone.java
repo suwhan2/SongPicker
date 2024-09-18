@@ -1,6 +1,6 @@
-package com.fastarm.back.member.valication.annotation;
+package com.fastarm.back.member.validation.annotation;
 
-import com.fastarm.back.member.valication.validator.NicknameValidator;
+import com.fastarm.back.member.validation.validator.PhoneValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,9 +11,9 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = NicknameValidator.class)
-public @interface Nickname {
-    String message() default "닉네임 형식 불일치";
+@Constraint(validatedBy = PhoneValidator.class)
+public @interface Phone {
+    String message() default "전화번호 형식 불일치";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
