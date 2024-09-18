@@ -3,10 +3,6 @@ package com.fastarm.back.member.dto;
 import com.fastarm.back.member.entity.Member;
 import com.fastarm.back.member.enums.Gender;
 import com.fastarm.back.member.enums.Role;
-import com.fastarm.back.member.valication.annotation.LoginId;
-import com.fastarm.back.member.valication.annotation.Nickname;
-import com.fastarm.back.member.valication.annotation.Password;
-import com.fastarm.back.member.valication.annotation.Phone;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,10 +27,10 @@ public class MemberAddDto {
 
     HttpSession session;
 
-    public Member toEntity() {
+    public Member toEntity(String encodedPassword) {
         return Member.builder()
                 .loginId(loginId)
-                .password(password)
+                .password(encodedPassword)
                 .name(name)
                 .nickname(nickname)
                 .birth(birth)

@@ -1,6 +1,6 @@
-package com.fastarm.back.member.validation.annotation;
+package com.fastarm.back.member.valication.annotation;
 
-import com.fastarm.back.member.validation.validator.PhoneValidator;
+import com.fastarm.back.member.valication.validator.PhoneValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
