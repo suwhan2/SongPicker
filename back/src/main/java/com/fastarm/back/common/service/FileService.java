@@ -7,3 +7,4 @@ import java.io.IOException;
 public interface FileService {
     String uploadFile(MultipartFile file, String dir, Long memberId) throws IOException;
 }
+
