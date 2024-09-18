@@ -8,5 +8,5 @@ import lombok.Getter;
 public enum PhoneAuthPurpose {
     SIGNUP("signup"), FIND_PASSWORD("findPassword"), CHANGE_PHONE("changePhone");
 
-    private final String purpose;
+    private final String value;
 }

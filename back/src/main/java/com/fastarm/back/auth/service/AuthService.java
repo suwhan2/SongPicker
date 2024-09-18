@@ -1,12 +1,15 @@
 package com.fastarm.back.auth.service;
 
 import com.fastarm.back.auth.dto.PhoneSendDto;
+import com.fastarm.back.auth.dto.PhoneVerifyDto;
 import com.fastarm.back.auth.enums.PhoneAuthPurpose;
+import com.fastarm.back.auth.exception.PhoneAuthenticationException;
 import com.fastarm.back.common.constants.RedisSessionConstants;
 import com.fastarm.back.common.constants.RedisExpiredTimeConstants;
 import com.fastarm.back.common.service.RedisService;
 import com.fastarm.back.member.entity.Member;
 import com.fastarm.back.member.exception.LoginIdPhoneMismatchException;
+import com.fastarm.back.member.exception.MemberNotFoundException;
 import com.fastarm.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.message.model.Message;
@@ -43,9 +46,9 @@ public class AuthService {
     @Transactional
     public void sendAuthCode(PhoneSendDto phoneSendDto) {
 
-        if (phoneSendDto.getPurpose().equals(PhoneAuthPurpose.FIND_PASSWORD.getPurpose())) {
+        if (phoneSendDto.getPurpose().equals(PhoneAuthPurpose.FIND_PASSWORD.getValue())) {
             Member member = memberRepository.findByLoginId(phoneSendDto.getLoginId())
-                    .orElseThrow();
+                    .orElseThrow(MemberNotFoundException::new);
             if (!member.getPhone().equals(phoneSendDto.getPhone())) {
                 throw new LoginIdPhoneMismatchException();
             }
@@ -60,6 +63,15 @@ public class AuthService {
         redisService.setData(generatePrefixedKey(receiverPhone), authCode, RedisExpiredTimeConstants.PHONE_AUTH_EXPIRED);
 
         messageService.sendOne(new SingleMessageSendingRequest(message));
+    }
+
+    public void verifyAuthCode(PhoneVerifyDto phoneVerifyDto) {
+        String issuedCode = (String)redisService.getData(generatePrefixedKey(phoneVerifyDto.getPhone()));
+
+        if (!issuedCode.equals(phoneVerifyDto.getAuthCode())) {
+            throw new PhoneAuthenticationException();
+        }
+        redisService.deleteData(generatePrefixedKey(phoneVerifyDto.getPhone()));
     }
 
     private String generatePrefixedKey(String phone) {
