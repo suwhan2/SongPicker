@@ -7,3 +7,4 @@ public class NotCheckPhoneAuthenticationException extends CustomException {
         super(AuthExceptionConstants.NOT_CHECK_PHONE_AUTH);
     }
 }
+

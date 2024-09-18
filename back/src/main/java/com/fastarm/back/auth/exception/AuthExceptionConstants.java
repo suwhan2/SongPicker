@@ -17,3 +17,4 @@ public enum AuthExceptionConstants implements ExceptionConstants {
     final String message;
     final HttpStatus httpStatus;
 }
+

@@ -7,3 +7,4 @@ public class PhoneAuthenticationException extends CustomException {
         super(AuthExceptionConstants.PHONE_AUTH_CODE_MISMATCH);
     }
 }
+

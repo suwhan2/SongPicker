@@ -11,3 +11,4 @@ public class PhoneVerifyDto {
     private String phone;
     private String authCode;
 }
+

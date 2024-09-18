@@ -15,3 +15,4 @@ public class PhoneSendDto {
     @PhoneAuthPurpose
     private String purpose;
 }
+
