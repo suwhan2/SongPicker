@@ -40,3 +40,4 @@ public class AuthController {
         return ResponseEntity.ok(new ApiResponse<>("AU102", "전화번호 인증 성공", null));
     }
 }
+
