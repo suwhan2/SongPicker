@@ -1,13 +1,15 @@
 import MainBackground from '../assets/MainBackground.png';
-import GuideQrcode from '../organisms/guideQrcode';
+import GuideQrcode from '../organisms/GuideQrcode';
 
-type Props = {};
-
-const MainPage = (props: Props) => {
+const MainPage = () => {
   return (
-    <div className="relative">
-      <GuideQrcode/>
-      {/* <img src={MainBackground} /> */}
+    <div
+      className="relative w-full h-full bg-cover bg-center"
+      style={{
+        backgroundImage: `url(${MainBackground})`,
+      }}
+    >
+      <GuideQrcode />
     </div>
   );
 };

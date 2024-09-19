@@ -3,7 +3,7 @@ import Text72 from '../atoms/Text72';
 
 const GuideQrcode = () => {
   return (
-    <div className="absolute h-full flex flex-col left-[1069px] justify-center gap-y-7">
+    <div className="absolute h-full flex flex-col left-[1100px] justify-center gap-y-7">
       <div className="flex justify-center gap-x-5">
         {/* 제목 */}
         <div className="flex text-pink">
