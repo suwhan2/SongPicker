@@ -32,5 +32,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src')
     }
   },
-  publicDir: 'public', // 정적 파일이 위치한 디렉토리
+  publicDir: 'public', // 정적 파일이 위치한 
+  
+  // 서버 설정 추가
+  server: {
+    host: '0.0.0.0',  // 네트워크의 모든 인터페이스에서 접근 가능
+    port: 3000,        // 포트 설정 (기본 3000, 필요에 따라 변경 가능)
+  },
 });

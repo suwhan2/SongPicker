@@ -1,5 +1,6 @@
 import React from 'react'
 import TopNavbar from '../components/organisms/commons/TopNavbar'
+import BottomNavbar from '../components/organisms/commons/BottomNavbar'
 
 type Props = {}
 
@@ -12,6 +13,9 @@ const ThemePage = (props: Props) => {
       <div>
       ThemePage
       </div>
+
+      {/* 하단 네브 */}
+      <BottomNavbar />
     </div>
   )
 }
