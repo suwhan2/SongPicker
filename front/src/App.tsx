@@ -23,7 +23,7 @@ const App = () => {
           <Route path="/group" element={<GroupPage />} />
           <Route path="/members/:id" element={<ProfilePage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/signup/*" element={<SignupPage />} />
           <Route path="/member-select" element={<MemberSelectPage />} />
           <Route path="/group-select" element={<GroupSelectPage />} />
           <Route path="/qr-scan" element={<QrScanPage />} />
