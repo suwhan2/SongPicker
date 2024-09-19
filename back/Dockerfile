@@ -6,4 +6,4 @@ ARG JAR_FILE=build/libs/back-0.0.1-SNAPSHOP.jar
 
 COPY ${JAR_FILE} back.jar
 
-ENTRYPOINT ["java", "-jar", "-Duser.timezone=Asia/Seoul", "/back/jar"]
+ENTRYPOINT ["java", "-jar", "-Duser.timezone=Asia/Seoul", "/back.jar"]
