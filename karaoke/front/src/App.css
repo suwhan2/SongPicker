@@ -6,4 +6,5 @@
   display: flex;
   box-sizing: border-box;
   background: linear-gradient(180deg, #575ED2 0%, #9747FF 100%);
+  overflow: hidden;
 }

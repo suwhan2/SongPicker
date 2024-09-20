@@ -50,7 +50,7 @@ const PayingPage = () => {
       </div>
 
       {/* 결제 카테고리 버튼 */}
-      <div className="flex w-fit h-fit grid grid-cols-2 gap-11">
+      <div className="w-fit h-fit grid grid-cols-2 gap-11">
         {PayingCategory.map((item, i) => {
           return (
             <div key={`PayCategory-${i}`}>
