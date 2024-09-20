@@ -9,7 +9,7 @@ const LandingPage = () => {
       <div className="flex-c h-full content-center space-y-9">
         {/* 캐릭터 이미지 */}
         <div className="flex justify-center">
-          <img src={LandingCharacter} className="w-36" />
+          <img src={LandingCharacter} />
         </div>
         {/* SSAFY 노래방 */}
         <div className="flex justify-center space-x-2">
