@@ -1,16 +1,17 @@
-import React from 'react'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import SearchPage from './pages/SearchPage'
-import ThemePage from './pages/ThemePage'
-import MainPage from './pages/MainPage'
-import GroupPage from './pages/GroupPage'
-import ProfilePage from './pages/ProfilePage'
-import LoginPage from './pages/LoginPage'
-import SignupPage from './pages/SignupPage'
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import SearchPage from './pages/SearchPage';
+import ThemePage from './pages/ThemePage';
+import MainPage from './pages/MainPage';
+import GroupPage from './pages/GroupPage';
+import ProfilePage from './pages/ProfilePage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 import MemberSelectPage from './pages/LinkPages/MemberSelectPage';
 import GroupSelectPage from './pages/LinkPages/GroupSelectPage';
 import QrScanPage from './pages/LinkPages/QrScanPage';
-import './App.css'
+import SongSelectPage from './pages/SongSelectPage';
+import './App.css';
 
 const App = () => {
   return (
@@ -27,10 +28,11 @@ const App = () => {
           <Route path="/member-select" element={<MemberSelectPage />} />
           <Route path="/group-select" element={<GroupSelectPage />} />
           <Route path="/qr-scan" element={<QrScanPage />} />
+          <Route path="/song-select" element={<SongSelectPage />} />
         </Routes>
       </div>
     </Router>
-  )
-}
+  );
+};
 
-export default App
+export default App;

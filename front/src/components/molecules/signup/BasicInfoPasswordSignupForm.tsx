@@ -8,7 +8,11 @@ type BasicInfoPasswordFormProps = {
   onValidation: (isValid: boolean) => void;
 };
 
-const BasicInfoPasswordForm = ({ password, onChange, onValidation }: BasicInfoPasswordFormProps) => {
+const BasicInfoPasswordForm = ({
+  password,
+  onChange,
+  onValidation,
+}: BasicInfoPasswordFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLengthValid, setIsLengthValid] = useState(false);
   const [isContentValid, setIsContentValid] = useState(false);
@@ -27,7 +31,9 @@ const BasicInfoPasswordForm = ({ password, onChange, onValidation }: BasicInfoPa
 
   return (
     <div className="relative h-24">
-      <label htmlFor="password" className="block text-lg text-white mb-2">비밀번호</label>
+      <label htmlFor="password" className="block text-lg text-white mb-2">
+        비밀번호
+      </label>
       <div className="relative">
         <BasicInput
           id="password"
@@ -48,16 +54,16 @@ const BasicInfoPasswordForm = ({ password, onChange, onValidation }: BasicInfoPa
 
       {password.length > 0 && !allValid && (
         <ul className="list-disc list-inside text-sm mt-2 space-y-1">
-          <li className={isLengthValid ? 'text-green-500' : 'text-red-500'}>
-            최소 8자, 최대 16자
-          </li>
+          <li className={isLengthValid ? 'text-green-500' : 'text-red-500'}>최소 8자, 최대 16자</li>
           <li className={isContentValid ? 'text-green-500' : 'text-red-500'}>
             하나 이상의 영문자, 숫자 및 특수문자 포함
           </li>
         </ul>
       )}
       {allValid && (
-        <p className="text-green-500 text-sm mt-2">올바른 비밀번호 형식입니다.</p>
+        <ul className="list-disc list-inside text-sm mt-2 space-y-1">
+          <li className="text-green-500 text-sm mt-2">올바른 비밀번호 형식입니다.</li>
+        </ul>
       )}
     </div>
   );

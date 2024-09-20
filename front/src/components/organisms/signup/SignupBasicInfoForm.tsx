@@ -60,7 +60,7 @@ const SignupBasicInfoForm = React.memo(
     }, [formData, validations, showPasswordConfirm, onValidation, onSubmit]);
 
     return (
-      <div className="flex flex-col space-y-12 min-w-72 w-full">
+      <div className="flex flex-col space-y-12 min-w-72  w-full">
         <BasicInfoIdForm
           loginId={formData.loginId}
           onChange={handleChange}

@@ -82,6 +82,7 @@ const SignupPage = () => {
         return '';
     }
   };
+
   const adjustScroll = useCallback(() => {
     if (scrollRef.current) {
       const activeElement = document.activeElement;
@@ -106,6 +107,12 @@ const SignupPage = () => {
       window.removeEventListener('focus', adjustScroll, true);
     };
   }, [adjustScroll]);
+
+  useEffect(() => {
+    if (currentStep === 3) {
+      setIsValid(true);
+    }
+  }, [currentStep]);
 
   return (
     <div className="flex flex-col w-full h-screen bg-black text-white">
@@ -140,7 +147,7 @@ const SignupPage = () => {
                   />
                 }
               />
-              <Route path="complete" element={<SignupCompleteInfo />} />
+              <Route path="complete" element={<SignupCompleteInfo name={signupData.name} />} />
               <Route path="*" element={<Navigate to="basic-info" replace />} />
             </Routes>
           </form>
@@ -148,7 +155,7 @@ const SignupPage = () => {
       </div>
 
       <div className="flex-shrink-0">
-        <FooterButton onClick={handleNext} isValid={isValid}>
+        <FooterButton onClick={handleNext} isValid={currentStep === 3 ? true : isValid}>
           {currentStep === 3 ? '완료' : '다음'}
         </FooterButton>
       </div>
