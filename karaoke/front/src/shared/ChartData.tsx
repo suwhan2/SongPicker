@@ -1,7 +1,7 @@
 const ChartData = {
   "nicknames": [
     {
-      "nickname": "UserA",
+      "nickname": "메가커피",
       "songs": [
         { "songNumber": 83434, "title": "I AM", "artist": "아이브" },
         { "songNumber": 85842, "title": "Love Wins All", "artist": "아이유" },
@@ -16,7 +16,7 @@ const ChartData = {
       ]
     },
     {
-      "nickname": "UserB",
+      "nickname": "이디야커피사먹자",
       "songs": [
         { "songNumber": 31943, "title": "나만, 봄", "artist": "볼빨간사춘기" },
         { "songNumber": 6093, "title": "사랑했지만", "artist": "김광석" },
