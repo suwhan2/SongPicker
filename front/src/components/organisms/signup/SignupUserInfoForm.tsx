@@ -26,7 +26,15 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
   const [nickname, setNickname] = useState('');
   const [birth, setBirth] = useState('');
   const [phone, setPhone] = useState('');
-  const [gender, setGender] = useState<'MALE' | 'FEMALE' | null>(null);
+  const [gender, setGender] = useState<'MALE' | 'FEMALE'>('MALE');
+
+  const formatBirthDate = (dateString: string): string => {
+    // 입력된 날짜가 YYYYMMDD 형식이라고 가정
+    if (dateString.length === 8) {
+      return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
+    }
+    return dateString; // 형식이 맞지 않으면 원래 문자열 반환
+  };
 
   useEffect(() => {
     const isValid =
@@ -35,16 +43,17 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
       name.trim() !== '' &&
       nickname.trim() !== '' &&
       birth.trim() !== '' &&
-      gender !== null;
+      phone.trim() !== '';
     onValidChange(isValid);
 
     if (isValid) {
+      const formattedBirth = formatBirthDate(birth);
       onSubmit({
         name,
         nickname,
-        birth,
+        birth: formattedBirth,
         phone,
-        gender: gender as 'MALE' | 'FEMALE',
+        gender,
       });
     }
   }, [
@@ -76,17 +85,34 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
   };
 
   const handleGenderChange = (selectedGender: 'male' | 'female') => {
-    setGender(selectedGender === 'male' ? 'MALE' : 'FEMALE');
+    const genderValue = selectedGender === 'male' ? 'MALE' : 'FEMALE';
+    setGender(genderValue);
+  };
+
+  const handleNameChange = (value: string) => {
+    setName(value);
+  };
+
+  const handleNicknameChange = (value: string) => {
+    setNickname(value);
+  };
+
+  const handleBirthChange = (value: string) => {
+    setBirth(value);
+  };
+
+  const handlePhoneChange = (value: string) => {
+    setPhone(value);
   };
 
   return (
-    <div className="flex flex-col space-y-12  min-w-72 w-full">
-      <UserInfoNameSignupForm onChange={setName} />
-      <UserInfoNicknameSignupForm onChange={setNickname} />
+    <div className="flex flex-col space-y-12 min-w-72 w-full">
+      <UserInfoNameSignupForm onChange={handleNameChange} />
+      <UserInfoNicknameSignupForm onChange={handleNicknameChange} />
       <UserInfoPhoneSignupForm
         onVerify={handlePhoneVerification}
         onResetAuthCode={handleResetAuthCode}
-        onChange={setPhone}
+        onChange={handlePhoneChange}
       />
       {showAuthCode && (
         <UserInfoAuthCodeSignupForm
@@ -94,7 +120,7 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
           resetAuthCode={resetAuthCode}
         />
       )}
-      <UserInfoBirthSignupForm onChange={setBirth} />
+      <UserInfoBirthSignupForm onChange={handleBirthChange} />
       <UserInfoGenderSignupForm onChange={handleGenderChange} />
     </div>
   );
