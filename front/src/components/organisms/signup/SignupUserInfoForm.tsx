@@ -29,12 +29,13 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
   const [gender, setGender] = useState<'MALE' | 'FEMALE' | null>(null);
 
   useEffect(() => {
-    const isValid = isPhoneVerified && 
-                    isAuthCodeVerified && 
-                    name.trim() !== '' && 
-                    nickname.trim() !== '' && 
-                    birth.trim() !== '' && 
-                    gender !== null;
+    const isValid =
+      isPhoneVerified &&
+      isAuthCodeVerified &&
+      name.trim() !== '' &&
+      nickname.trim() !== '' &&
+      birth.trim() !== '' &&
+      gender !== null;
     onValidChange(isValid);
 
     if (isValid) {
@@ -46,7 +47,17 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
         gender: gender as 'MALE' | 'FEMALE',
       });
     }
-  }, [isPhoneVerified, isAuthCodeVerified, name, nickname, birth, phone, gender, onValidChange, onSubmit]);
+  }, [
+    isPhoneVerified,
+    isAuthCodeVerified,
+    name,
+    nickname,
+    birth,
+    phone,
+    gender,
+    onValidChange,
+    onSubmit,
+  ]);
 
   const handlePhoneVerification = () => {
     setShowAuthCode(true);
@@ -69,12 +80,19 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
   };
 
   return (
-    <div className="flex flex-col space-y-12 min-w-72 w-full">
+    <div className="flex flex-col space-y-12  min-w-72 w-full">
       <UserInfoNameSignupForm onChange={setName} />
       <UserInfoNicknameSignupForm onChange={setNickname} />
-      <UserInfoPhoneSignupForm onVerify={handlePhoneVerification} onResetAuthCode={handleResetAuthCode} onChange={setPhone} />
+      <UserInfoPhoneSignupForm
+        onVerify={handlePhoneVerification}
+        onResetAuthCode={handleResetAuthCode}
+        onChange={setPhone}
+      />
       {showAuthCode && (
-        <UserInfoAuthCodeSignupForm onVerify={handleAuthCodeVerification} resetAuthCode={resetAuthCode} />
+        <UserInfoAuthCodeSignupForm
+          onVerify={handleAuthCodeVerification}
+          resetAuthCode={resetAuthCode}
+        />
       )}
       <UserInfoBirthSignupForm onChange={setBirth} />
       <UserInfoGenderSignupForm onChange={handleGenderChange} />

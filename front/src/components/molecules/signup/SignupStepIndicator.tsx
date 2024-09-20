@@ -19,7 +19,7 @@ const StepIndicator = ({ currentStep }: StepIndicatorProps) => {
           ></div>
         </div>
 
-        {/* 스텝 아이콘 및 텍스트 */}
+        {/* 아이콘 및 텍스트 */}
         <ul className="flex justify-between items-start w-full">
           {steps.map((step, index) => (
             <li key={index} className="relative flex flex-col items-center w-[33.33%]">
