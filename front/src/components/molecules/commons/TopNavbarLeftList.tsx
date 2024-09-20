@@ -1,16 +1,24 @@
-import React from 'react'
-import NavLogoIcon from '../../atoms/commons/NavLogoIcon'
-import NavLogoText from '../../atoms/commons/NavLogoText'
+import React from 'react';
+import NavLogoIcon from '../../atoms/commons/NavLogoIcon';
+import NavLogoText from '../../atoms/commons/NavLogoText';
 
-type Props = {}
+type Props = {
+  title?: string;
+};
 
-const TopNavbarLeftList = (props: Props) => {
+const TopNavbarLeftList = ({ title }: Props) => {
   return (
-    <div className='flex items-center'>
-      <NavLogoIcon />
-      <NavLogoText />
+    <div className="flex items-center">
+      {title ? (
+        <h1 className="text-white text-lg font-bold">{title}</h1>
+      ) : (
+        <>
+          <NavLogoIcon />
+          <NavLogoText />
+        </>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default TopNavbarLeftList
+export default TopNavbarLeftList;

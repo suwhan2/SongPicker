@@ -1,11 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom';
-import SubTopNavbar from '../components/molecules/commons/SubTopNavbar';
-import StepIndicator from '../components/molecules/signup/SignupStepIndicator';
-import FooterButton from '../components/atoms/commons/FooterButton';
+import FooterButtonLayout from '../layouts/FooterButtonLayout';
+import SignupStepText from '../components/atoms/signup/SignupStepText';
 import SignupBasicInfoForm from '../components/organisms/signup/SignupBasicInfoForm';
 import SignupUserInfoForm from '../components/organisms/signup/SignupUserInfoForm';
-import SignupStepText from '../components/atoms/signup/SignupStepText';
 import SignupCompleteInfo from '../components/organisms/signup/SignupCompleteInfo';
 
 const SignupPage = () => {
@@ -22,7 +20,6 @@ const SignupPage = () => {
     gender: '',
     role: 'USER',
   });
-  const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const getCurrentStep = () => {
@@ -34,10 +31,7 @@ const SignupPage = () => {
 
   const currentStep = getCurrentStep();
 
-  const handleNext = (e?: React.MouseEvent | React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
+  const handleNext = useCallback(() => {
     if (currentStep < 3 && isValid) {
       if (currentStep === 2) {
         console.log('회원가입 데이터:', signupData);
@@ -48,7 +42,7 @@ const SignupPage = () => {
     } else if (currentStep === 3) {
       navigate('/login');
     }
-  };
+  }, [currentStep, isValid, navigate, signupData]);
 
   const handleValidation = useCallback((valid: boolean) => {
     setIsValid(valid);
@@ -84,15 +78,15 @@ const SignupPage = () => {
   };
 
   const adjustScroll = useCallback(() => {
-    if (scrollRef.current) {
+    if (contentRef.current) {
       const activeElement = document.activeElement;
       if (activeElement && activeElement instanceof HTMLElement) {
         const rect = activeElement.getBoundingClientRect();
-        const scrollTop = scrollRef.current.scrollTop;
-        const containerHeight = scrollRef.current.clientHeight;
+        const scrollTop = contentRef.current.scrollTop;
+        const containerHeight = contentRef.current.clientHeight;
 
         if (rect.bottom > containerHeight) {
-          scrollRef.current.scrollTo({
+          contentRef.current.scrollTo({
             top: scrollTop + rect.bottom - containerHeight + 20,
             behavior: 'smooth',
           });
@@ -115,51 +109,42 @@ const SignupPage = () => {
   }, [currentStep]);
 
   return (
-    <div className="flex flex-col w-full h-screen bg-black text-white">
-      <div className="flex-shrink-0">
-        <SubTopNavbar title="회원가입" />
+    <FooterButtonLayout
+      title="회원가입"
+      buttonText={currentStep === 3 ? '완료' : '다음'}
+      onButtonClick={handleNext}
+      isButtonValid={currentStep === 3 ? true : isValid}
+      currentStep={currentStep}
+    >
+      <div ref={contentRef} className="max-w-[440px] w-full mx-auto p-6">
+        <SignupStepText text={getStepText(currentStep)} />
+        <form onSubmit={e => e.preventDefault()} className="mt-12">
+          <Routes>
+            <Route
+              path="basic-info"
+              element={
+                <SignupBasicInfoForm
+                  onValidation={handleValidation}
+                  onSubmit={handleBasicInfoSubmit}
+                  onInputChange={adjustScroll}
+                />
+              }
+            />
+            <Route
+              path="user-info"
+              element={
+                <SignupUserInfoForm
+                  onValidChange={handleValidation}
+                  onSubmit={handleUserInfoSubmit}
+                />
+              }
+            />
+            <Route path="complete" element={<SignupCompleteInfo name={signupData.name} />} />
+            <Route path="*" element={<Navigate to="basic-info" replace />} />
+          </Routes>
+        </form>
       </div>
-      <div className="flex-shrink-0">
-        <StepIndicator currentStep={currentStep} />
-      </div>
-
-      <div ref={scrollRef} className="flex-grow overflow-y-auto">
-        <div ref={contentRef} className="max-w-[440px] w-full mx-auto p-6">
-          <SignupStepText text={getStepText(currentStep)} />
-          <form onSubmit={e => e.preventDefault()} className="mt-12">
-            <Routes>
-              <Route
-                path="basic-info"
-                element={
-                  <SignupBasicInfoForm
-                    onValidation={handleValidation}
-                    onSubmit={handleBasicInfoSubmit}
-                    onInputChange={adjustScroll}
-                  />
-                }
-              />
-              <Route
-                path="user-info"
-                element={
-                  <SignupUserInfoForm
-                    onValidChange={handleValidation}
-                    onSubmit={handleUserInfoSubmit}
-                  />
-                }
-              />
-              <Route path="complete" element={<SignupCompleteInfo name={signupData.name} />} />
-              <Route path="*" element={<Navigate to="basic-info" replace />} />
-            </Routes>
-          </form>
-        </div>
-      </div>
-
-      <div className="flex-shrink-0">
-        <FooterButton onClick={handleNext} isValid={currentStep === 3 ? true : isValid}>
-          {currentStep === 3 ? '완료' : '다음'}
-        </FooterButton>
-      </div>
-    </div>
+    </FooterButtonLayout>
   );
 };
 
