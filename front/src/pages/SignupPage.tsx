@@ -5,20 +5,33 @@ import SignupStepText from '../components/atoms/signup/SignupStepText';
 import SignupBasicInfoForm from '../components/organisms/signup/SignupBasicInfoForm';
 import SignupUserInfoForm from '../components/organisms/signup/SignupUserInfoForm';
 import SignupCompleteInfo from '../components/organisms/signup/SignupCompleteInfo';
+import useAuthStore from '../stores/useAuthStore';
+
+interface SignupData {
+  loginId: string;
+  password: string;
+  name: string;
+  nickname: string;
+  birth: string;
+  phone: string;
+  gender: 'MALE' | 'FEMALE';
+  role: 'ROLE_USER' | 'ROLE_ADMIN' | 'ROLE_OWNER';
+}
 
 const SignupPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const register = useAuthStore(state => state.register);
   const [isValid, setIsValid] = useState(false);
-  const [signupData, setSignupData] = useState({
+  const [signupData, setSignupData] = useState<SignupData>({
     loginId: '',
     password: '',
     name: '',
     nickname: '',
     birth: '',
     phone: '',
-    gender: '',
-    role: 'USER',
+    gender: 'MALE',
+    role: 'ROLE_USER',
   });
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -31,18 +44,24 @@ const SignupPage = () => {
 
   const currentStep = getCurrentStep();
 
-  const handleNext = useCallback(() => {
-    if (currentStep < 3 && isValid) {
-      if (currentStep === 2) {
-        console.log('회원가입 데이터:', signupData);
-      }
+  const handleNext = useCallback(async () => {
+    if (currentStep < 2 && isValid) {
       const nextPaths = ['basic-info', 'user-info', 'complete'];
       navigate(`/signup/${nextPaths[currentStep]}`);
       setIsValid(false);
+    } else if (currentStep === 2 && isValid) {
+      try {
+        // console.log('회원가입 시도:', JSON.stringify(signupData, null, 2));
+        await register(signupData);
+        console.log('회원가입 성공');
+        navigate(`/signup/complete`);
+      } catch (error) {
+        console.error('회원가입 실패:', error);
+      }
     } else if (currentStep === 3) {
       navigate('/login');
     }
-  }, [currentStep, isValid, navigate, signupData]);
+  }, [currentStep, isValid, navigate, signupData, register]);
 
   const handleValidation = useCallback((valid: boolean) => {
     setIsValid(valid);
@@ -60,7 +79,8 @@ const SignupPage = () => {
       phone: string;
       gender: 'MALE' | 'FEMALE';
     }) => {
-      setSignupData(prevData => ({ ...prevData, ...formData }));
+      const formattedBirth = formData.birth.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+      setSignupData(prevData => ({ ...prevData, ...formData, birth: formattedBirth }));
     },
     []
   );
