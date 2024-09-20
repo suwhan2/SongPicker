@@ -10,7 +10,7 @@ type ChartItemProps = {
 
 const ChartItem = (props: ChartItemProps) => {
   return (
-    <div className="w-[1690px] h-fit bg-black/50 grid grid-flow-col grid-cols-12 p-2.5 gap-x-2.5 border-b border-white/10 hover:bg-[#80F9C6] duration-75 cursor-pointer group">
+    <div className="w-[1690px] h-fit bg-black/50 grid grid-flow-col grid-cols-12 p-2.5 gap-x-2.5 hover:bg-[#80F9C6] duration-75 cursor-pointer group">
       {/* 노래방 번호 */}
       <div className="col-span-3 text-[#FDE047] text-center items-center py-2 ">
         <Text36 text={`${props.song.songNumber}`} />
