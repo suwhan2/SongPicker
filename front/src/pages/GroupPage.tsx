@@ -1,24 +1,16 @@
-import React from 'react'
-import TopNavbar from '../components/organisms/commons/TopNavbar'
-import BottomNavbar from '../components/organisms/commons/BottomNavbar'
+import React from 'react';
+import MainLayout from '../layouts/MainLayout';
 
-type Props = {}
-
-const GroupPage = (props: Props) => {
+const GroupPage: React.FC = () => {
   return (
-    <div>
-      {/* 상단네브 */}
-      <TopNavbar />
-
-      {/* 그룹페이지 내용 담기는 곳 */}
-      <div>
-        GroupPage
+    <MainLayout title="그룹">
+      <div className="p-4">
+        {/* GroupPage 컨텐츠 */}
+        <h1 className="text-2xl font-bold">그룹 페이지</h1>
+        {/* 추가 컨텐츠 */}
       </div>
+    </MainLayout>
+  );
+};
 
-      {/* 하단 네브 */}
-      <BottomNavbar />
-    </div>
-  )
-}
-
-export default GroupPage
+export default GroupPage;

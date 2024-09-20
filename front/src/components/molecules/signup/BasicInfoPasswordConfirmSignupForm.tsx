@@ -9,11 +9,11 @@ type BasicInfoPasswordConfirmFormProps = {
   onValidation: (isValid: boolean) => void;
 };
 
-const BasicInfoPasswordConfirmForm = ({ 
+const BasicInfoPasswordConfirmForm = ({
   password,
-  passwordConfirm, 
+  passwordConfirm,
   onChange,
-  onValidation
+  onValidation,
 }: BasicInfoPasswordConfirmFormProps) => {
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [error, setError] = useState('');
@@ -26,7 +26,9 @@ const BasicInfoPasswordConfirmForm = ({
 
   return (
     <div className="relative h-24">
-      <label htmlFor="passwordConfirm" className="block text-lg text-white mb-2">비밀번호 확인</label>
+      <label htmlFor="passwordConfirm" className="block text-lg text-white mb-2">
+        비밀번호 확인
+      </label>
       <div className="relative">
         <BasicInput
           id="passwordConfirm"
@@ -45,7 +47,11 @@ const BasicInfoPasswordConfirmForm = ({
         </div>
       </div>
       <div className="h-6 mt-1">
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && (
+          <ul className="list-disc list-inside text-sm mt-2 space-y-1">
+            <li className="text-red-500 text-sm">{error}</li>
+          </ul>
+        )}
       </div>
     </div>
   );
