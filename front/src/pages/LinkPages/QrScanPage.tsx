@@ -28,11 +28,11 @@ const QrScanPage = () => {
             delay={300}
             onError={handleError}
             onScan={handleScan}
-            constraints={{
-              video: {
-                facingMode: "environment"
-              }
-            }}
+            // constraints={{
+            //   video: {
+            //     facingMode: "environment"
+            //   }
+            // }}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
           <div className="absolute inset-0 flex items-center justify-center">
