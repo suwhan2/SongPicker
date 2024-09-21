@@ -40,6 +40,8 @@ public class Song {
     @Column(nullable = false)
     private String lyrics;
 
+    //장르 관련 엔티티 수정
+
     private int acousticness;
 
     private int danceability;
@@ -49,7 +51,7 @@ public class Song {
     private int bpm;
 
     @Column(nullable = false)
-    private String key;
+    private String tune;
 
     private int happiness;
 

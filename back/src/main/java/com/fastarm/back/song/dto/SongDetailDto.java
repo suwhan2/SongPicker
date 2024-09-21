@@ -1,6 +1,5 @@
 package com.fastarm.back.song.dto;
 
-import com.fastarm.back.song.entity.Song;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,8 +8,8 @@ import java.time.LocalDate;
 
 @Getter
 @Builder
-public class SongDetailResponseDto {
-    private String number;
+public class SongDetailDto {
+    private int number;
     private String title;
     private String singer;
     private String coverImage;
@@ -19,6 +18,7 @@ public class SongDetailResponseDto {
     private String composer;
     private String lyrics;
     private LocalDate releasedAt;
+
     private Boolean isLike;
     private Long likeId;
 

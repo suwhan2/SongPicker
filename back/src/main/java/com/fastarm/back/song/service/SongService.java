@@ -1,25 +1,31 @@
 package com.fastarm.back.song.service;
 
-import com.fastarm.back.song.dto.SongDetailResponseDto;
+import com.fastarm.back.member.entity.Member;
+import com.fastarm.back.member.repository.MemberRepository;
+import com.fastarm.back.song.controller.dto.SongDetailRequest;
+import com.fastarm.back.song.dto.SongDetailDto;
 import com.fastarm.back.song.dto.SongRecommendDto;
 import com.fastarm.back.song.entity.Song;
 import com.fastarm.back.song.exception.NotFoundSongDetailException;
 import com.fastarm.back.song.repository.SongRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class SongService {
     private final SongRepository songRepository;
+    private final MemberRepository memberRepository;
     //private final PersonalSingHistoryRepository personalSingHistoryRepository;
     //private final GroupSingHistoryRepository groupSingHistoryRepository;
+
 
 //    @Transactional
 //    public List<SongRecommendDto> recommendMySong(Long memberId){
@@ -74,28 +80,28 @@ public class SongService {
         return recommendedSongs;
     }
 
-    public SongDetailResponseDto getSongDetails(Long songId) {
+    @Transactional(readOnly = true)
+    public SongDetailDto getSongDetails(SongDetailRequest dto) {
         // 노래 조회
-        Song song = songRepository.findById(songId)
+        Song song = songRepository.findById(dto.getSongId())
                 .orElseThrow(NotFoundSongDetailException::new);
+        //id 찾기
+//        Optional<Member> memberId = memberRepository.findByLoginId(dto.getLoginId());
+//        Optional<Long> likeId = likesRepository.findByMemberIdAndSongId(memberId,songId);
 
-        //임시방편 ERD 수정 필요
-        Boolean isLike = false;
-        Long likeId = null;
-
-        // DTO 생성 시 builder 패턴 사용
-        return SongDetailResponseDto.builder()
-                .number(String.valueOf(song.getNumber()))
+        return SongDetailDto.builder()
+                .number(song.getNumber())
                 .title(song.getTitle())
                 .singer(song.getSinger())
                 .coverImage(song.getCoverImage())
+//                .genre(song.getGenre())
                 .lyricist(song.getLyricist())
                 .composer(song.getComposer())
                 .lyrics(song.getLyrics())
                 .releasedAt(song.getReleasedAt())
-                .isLike(isLike)
-                .likeId(likeId)
+//                .isLike(likeId.isPresent())
+//                .likeId(likeId.orElse(null))
                 .build();
-    }
+   }
 
 }
