@@ -1,62 +1,89 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import SubTopNavbar from '../components/molecules/commons/SubTopNavbar';
-import StepIndicator from '../components/molecules/signup/SignupStepIndicator';
-import FooterButton from '../components/atoms/commons/FooterButton';
-import BasicInfoForm from '../components/organisms/signup/BasicInfoSignupForm';
-import UserInfoSignupForm from '../components/organisms/signup/UserInfoSignupForm';
+import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom';
+import FooterButtonLayout from '../layouts/FooterButtonLayout';
 import SignupStepText from '../components/atoms/signup/SignupStepText';
+import SignupBasicInfoForm from '../components/organisms/signup/SignupBasicInfoForm';
+import SignupUserInfoForm from '../components/organisms/signup/SignupUserInfoForm';
+import SignupCompleteInfo from '../components/organisms/signup/SignupCompleteInfo';
+import useAuthStore from '../stores/useAuthStore';
+
+interface SignupData {
+  loginId: string;
+  password: string;
+  name: string;
+  nickname: string;
+  birth: string;
+  phone: string;
+  gender: 'MALE' | 'FEMALE';
+  role: 'ROLE_USER' | 'ROLE_ADMIN' | 'ROLE_OWNER';
+}
 
 const SignupPage = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
+  const location = useLocation();
+  const register = useAuthStore(state => state.register);
   const [isValid, setIsValid] = useState(false);
-  const [signupData, setSignupData] = useState({
+  const [signupData, setSignupData] = useState<SignupData>({
     loginId: '',
     password: '',
     name: '',
     nickname: '',
     birth: '',
     phone: '',
-    gender: '',
-    role: 'USER'
+    gender: 'MALE',
+    role: 'ROLE_USER',
   });
-  const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const handleNext = (e?: React.MouseEvent | React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
-    if (currentStep < 4 && isValid) {
-      if (currentStep === 2) {
-        // 회원가입 API 호출 대신 콘솔에 데이터 출력
-        console.log('회원가입 데이터:', signupData);
-      }
-      setCurrentStep(currentStep + 1);
+  const getCurrentStep = () => {
+    if (location.pathname.includes('basic-info')) return 1;
+    if (location.pathname.includes('user-info')) return 2;
+    if (location.pathname.includes('complete')) return 3;
+    return 1;
+  };
+
+  const currentStep = getCurrentStep();
+
+  const handleNext = useCallback(async () => {
+    if (currentStep < 2 && isValid) {
+      const nextPaths = ['basic-info', 'user-info', 'complete'];
+      navigate(`/signup/${nextPaths[currentStep]}`);
       setIsValid(false);
-    } else if (currentStep === 4) {
+    } else if (currentStep === 2 && isValid) {
+      try {
+        // console.log('회원가입 시도:', JSON.stringify(signupData, null, 2));
+        await register(signupData);
+        console.log('회원가입 성공');
+        navigate(`/signup/complete`);
+      } catch (error) {
+        console.error('회원가입 실패:', error);
+      }
+    } else if (currentStep === 3) {
       navigate('/login');
     }
-  };
+  }, [currentStep, isValid, navigate, signupData, register]);
 
   const handleValidation = useCallback((valid: boolean) => {
     setIsValid(valid);
   }, []);
-  
+
   const handleBasicInfoSubmit = useCallback((formData: { loginId: string; password: string }) => {
     setSignupData(prevData => ({ ...prevData, ...formData }));
   }, []);
 
-  const handleUserInfoSubmit = useCallback((formData: {
-    name: string;
-    nickname: string;
-    birth: string;
-    phone: string;
-    gender: 'MALE' | 'FEMALE';
-  }) => {
-    setSignupData(prevData => ({ ...prevData, ...formData }));
-  }, []);
+  const handleUserInfoSubmit = useCallback(
+    (formData: {
+      name: string;
+      nickname: string;
+      birth: string;
+      phone: string;
+      gender: 'MALE' | 'FEMALE';
+    }) => {
+      const formattedBirth = formData.birth.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+      setSignupData(prevData => ({ ...prevData, ...formData, birth: formattedBirth }));
+    },
+    []
+  );
 
   const getStepText = (step: number) => {
     switch (step) {
@@ -65,26 +92,23 @@ const SignupPage = () => {
       case 2:
         return '맞춤 추천을 위해\n회원 정보를 입력해 주세요!';
       case 3:
-        return '애창곡이 있으신가요?\n5곡 이상 선택하시면 맞춤 콘텐츠를 추천해드릴게요!';
-      case 4:
-        return '가입이 완료되었습니다';
       default:
         return '';
     }
   };
 
   const adjustScroll = useCallback(() => {
-    if (scrollRef.current) {
+    if (contentRef.current) {
       const activeElement = document.activeElement;
       if (activeElement && activeElement instanceof HTMLElement) {
         const rect = activeElement.getBoundingClientRect();
-        const scrollTop = scrollRef.current.scrollTop;
-        const containerHeight = scrollRef.current.clientHeight;
-        
+        const scrollTop = contentRef.current.scrollTop;
+        const containerHeight = contentRef.current.clientHeight;
+
         if (rect.bottom > containerHeight) {
-          scrollRef.current.scrollTo({
+          contentRef.current.scrollTo({
             top: scrollTop + rect.bottom - containerHeight + 20,
-            behavior: 'smooth'
+            behavior: 'smooth',
           });
         }
       }
@@ -98,44 +122,49 @@ const SignupPage = () => {
     };
   }, [adjustScroll]);
 
+  useEffect(() => {
+    if (currentStep === 3) {
+      setIsValid(true);
+    }
+  }, [currentStep]);
+
   return (
-    <div className="flex flex-col w-full h-screen bg-black text-white">
-      <div className="flex-shrink-0">
-        <SubTopNavbar title="회원가입" />
+    <FooterButtonLayout
+      title="회원가입"
+      buttonText={currentStep === 3 ? '완료' : '다음'}
+      onButtonClick={handleNext}
+      isButtonValid={currentStep === 3 ? true : isValid}
+      currentStep={currentStep}
+    >
+      <div ref={contentRef} className="max-w-[440px] w-full mx-auto p-6">
+        <SignupStepText text={getStepText(currentStep)} />
+        <form onSubmit={e => e.preventDefault()} className="mt-12">
+          <Routes>
+            <Route
+              path="basic-info"
+              element={
+                <SignupBasicInfoForm
+                  onValidation={handleValidation}
+                  onSubmit={handleBasicInfoSubmit}
+                  onInputChange={adjustScroll}
+                />
+              }
+            />
+            <Route
+              path="user-info"
+              element={
+                <SignupUserInfoForm
+                  onValidChange={handleValidation}
+                  onSubmit={handleUserInfoSubmit}
+                />
+              }
+            />
+            <Route path="complete" element={<SignupCompleteInfo name={signupData.name} />} />
+            <Route path="*" element={<Navigate to="basic-info" replace />} />
+          </Routes>
+        </form>
       </div>
-      <div className="flex-shrink-0">
-        <StepIndicator currentStep={currentStep} />
-      </div>
-      
-      <div ref={scrollRef} className="flex-grow overflow-y-auto">
-        <div ref={contentRef} className="max-w-[440px] w-full mx-auto p-6">
-          <SignupStepText text={getStepText(currentStep)} />
-          <form onSubmit={(e) => e.preventDefault()} className="mt-12">
-            {currentStep === 1 && (
-              <BasicInfoForm 
-                onValidation={handleValidation} 
-                onSubmit={handleBasicInfoSubmit}
-                onInputChange={adjustScroll}
-              />
-            )}
-            {currentStep === 2 && (
-              <UserInfoSignupForm
-                onValidChange={handleValidation}
-                onSubmit={handleUserInfoSubmit}
-              />
-            )}
-            {currentStep === 3 && <div>곡 선택 (제작 중...)</div>}
-            {currentStep === 4 && <div>가입 완료 (제작 중...)</div>}
-          </form>
-        </div>
-      </div>
-      
-      <div className="flex-shrink-0">
-        <FooterButton onClick={handleNext} isValid={isValid}>
-          {currentStep === 4 ? '완료' : '다음'}
-        </FooterButton>
-      </div>
-    </div>
+    </FooterButtonLayout>
   );
 };
 

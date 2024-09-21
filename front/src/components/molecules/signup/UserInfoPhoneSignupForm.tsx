@@ -6,9 +6,10 @@ type UserInfoPhoneSignupFormProps = {
   onVerify: () => void;
   onResetAuthCode: () => void;
   onChange: (phone: string) => void;
+  showLabel?: boolean;
 };
 
-const UserInfoPhoneSignupForm = ({ onVerify, onResetAuthCode, onChange }: UserInfoPhoneSignupFormProps) => {
+const UserInfoPhoneSignupForm = ({ onVerify, onResetAuthCode, onChange, showLabel = true }: UserInfoPhoneSignupFormProps) => {
   const [phone, setPhone] = useState('');
   const [isAvailable, setIsAvailable] = useState(false);
   const [showAuthCodeForm, setShowAuthCodeForm] = useState(false);
@@ -36,7 +37,9 @@ const UserInfoPhoneSignupForm = ({ onVerify, onResetAuthCode, onChange }: UserIn
 
   return (
     <div className="h-24">
-      <label htmlFor="phone" className="block text-lg text-white mb-2">휴대폰 번호</label>
+      {showLabel && (
+        <label htmlFor="phone" className="block text-lg text-white mb-2">휴대폰 번호</label>
+      )}
       <div className="flex items-center">
         <SignupInput
           id="phone"
@@ -66,12 +69,12 @@ const UserInfoPhoneSignupForm = ({ onVerify, onResetAuthCode, onChange }: UserIn
         </div>
       </div>
       {isAvailable && !showAuthCodeForm && (
-        <ul className="list-disc list-inside text-green-500 text-sm mt-1">
+        <ul className="list-disc list-inside text-green-500 text-sm mt-2">
           <li>사용 가능한 번호입니다.</li>
         </ul>
       )}
       {!isAvailable && phone.length > 0 && (
-        <ul className="list-disc list-inside text-red-500 text-sm mt-1">
+        <ul className="list-disc list-inside text-red-500 text-sm mt-2">
           <li>올바른 휴대폰 번호를 입력해주세요.</li>
         </ul>
       )}

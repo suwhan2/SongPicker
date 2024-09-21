@@ -1,15 +1,19 @@
 import Text60 from '../atoms/Text60';
 import Check from '../assets/Check.svg';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 type FinishPayModalProps = {
   closeFinishPayModal: () => void;
 };
 
+
 const FinishPayModal = (props: FinishPayModalProps) => {
+  const navigate = useNavigate()
   useEffect(() => {
     setTimeout(() => {
       props.closeFinishPayModal();
+      navigate('/main')
     }, 1500);
   });
   return (

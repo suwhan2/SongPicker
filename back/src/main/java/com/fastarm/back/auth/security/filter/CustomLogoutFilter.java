@@ -69,6 +69,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
             throw new RefreshAuthenticationException();
         }
 
+        redisService.deleteData(generatePrefixedKey(loginId));
+
         Cookie cookie = new Cookie("refresh", null);
         cookie.setMaxAge(0);
         cookie.setPath("/");

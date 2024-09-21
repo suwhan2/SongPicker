@@ -1,15 +1,12 @@
 import React from 'react';
-import SubTopNavbar from '../components/molecules/commons/SubTopNavbar';
+import SimpleLayout from '../layouts/SimpleLayout';
 import LoginTemplate from '../components/template/login/LoginTemplate';
 
-const LoginPage = () => {
+const LoginPage: React.FC = () => {
   return (
-    <div className="flex flex-col w-full h-screen">
-      <SubTopNavbar title="로그인" />
-      <div className="flex-grow flex items-center justify-center">
-        <LoginTemplate />
-      </div>
-    </div>
+    <SimpleLayout title="로그인" centerContent>
+      <LoginTemplate />
+    </SimpleLayout>
   );
 };
 

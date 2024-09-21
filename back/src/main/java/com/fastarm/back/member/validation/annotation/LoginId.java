@@ -1,6 +1,6 @@
-package com.fastarm.back.member.valication.annotation;
+package com.fastarm.back.member.validation.annotation;
 
-import com.fastarm.back.member.valication.validator.PhoneValidator;
+import com.fastarm.back.member.validation.validator.LoginIdValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,9 +11,9 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = PhoneValidator.class)
-public @interface Phone {
-    String message() default "전화번호 형식 불일치";
+@Constraint(validatedBy = LoginIdValidator.class)
+public @interface LoginId {
+    String message() default "로그인 아이디 형식 불일치";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

@@ -5,11 +5,7 @@ type SignupStepTextProps = {
 };
 
 const SignupStepText = ({ text }: SignupStepTextProps) => {
-  return (
-    <div className="text-xl font-medium text-white h-[48px] whitespace-pre-line">
-      {text}
-    </div>
-  );
+  return <p className="text-center text-xl">{text}</p>;
 };
 
 export default SignupStepText;
