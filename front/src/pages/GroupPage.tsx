@@ -1,7 +1,7 @@
 import React from 'react';
 import MainLayout from '../layouts/MainLayout';
 
-const GroupPage: React.FC = () => {
+const GroupPage = () => {
   return (
     <MainLayout title="그룹">
       <div className="p-4">

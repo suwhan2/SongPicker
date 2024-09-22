@@ -1,15 +1,12 @@
-import React from 'react'
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import SearchIcon from '../../atoms/commons/SearchIcon';
+import HashtagIcon from '../../atoms/commons/HashtagIcon';
+import HomeIcon from '../../atoms/commons/HomeIcon';
+import GroupIcon from '../../atoms/commons/GroupIcon';
+import PersonIcon from '../../atoms/commons/PersonIcon';
 
-import SearchIcon from '../../atoms/commons/SearchIcon'
-import HashtagIcon from '../../atoms/commons/HashtagIcon'
-import HomeIcon from '../../atoms/commons/HomeIcon'
-import GroupIcon from '../../atoms/commons/GroupIcon'
-import PersonIcon from '../../atoms/commons/PersonIcon'
-
-type Props = {}
-
-function BottomNavIconList({}: Props) {
+function BottomNavIconList() {
   const location = useLocation();
 
   const isActive = (path: string) => {
@@ -35,7 +32,7 @@ function BottomNavIconList({}: Props) {
         <PersonIcon isActive={isActive('/members/id')} />
       </Link>
     </div>
-  )
-}
+  );
+};
 
-export default BottomNavIconList
+export default BottomNavIconList;

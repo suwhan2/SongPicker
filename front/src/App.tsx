@@ -10,7 +10,7 @@ import SignupPage from './pages/SignupPage';
 import MemberSelectPage from './pages/LinkPages/MemberSelectPage';
 import GroupSelectPage from './pages/LinkPages/GroupSelectPage';
 import QrScanPage from './pages/LinkPages/QrScanPage';
-import FindAccountPage from './pages/FindAccountPage'
+import FindAccountPage from './pages/FindAccountPage';
 import SongSelectPage from './pages/SongSelectPage';
 import './App.css';
 
@@ -29,7 +29,7 @@ const App = () => {
           <Route path="/member-select" element={<MemberSelectPage />} />
           <Route path="/group-select" element={<GroupSelectPage />} />
           <Route path="/qr-scan" element={<QrScanPage />} />
-          <Route path="/find-account/*" element={<FindAccountPage />} /> 
+          <Route path="/find-account/*" element={<FindAccountPage />} />
           <Route path="/song-select" element={<SongSelectPage />} />
         </Routes>
       </div>
