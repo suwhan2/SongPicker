@@ -40,7 +40,7 @@ const UserInfoAuthCodeSignupForm = ({
   };
 
   const handleVerify = useCallback(async () => {
-    if (authCode.length === 6) {
+    if (authCode.trim() !== '') {
       console.log('Verifying phone code:', authCode);
       const verified = await verifyPhoneCode(authCode, ''); // 전화번호는 상위 컴포넌트에서 관리되므로 빈 문자열 전달
       console.log('Phone code verification result:', verified);
@@ -51,6 +51,8 @@ const UserInfoAuthCodeSignupForm = ({
       } else {
         setError('인증번호가 올바르지 않습니다.');
       }
+    } else {
+      setError('인증번호를 입력해주세요.');
     }
   }, [authCode, verifyPhoneCode, onVerify]);
 
@@ -69,7 +71,7 @@ const UserInfoAuthCodeSignupForm = ({
         <SignupInput
           id="authCode"
           name="authCode"
-          type="number"
+          type="text"
           placeholder="인증번호를 입력해주세요"
           value={authCode}
           onChange={handleChange}
@@ -77,7 +79,7 @@ const UserInfoAuthCodeSignupForm = ({
           disabled={isVerified}
         />
         <div className="ml-[18px]">
-          <SignupButton disabled={authCode.length !== 6 || isVerified} onClick={handleVerify}>
+          <SignupButton disabled={authCode.trim() === '' || isVerified} onClick={handleVerify}>
             확인하기
           </SignupButton>
         </div>
