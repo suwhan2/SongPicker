@@ -39,7 +39,7 @@ export default [
         {
           semi: true, // 세미콜론 강제
           singleQuote: true, // 쌍따옴표 사용
-          endOfLine: 'lf', // EOL 통일
+          endOfLine: 'auto', // EOL 통일
         },
       ],
       'react/react-in-jsx-scope': 'off',
