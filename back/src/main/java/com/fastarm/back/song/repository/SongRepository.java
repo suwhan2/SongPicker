@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface SongRepository extends JpaRepository<Song, Long> {
-    @Query(value = "SELECT * FROM song LIMIT 20", nativeQuery = true)
+    @Query(value = "SELECT * FROM song ORDER BY RAND() LIMIT 20", nativeQuery = true)
     List<Song> findRandomSongs();
 }
