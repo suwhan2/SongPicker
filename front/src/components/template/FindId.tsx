@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
-import UserInfoPhoneSignupForm from '../molecules/signup/UserInfoPhoneSignupForm'
-import UserInfoAuthCodeSignupForm from '../molecules/signup/UserInfoAuthCodeSignupForm'
+import React, { useState } from 'react';
+import UserInfoPhoneSignupForm from '../molecules/signup/UserInfoPhoneSignupForm';
+import UserInfoAuthCodeSignupForm from '../molecules/signup/UserInfoAuthCodeSignupForm';
 
 type Props = {
   onVerificationComplete: (isComplete: boolean) => void;
-}
+};
 
 const FindId = ({ onVerificationComplete }: Props) => {
   const [phone, setPhone] = useState('');
@@ -34,24 +34,22 @@ const FindId = ({ onVerificationComplete }: Props) => {
   };
 
   return (
-    <div className='mt-4'>
-      <div className='text-xl mb-6 font-semibold'>
-        아이디를 찾기 위해<br/> 휴대폰 번호를 인증해주세요.
+    <div className="mt-4">
+      <div className="text-xl mb-6 font-semibold">
+        아이디를 찾기 위해
+        <br /> 휴대폰 번호를 인증해주세요.
       </div>
-      <UserInfoPhoneSignupForm 
+      <UserInfoPhoneSignupForm
         onVerify={handlePhoneVerify}
         onResetAuthCode={handleResetAuthCode}
         onChange={handlePhoneChange}
         showLabel={false}
       />
       {showAuthCode && (
-        <UserInfoAuthCodeSignupForm 
-          onVerify={handleAuthCodeVerify}
-          resetAuthCode={resetAuthCode}
-        />
+        <UserInfoAuthCodeSignupForm onVerify={handleAuthCodeVerify} resetAuthCode={resetAuthCode} />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default FindId
+export default FindId;

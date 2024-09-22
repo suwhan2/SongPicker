@@ -7,13 +7,12 @@ interface MemberSelectListProps {
 }
 
 const MemberSelectList = ({ selectedMode, setSelectedMode }: MemberSelectListProps) => {
-  
   useEffect(() => {
     if (selectedMode === '') {
       setSelectedMode('솔로 모드');
     }
   }, []);
-  
+
   return (
     <div className="w-full h-[calc(100vh-120px)] flex flex-col justify-between px-5 py-6 ">
       <MemberSelectItem

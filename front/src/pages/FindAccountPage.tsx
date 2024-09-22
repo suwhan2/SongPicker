@@ -58,9 +58,7 @@ const FindAccountPage = () => {
             to="/find-account/id"
             className={({ isActive }) =>
               `flex-1 h-full flex items-center justify-center text-center border-b-2  ${
-                isActive 
-                ? 'text-purple-600 border-purple-600' 
-                : 'text-gray-500 border-gray-500'
+                isActive ? 'text-purple-600 border-purple-600' : 'text-gray-500 border-gray-500'
               }`
             }
           >
@@ -70,9 +68,7 @@ const FindAccountPage = () => {
             to="/find-account/password"
             className={({ isActive }) =>
               `flex-1 h-full flex items-center justify-center text-center border-b-2 ${
-                isActive 
-                ? 'text-purple-600 border-purple-600' 
-                : 'text-gray-500 border-gray-500'
+                isActive ? 'text-purple-600 border-purple-600' : 'text-gray-500 border-gray-500'
               }`
             }
           >
@@ -86,7 +82,10 @@ const FindAccountPage = () => {
           ) : (
             <Routes>
               <Route index element={<Navigate to="/find-account/id" replace />} />
-              <Route path="id" element={<FindId onVerificationComplete={handleVerificationComplete} />} />
+              <Route
+                path="id"
+                element={<FindId onVerificationComplete={handleVerificationComplete} />}
+              />
               <Route path="password" element={<FindPassword />} />
             </Routes>
           )}
@@ -98,7 +97,7 @@ const FindAccountPage = () => {
         {buttonText}
       </FooterButton>
     </div>
-  )
-}
+  );
+};
 
-export default FindAccountPage
+export default FindAccountPage;
