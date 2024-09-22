@@ -17,7 +17,7 @@ const UserInfoNicknameSignupForm = ({
   const [isContentValid, setIsContentValid] = useState(false);
   const [isAvailable, setIsAvailable] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
-  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
   const checkNicknameAvailability = useAuthStore(state => state.checkNicknameAvailability);
 
@@ -27,15 +27,11 @@ const UserInfoNicknameSignupForm = ({
         setIsChecking(true);
         console.log('Checking nickname availability:', value);
         try {
-          const available = await checkNicknameAvailability(value);
-          console.log('Nickname availability result:', available);
-          setIsAvailable(available);
-          setError(available ? '' : '이미 사용 중인 닉네임입니다.');
-          onValidation(available);
-        } catch (error) {
-          console.error('Nickname check failed:', error);
-          setError('닉네임 확인 중 오류가 발생했습니다.');
-          onValidation(false);
+          const { isAvailable, message } = await checkNicknameAvailability(value);
+          console.log('Nickname availability result:', isAvailable, message);
+          setIsAvailable(isAvailable);
+          setMessage(message);
+          onValidation(isAvailable);
         } finally {
           setIsChecking(false);
         }
@@ -61,6 +57,7 @@ const UserInfoNicknameSignupForm = ({
       } else {
         setIsAvailable(false);
         onValidation(false);
+        setMessage('');
       }
     },
     [onChange, debouncedCheckAvailability, onValidation]
@@ -86,22 +83,17 @@ const UserInfoNicknameSignupForm = ({
             <li>확인 중...</li>
           </ul>
         )}
-        {!isChecking && isLengthValid && isContentValid && isAvailable && (
-          <ul className="list-disc list-inside text-green-500 text-sm">
-            <li>사용 가능한 닉네임입니다.</li>
+        {!isChecking && message && (
+          <ul className="list-disc list-inside text-sm">
+            <li className={isAvailable ? 'text-green-500' : 'text-red-500'}>{message}</li>
           </ul>
         )}
-        {error && (
-          <ul className="list-disc list-inside text-red-500 text-sm">
-            <li>{error}</li>
-          </ul>
-        )}
-        {!isLengthValid && nickname.length > 0 && (
+        {!isChecking && !isLengthValid && nickname.length > 0 && (
           <ul className="list-disc list-inside text-red-500 text-sm">
             <li>닉네임은 2~8자 사이여야 합니다.</li>
           </ul>
         )}
-        {!isContentValid && nickname.length > 0 && (
+        {!isChecking && !isContentValid && nickname.length > 0 && (
           <ul className="list-disc list-inside text-red-500 text-sm">
             <li>영문, 한글, 숫자만 사용 가능합니다.</li>
           </ul>
