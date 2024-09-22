@@ -14,11 +14,19 @@ interface AuthState {
   getAccessToken: () => string | null;
   getRole: () => string | null;
   getLoginId: () => string | null;
-  checkLoginIdAvailability: (loginId: string) => Promise<boolean>;
-  checkNicknameAvailability: (nickname: string) => Promise<boolean>;
-  checkPhoneAvailability: (phone: string) => Promise<boolean>;
-  sendPhoneVerification: (phone: string, purpose: string) => Promise<boolean>;
-  verifyPhoneCode: (authCode: string, phone: string) => Promise<boolean>;
+  checkLoginIdAvailability: (loginId: string) => Promise<{ isAvailable: boolean; message: string }>;
+  checkNicknameAvailability: (
+    nickname: string
+  ) => Promise<{ isAvailable: boolean; message: string }>;
+  checkPhoneAvailability: (phone: string) => Promise<{ isAvailable: boolean; message: string }>;
+  sendPhoneVerification: (
+    phone: string,
+    purpose: string
+  ) => Promise<{ isSuccess: boolean; message: string }>;
+  verifyPhoneCode: (
+    authCode: string,
+    phone: string
+  ) => Promise<{ isSuccess: boolean; message: string }>;
 }
 
 interface RegisterData {
@@ -75,54 +83,112 @@ const useAuthStore = create<AuthState>()(
       getAccessToken: () => get().accessToken,
       getRole: () => get().role,
       getLoginId: () => get().loginId,
+
       checkLoginIdAvailability: async (loginId: string) => {
         try {
-          const response = await axiosInstance.get(`/api/members/check-id?loginId=${loginId}`);
-          return response.data.status === 'ME101';
+          const response = await axiosInstance.get(`/api/members/check-id`, {
+            params: { loginId },
+          });
+          const { code, message } = response.data;
+          switch (code) {
+            case 'ME101':
+              return { isAvailable: true, message: '사용 가능한 아이디입니다.' };
+            case 'ME001':
+              return { isAvailable: false, message: '이미 사용 중인 아이디입니다.' };
+            default:
+              return { isAvailable: false, message: '아이디 확인 중 오류가 발생했습니다.' };
+          }
         } catch (error) {
           console.error('Login ID check failed:', error);
-          return false;
+          return { isAvailable: false, message: '아이디 확인 중 오류가 발생했습니다.' };
         }
       },
+
       checkNicknameAvailability: async (nickname: string) => {
         try {
-          const response = await axiosInstance.get(
-            `/api/members/check-nickname?nickname=${nickname}`
-          );
-          return response.data.status === 'ME102';
+          const response = await axiosInstance.get(`/api/members/check-nickname`, {
+            params: { nickname },
+          });
+          const { code, message } = response.data;
+          switch (code) {
+            case 'ME102':
+              return { isAvailable: true, message: '사용 가능한 닉네임입니다.' };
+            case 'ME003':
+              return { isAvailable: false, message: '이미 사용 중인 닉네임입니다.' };
+            default:
+              return { isAvailable: false, message: '닉네임 확인 중 오류가 발생했습니다.' };
+          }
         } catch (error) {
           console.error('Nickname check failed:', error);
-          return false;
+          return { isAvailable: false, message: '닉네임 확인 중 오류가 발생했습니다.' };
         }
       },
+
       checkPhoneAvailability: async (phone: string) => {
         try {
-          const response = await axiosInstance.get(`/api/members/check-phone?phone=${phone}`);
-          return response.data.status === 'ME103';
+          const response = await axiosInstance.get(`/api/members/check-phone`, {
+            params: { phone },
+          });
+          const { code, message } = response.data;
+          switch (code) {
+            case 'ME103':
+              return { isAvailable: true, message: '사용 가능한 휴대폰 번호입니다.' };
+            case 'ME004':
+              return { isAvailable: false, message: '이미 등록된 휴대폰 번호입니다.' };
+            default:
+              return { isAvailable: false, message: '휴대폰 번호 확인 중 오류가 발생했습니다.' };
+          }
         } catch (error) {
           console.error('Phone check failed:', error);
-          return false;
+          return { isAvailable: false, message: '휴대폰 번호 확인 중 오류가 발생했습니다.' };
         }
       },
-      sendPhoneVerification: async (phone: string, purpose: string) => {
+
+      sendPhoneVerification: async (phone: string, purpose: string, loginId?: string) => {
         try {
-          const response = await axiosInstance.post('/api/auth/send-verification', {
+          const requestBody: { phone: string; purpose: string; loginId?: string } = {
             phone,
             purpose,
-          });
-          return response.data.status === 'AU101';
+          };
+          if (purpose === 'findPassword' && loginId) {
+            requestBody.loginId = loginId;
+          }
+
+          const response = await axiosInstance.post('/api/auth/phone/send', requestBody);
+          const { code, message } = response.data;
+          switch (code) {
+            case 'AU101':
+              return { isSuccess: true, message: '인증번호가 전송되었습니다.' };
+            case 'CN000':
+              return { isSuccess: false, message: '인증번호 전송에 실패했습니다.' };
+            case 'ME007':
+              return { isSuccess: false, message: '전화번호를 다시 확인해주세요.' };
+            case 'ME008':
+              return { isSuccess: false, message: '중복 확인을 먼저 진행해주세요.' };
+            default:
+              return { isSuccess: false, message: '인증번호 전송 중 오류가 발생했습니다.' };
+          }
         } catch (error) {
           console.error('Phone verification send failed:', error);
-          return false;
+          return { isSuccess: false, message: '인증번호 전송 중 오류가 발생했습니다.' };
         }
       },
+
       verifyPhoneCode: async (authCode: string, phone: string) => {
         try {
-          const response = await axiosInstance.post('/api/auth/verify-code', { authCode, phone });
-          return response.data.status === 'AU102';
+          const response = await axiosInstance.post('/api/auth/phone/verify', { authCode, phone });
+          const { code, message } = response.data;
+          switch (code) {
+            case 'AU102':
+              return { isSuccess: true, message: '인증이 완료되었습니다.' };
+            case 'AU002':
+              return { isSuccess: false, message: '인증번호가 올바르지 않습니다.' };
+            default:
+              return { isSuccess: false, message: '인증 확인 중 오류가 발생했습니다.' };
+          }
         } catch (error) {
           console.error('Phone code verification failed:', error);
-          return false;
+          return { isSuccess: false, message: '인증 확인 중 오류가 발생했습니다.' };
         }
       },
     }),
