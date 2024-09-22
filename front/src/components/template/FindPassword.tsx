@@ -1,11 +1,7 @@
-import React from 'react'
+import React from 'react';
 
-type Props = {}
+const FindPassword = () => {
+  return <div>FindPassword</div>;
+};
 
-const FindPassword = (props: Props) => {
-  return (
-    <div>FindPassword</div>
-  )
-}
-
-export default FindPassword
+export default FindPassword;

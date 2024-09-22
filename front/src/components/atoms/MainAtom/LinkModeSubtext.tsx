@@ -1,11 +1,15 @@
-import React from 'react'
+import React from 'react';
+import { useQRConnectionStore } from '../../../stores/useQRConnectionStore ';
 
-type Props = {}
+const LinkModeSubtext = () => {
+  const { isConnected, selectedMode } = useQRConnectionStore();
 
-const LinkModeSubtext = (props: Props) => {
-  return (
-    <div >이용하시려면 먼저 연결해주세요</div>
-  )
-}
+  const getSubtext = () => {
+    if (!isConnected) return '연결을 해주세요';
+    return `${selectedMode} 이용중`;
+  };
 
-export default LinkModeSubtext
+  return <div>{getSubtext()}</div>;
+};
+
+export default LinkModeSubtext;
