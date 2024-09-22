@@ -22,18 +22,6 @@ import java.util.List;
 public class SongController {
     private final SongService songService;
 
-//    @GetMapping("/my/recommendations")
-//    public ResponseEntity<?> mySongsRecommend(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
-//        List<SongRecommendDto> songRecommendDtos = songService.recommendMySong();
-//        return new ResponseEntity<>(new ApiResponse<>("SO102","선곡 추천 성공",songRecommendDtos), HttpStatus.OK);
-//    }
-//
-//    @GetMapping("/group/recommendations")
-//    public ResponseEntity<?> groupSongsRecommend(@RequestParam Long groupId){
-//        List<SongRecommendDto> songRecommendDtos = songService.recommendGroupSong(groupId);
-//        return new ResponseEntity<>(new ApiResponse<>("SO102","선곡 추천 성공",songRecommendDtos), HttpStatus.OK);
-//    }
-
     @GetMapping("/{songId}")
     public ResponseEntity<?> getSongDetails(@PathVariable Long songId, @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
 
