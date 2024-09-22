@@ -3,8 +3,10 @@ package com.fastarm.back.song.service;
 import com.fastarm.back.member.entity.Member;
 import com.fastarm.back.member.repository.MemberRepository;
 import com.fastarm.back.song.controller.dto.SongDetailRequest;
+import com.fastarm.back.song.controller.dto.SongSearchRequest;
+import com.fastarm.back.song.controller.dto.SongSearchResponse;
 import com.fastarm.back.song.dto.SongDetailDto;
-import com.fastarm.back.song.dto.SongRecommendDto;
+import com.fastarm.back.song.dto.SongDto;
 import com.fastarm.back.song.entity.Song;
 import com.fastarm.back.song.exception.NotFoundSongDetailException;
 import com.fastarm.back.song.repository.SongRepository;
@@ -17,6 +19,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,8 +54,8 @@ public class SongService {
 //        return runRecommendationAlgorithm(sangList);
 //    }
 
-    private List<SongRecommendDto> runRecommendationAlgorithm(List<Song> sangList){
-        List<SongRecommendDto> recommendedSongs = new ArrayList<>();
+    private List<SongDto> runRecommendationAlgorithm(List<Song> sangList){
+        List<SongDto> recommendedSongs = new ArrayList<>();
         try {
             ProcessBuilder processBuilder = new ProcessBuilder("python3", "경로쓰기/이름.py");
 
@@ -86,7 +89,7 @@ public class SongService {
         Song song = songRepository.findById(dto.getSongId())
                 .orElseThrow(NotFoundSongDetailException::new);
         //id 찾기
-//        Optional<Member> memberId = memberRepository.findByLoginId(dto.getLoginId());
+        Optional<Member> memberId = memberRepository.findByLoginId(dto.getLoginId());
 //        Optional<Long> likeId = likesRepository.findByMemberIdAndSongId(memberId,songId);
 
         return SongDetailDto.builder()
@@ -103,5 +106,39 @@ public class SongService {
 //                .likeId(likeId.orElse(null))
                 .build();
    }
+
+
+   @Transactional(readOnly = true)
+   public SongSearchResponse searchSongs(SongSearchRequest dto){
+        Optional<Member> member = memberRepository.findByLoginId(dto.getLoginId());
+        Long memberId = member.map(Member::getId).orElse(null);
+
+
+        List<Song> songsByTitle = songRepository.findSongsByKeyword(dto.getKeyword());
+        List<SongDto> songResults = createSongDtoList(songsByTitle, memberId);
+
+        List<Song> songsBySinger = songRepository.findSongsBySinger(dto.getKeyword());
+        List<SongDto> singerResults = createSongDtoList(songsBySinger, memberId);
+
+       return SongSearchResponse.from(songResults, singerResults);
+   }
+
+    private List<SongDto> createSongDtoList(List<Song> songs, Long memberId) {
+        List<SongDto> songDtos = new ArrayList<>();
+
+        for (Song song : songs) {
+            boolean isLike = false;
+            Long likeId = null;
+//            Optional<Long> likeResult = likesRepository.findByMemberIdAndSongId(memberId, song.getId());
+//            if (likeResult.isPresent()) {
+//                isLike = true;
+//                likeId = likeResult.get();
+//            }
+            SongDto songDto = SongDto.from(song, isLike, likeId);
+            songDtos.add(songDto);
+        }
+        return songDtos;
+    }
+
 
 }

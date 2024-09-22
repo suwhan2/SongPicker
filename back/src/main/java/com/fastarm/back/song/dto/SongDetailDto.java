@@ -18,7 +18,6 @@ public class SongDetailDto {
     private String composer;
     private String lyrics;
     private LocalDate releasedAt;
-
     private Boolean isLike;
     private Long likeId;
 
