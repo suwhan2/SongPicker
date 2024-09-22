@@ -14,6 +14,11 @@ interface AuthState {
   getAccessToken: () => string | null;
   getRole: () => string | null;
   getLoginId: () => string | null;
+  checkLoginIdAvailability: (loginId: string) => Promise<boolean>;
+  checkNicknameAvailability: (nickname: string) => Promise<boolean>;
+  checkPhoneAvailability: (phone: string) => Promise<boolean>;
+  sendPhoneVerification: (phone: string, purpose: string) => Promise<boolean>;
+  verifyPhoneCode: (authCode: string, phone: string) => Promise<boolean>;
 }
 
 interface RegisterData {
@@ -70,6 +75,56 @@ const useAuthStore = create<AuthState>()(
       getAccessToken: () => get().accessToken,
       getRole: () => get().role,
       getLoginId: () => get().loginId,
+      checkLoginIdAvailability: async (loginId: string) => {
+        try {
+          const response = await axiosInstance.get(`/api/members/check-id?loginId=${loginId}`);
+          return response.data.status === 'ME101';
+        } catch (error) {
+          console.error('Login ID check failed:', error);
+          return false;
+        }
+      },
+      checkNicknameAvailability: async (nickname: string) => {
+        try {
+          const response = await axiosInstance.get(
+            `/api/members/check-nickname?nickname=${nickname}`
+          );
+          return response.data.status === 'ME102';
+        } catch (error) {
+          console.error('Nickname check failed:', error);
+          return false;
+        }
+      },
+      checkPhoneAvailability: async (phone: string) => {
+        try {
+          const response = await axiosInstance.get(`/api/members/check-phone?phone=${phone}`);
+          return response.data.status === 'ME103';
+        } catch (error) {
+          console.error('Phone check failed:', error);
+          return false;
+        }
+      },
+      sendPhoneVerification: async (phone: string, purpose: string) => {
+        try {
+          const response = await axiosInstance.post('/api/auth/send-verification', {
+            phone,
+            purpose,
+          });
+          return response.data.status === 'AU101';
+        } catch (error) {
+          console.error('Phone verification send failed:', error);
+          return false;
+        }
+      },
+      verifyPhoneCode: async (authCode: string, phone: string) => {
+        try {
+          const response = await axiosInstance.post('/api/auth/verify-code', { authCode, phone });
+          return response.data.status === 'AU102';
+        } catch (error) {
+          console.error('Phone code verification failed:', error);
+          return false;
+        }
+      },
     }),
     {
       name: 'auth-storage',
