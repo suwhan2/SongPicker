@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 interface TitleProps {
   text: string;
@@ -6,9 +6,7 @@ interface TitleProps {
 }
 
 const MemeberSelectTitle = ({ text, className = '' }: TitleProps) => {
-  return (
-    <div className={`text-3xl mb-2  ${className}`}>{text}</div>
-  )
-}
+  return <div className={`text-3xl mb-2  ${className}`}>{text}</div>;
+};
 
-export default MemeberSelectTitle
+export default MemeberSelectTitle;
