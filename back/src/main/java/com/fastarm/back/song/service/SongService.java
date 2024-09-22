@@ -1,10 +1,7 @@
 package com.fastarm.back.song.service;
 
-import com.fastarm.back.member.entity.Member;
 import com.fastarm.back.member.repository.MemberRepository;
-import com.fastarm.back.song.controller.dto.SongDetailRequest;
-import com.fastarm.back.song.dto.SongDetailDto;
-import com.fastarm.back.song.dto.SongRecommendDto;
+import com.fastarm.back.song.dto.SongDto;
 import com.fastarm.back.song.entity.Song;
 import com.fastarm.back.song.exception.NotFoundSongDetailException;
 import com.fastarm.back.song.repository.SongRepository;
@@ -16,7 +13,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,17 +24,19 @@ public class SongService {
     //private final GroupSingHistoryRepository groupSingHistoryRepository;
 
 
-//    @Transactional
-//    public List<SongRecommendDto> recommendMySong(Long memberId){
-//        List<PersonalSingHistory> myHistory  = personalSingHistoryRepository.findAllByMemberId(memberId);
-//
-//        List<Song> sangList = new ArrayList<>();
-//        for(PersonalSingHistory history : myHistory){
-//            Song song = songRepository.findById(history.getSongId).orElseThrow(NotFoundSongDetailException::new);
-//            sangList.add(song);
-//        }
-//        return runRecommendationAlgorithm(sangList);
-//    }
+    @Transactional
+    public List<SongDto> recommendMySong(){
+
+        return songRepository.findRandomSongs()
+                .stream()
+                .map(song -> SongDto.builder()
+                        .number(String.valueOf(song.getNumber()))
+                        .title(song.getTitle())
+                        .singer(song.getSinger())
+                        .coverImage(song.getCoverImage())
+                        .build())
+                .collect(Collectors.toList());
+    }
 //
 //    @Transactional
 //    public List<SongRecommendDto> recommendGroupSong(Long groupId){
@@ -51,8 +50,8 @@ public class SongService {
 //        return runRecommendationAlgorithm(sangList);
 //    }
 
-    private List<SongRecommendDto> runRecommendationAlgorithm(List<Song> sangList){
-        List<SongRecommendDto> recommendedSongs = new ArrayList<>();
+    private List<SongDto> runRecommendationAlgorithm(List<Song> sangList){
+        List<SongDto> recommendedSongs = new ArrayList<>();
         try {
             ProcessBuilder processBuilder = new ProcessBuilder("python3", "경로쓰기/이름.py");
 
@@ -79,29 +78,5 @@ public class SongService {
         }
         return recommendedSongs;
     }
-
-    @Transactional(readOnly = true)
-    public SongDetailDto getSongDetails(SongDetailRequest dto) {
-        // 노래 조회
-        Song song = songRepository.findById(dto.getSongId())
-                .orElseThrow(NotFoundSongDetailException::new);
-        //id 찾기
-//        Optional<Member> memberId = memberRepository.findByLoginId(dto.getLoginId());
-//        Optional<Long> likeId = likesRepository.findByMemberIdAndSongId(memberId,songId);
-
-        return SongDetailDto.builder()
-                .number(song.getNumber())
-                .title(song.getTitle())
-                .singer(song.getSinger())
-                .coverImage(song.getCoverImage())
-//                .genre(song.getGenre())
-                .lyricist(song.getLyricist())
-                .composer(song.getComposer())
-                .lyrics(song.getLyrics())
-                .releasedAt(song.getReleasedAt())
-//                .isLike(likeId.isPresent())
-//                .likeId(likeId.orElse(null))
-                .build();
-   }
 
 }

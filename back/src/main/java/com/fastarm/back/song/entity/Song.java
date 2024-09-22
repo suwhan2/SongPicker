@@ -37,6 +37,9 @@ public class Song {
     @Column(length = 256)
     private String coverImage;
 
+//    @Column
+//    private String genre;
+
     @Column(nullable = false)
     private String lyrics;
 
@@ -54,5 +57,7 @@ public class Song {
     private String tune;
 
     private int happiness;
+
+    private boolean isPopular;
 
 }

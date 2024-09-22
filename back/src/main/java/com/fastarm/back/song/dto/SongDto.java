@@ -7,12 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class SongRecommendDto {
+public class SongDto {
         private String number;
         private String title;
         private String singer;
         private String coverImage;
-        private Boolean isLike;
-        private Long likeId;
+//        private Boolean isLike;
+//        private Long likeId;
 
 }
