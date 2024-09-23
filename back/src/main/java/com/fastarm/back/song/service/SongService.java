@@ -42,7 +42,7 @@ public class SongService {
                 .title(song.getTitle())
                 .singer(song.getSinger())
                 .coverImage(song.getCoverImage())
-//                .genre(song.getGenre())
+                .genre(song.getGenre())
                 .lyricist(song.getLyricist())
                 .composer(song.getComposer())
                 .lyrics(song.getLyrics())
@@ -68,8 +68,9 @@ public class SongService {
        return SongSearchResponse.from(songResults, singerResults);
    }
 
+
     private List<SongDto> createSongDtoList(List<Song> songs, Long memberId) {
-        List<SongDto> songDtos = new ArrayList<>();
+        List<SongDto> songDtoList = new ArrayList<>();
 
         for (Song song : songs) {
             boolean isLike = false;
@@ -80,9 +81,9 @@ public class SongService {
 //                likeId = likeResult.get();
 //            }
             SongDto songDto = SongDto.from(song, isLike, likeId);
-            songDtos.add(songDto);
+            songDtoList.add(songDto);
         }
-        return songDtos;
+        return songDtoList;
     }
 
 

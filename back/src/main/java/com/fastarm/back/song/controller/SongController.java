@@ -8,7 +8,6 @@ import com.fastarm.back.song.controller.dto.SongSearchResponse;
 import com.fastarm.back.song.dto.SongDetailDto;
 import com.fastarm.back.song.service.SongService;
 import lombok.RequiredArgsConstructor;
-import okhttp3.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,10 +29,12 @@ public class SongController {
 
     }
 
+
     @GetMapping("/search")
     public ResponseEntity<?> songsSearch(@RequestParam String keyword, @AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
         SongSearchResponse songSearchResponse = songService.searchSongs(SongSearchRequest.from(keyword, loginMemberInfo.getLoginId()));
         return new ResponseEntity<>(new ApiResponse<>("SO101","노래 검색 성공",songSearchResponse), HttpStatus.OK);
     }
+
 
 }
