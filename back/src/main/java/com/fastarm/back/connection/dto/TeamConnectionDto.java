@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConnectionDto {
+public class TeamConnectionDto {
     private String serialNumber;
+    private Long teamId;
     private String nickname;
 }

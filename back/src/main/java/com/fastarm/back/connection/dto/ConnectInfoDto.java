@@ -1,5 +1,6 @@
 package com.fastarm.back.connection.dto;
 
+import com.fastarm.back.connection.Type;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,9 +8,10 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class ConnectionDto {
+@NoArgsConstructor
+public class ConnectInfoDto {
     private String serialNumber;
-    private String nickname;
+    private Type type;
+    private Long groupId;
 }

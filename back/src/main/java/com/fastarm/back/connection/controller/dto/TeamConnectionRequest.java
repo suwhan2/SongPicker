@@ -1,15 +1,13 @@
-package com.fastarm.back.connection.dto;
+package com.fastarm.back.connection.controller.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class ConnectionDto {
+@NoArgsConstructor
+public class TeamConnectionRequest {
     private String serialNumber;
-    private String nickname;
+    private Long teamId;
 }
