@@ -16,7 +16,9 @@ const UserInfoNameSignupForm = ({ onChange }: UserInfoNameSignupFormProps) => {
 
   return (
     <div className="h-24">
-      <label htmlFor="name" className="block text-lg text-white mb-2">이름</label>
+      <label htmlFor="name" className="block text-lg text-white mb-2">
+        이름
+      </label>
       <SignupInput
         id="name"
         name="name"

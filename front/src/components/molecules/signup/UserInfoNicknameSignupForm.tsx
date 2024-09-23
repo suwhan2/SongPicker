@@ -1,34 +1,73 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { debounce } from 'lodash';
 import SignupInput from '../../atoms/signup/SignupInput';
+import useAuthStore from '../../../stores/useAuthStore';
 
 type UserInfoNicknameSignupFormProps = {
   onChange: (nickname: string) => void;
+  onValidation: (isValid: boolean) => void;
 };
 
-const UserInfoNicknameSignupForm = ({ onChange }: UserInfoNicknameSignupFormProps) => {
+const UserInfoNicknameSignupForm = ({
+  onChange,
+  onValidation,
+}: UserInfoNicknameSignupFormProps) => {
   const [nickname, setNickname] = useState('');
   const [isLengthValid, setIsLengthValid] = useState(false);
   const [isContentValid, setIsContentValid] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
+  const [message, setMessage] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setNickname(value);
-    onChange(value);
-  };
+  const checkNicknameAvailability = useAuthStore(state => state.checkNicknameAvailability);
 
-  useEffect(() => {
-    const lengthValid = nickname.length >= 2 && nickname.length <= 8;
-    const contentValid = /^(?:[a-zA-Z]{2,8}|[가-힣]{2,8}|[a-zA-Z0-9가-힣]{2,8})$/.test(nickname);
+  const debouncedCheckAvailability = useCallback(
+    debounce(async (value: string) => {
+      if (isLengthValid && isContentValid) {
+        setIsChecking(true);
+        console.log('Checking nickname availability:', value);
+        try {
+          const { isAvailable, message } = await checkNicknameAvailability(value);
+          console.log('Nickname availability result:', isAvailable, message);
+          setIsAvailable(isAvailable);
+          setMessage(message);
+          onValidation(isAvailable);
+        } finally {
+          setIsChecking(false);
+        }
+      }
+    }, 300),
+    [isLengthValid, isContentValid, checkNicknameAvailability, onValidation]
+  );
 
-    setIsLengthValid(lengthValid);
-    setIsContentValid(contentValid);
-  }, [nickname]);
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setNickname(value);
+      onChange(value);
 
-  const allValid = isLengthValid && isContentValid;
+      const lengthValid = value.length >= 2 && value.length <= 8;
+      const contentValid = /^(?:[a-zA-Z]{2,8}|[가-힣]{2,8}|[a-zA-Z0-9가-힣]{2,8})$/.test(value);
+
+      setIsLengthValid(lengthValid);
+      setIsContentValid(contentValid);
+
+      if (lengthValid && contentValid) {
+        debouncedCheckAvailability(value);
+      } else {
+        setIsAvailable(false);
+        onValidation(false);
+        setMessage('');
+      }
+    },
+    [onChange, debouncedCheckAvailability, onValidation]
+  );
 
   return (
     <div className="h-24">
-      <label htmlFor="nickname" className="block text-lg text-white mb-2">닉네임</label>
+      <label htmlFor="nickname" className="block text-lg text-white mb-2">
+        닉네임
+      </label>
       <SignupInput
         id="nickname"
         name="nickname"
@@ -38,21 +77,28 @@ const UserInfoNicknameSignupForm = ({ onChange }: UserInfoNicknameSignupFormProp
         onChange={handleChange}
         maxLength={8}
       />
-      {!allValid && (
-        <ul className="list-disc list-inside text-sm mt-2 space-y-1">
-          <li className={isLengthValid ? 'text-green-500' : 'text-red-500'}>
-            최소 2자리 이상, 최대 8자리 이하
-          </li>
-          <li className={isContentValid ? 'text-green-500' : 'text-red-500'}>
-            영문자, 숫자, 한글만 가능
-          </li>
-        </ul>
-      )}
-      {allValid && (
-        <ul className="list-disc list-inside text-green-500 text-sm mt-1">
-          <li>사용 가능한 닉네임입니다.</li>
-        </ul>
-      )}
+      <div className="h-6 mt-1">
+        {isChecking && (
+          <ul className="list-disc list-inside text-yellow-500 text-sm">
+            <li>확인 중...</li>
+          </ul>
+        )}
+        {!isChecking && message && (
+          <ul className="list-disc list-inside text-sm">
+            <li className={isAvailable ? 'text-green-500' : 'text-red-500'}>{message}</li>
+          </ul>
+        )}
+        {!isChecking && !isLengthValid && nickname.length > 0 && (
+          <ul className="list-disc list-inside text-red-500 text-sm">
+            <li>닉네임은 2~8자 사이여야 합니다.</li>
+          </ul>
+        )}
+        {!isChecking && !isContentValid && nickname.length > 0 && (
+          <ul className="list-disc list-inside text-red-500 text-sm">
+            <li>영문, 한글, 숫자만 사용 가능합니다.</li>
+          </ul>
+        )}
+      </div>
     </div>
   );
 };
