@@ -1,4 +1,4 @@
-package com.fastarm.back.connection.dto;
+package com.fastarm.back.karaoke.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
