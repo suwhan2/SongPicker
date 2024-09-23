@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class SongDto {
-        private String number;
+        private int number;
         private String title;
         private String singer;
         private String coverImage;

@@ -37,27 +37,31 @@ public class Song {
     @Column(length = 256)
     private String coverImage;
 
-//    @Column
-//    private String genre;
-
     @Column(nullable = false)
+    private String genre;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String lyrics;
 
-    //장르 관련 엔티티 수정
-
+    @Column(nullable = false)
     private int acousticness;
 
+    @Column(nullable = false)
     private int danceability;
 
+    @Column(nullable = false)
     private int energy;
 
+    @Column(nullable = false)
     private int bpm;
 
     @Column(nullable = false)
     private String tune;
 
+    @Column(nullable = false)
     private int happiness;
 
+    @Column(nullable = false, columnDefinition = "TINYINT(1)")
     private boolean isPopular;
 
 }
