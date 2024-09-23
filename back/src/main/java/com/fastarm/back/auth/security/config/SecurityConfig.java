@@ -44,6 +44,8 @@ public class SecurityConfig {
         http
                 .csrf((auth) -> auth.disable());
         http
+                .csrf((song) -> song.disable());
+        http
                 .formLogin((auth) -> auth.disable());
         http
                 .httpBasic((auth) -> auth.disable());
@@ -52,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/auths/login", "/members").permitAll()
                         .requestMatchers("/auths/refresh").permitAll()
                         .requestMatchers("/auths/phone/*", "/members/check-nickname", "/members/check-phone", "/members/check-id", "/health-check").permitAll()
+                        .requestMatchers("/songs/my/recommendations").permitAll()
                         .anyRequest().authenticated());
         http
                 .addFilterBefore(new CustomLogoutFilter(redisService), LogoutFilter.class);

@@ -21,8 +21,8 @@ public class SongController {
 
     @GetMapping("/my/recommendations")
     public ResponseEntity<?> mySongsRecommend(){
-        List<SongDto> songRecommendDtoList = songService.recommendMySong();
-        return new ResponseEntity<>(new ApiResponse<>("SO102","선곡 추천 성공",songRecommendDtoList), HttpStatus.OK);
+        List<SongDto> songRecommendDtos = songService.recommendMySong();
+        return new ResponseEntity<>(new ApiResponse<>("SO102","선곡 추천 성공",songRecommendDtos), HttpStatus.OK);
     }
 
 //    @GetMapping("/my/recommendations")
