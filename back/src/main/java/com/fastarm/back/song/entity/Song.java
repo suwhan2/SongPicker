@@ -1,6 +1,7 @@
 package com.fastarm.back.song.entity;
 
 import jakarta.persistence.*;
+import kotlinx.serialization.descriptors.PrimitiveKind;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -25,16 +26,16 @@ public class Song {
     @Column(length = 256, nullable = false)
     private String singer;
 
-    @Column(length = 256, nullable = false)
+    @Column(length = 256)
     private String lyricist;
 
-    @Column(length = 256, nullable = false)
+    @Column(length = 256)
     private String composer;
 
     @Column(nullable = false)
     private LocalDate releasedAt;
 
-    @Column(length = 256)
+    @Column(length = 256, nullable = false)
     private String coverImage;
 
     @Column(nullable = false)
@@ -62,6 +63,6 @@ public class Song {
     private int happiness;
 
     @Column(nullable = false, columnDefinition = "TINYINT(1)")
-    private boolean isPopular;
+    private Boolean isPopular;
 
 }
