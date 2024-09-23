@@ -80,10 +80,11 @@ public class SongService {
 //                isLike = true;
 //                likeId = likeResult.get();
 //            }
-            SongDto songDto = SongDto.from(song, isLike, likeId);
+            //, isLike, likeId
+            SongDto songDto = SongDto.from(song);
             songDtoList.add(songDto);
         }
-        return songDtoList;
+        return songDtoList;/
     }
 
 

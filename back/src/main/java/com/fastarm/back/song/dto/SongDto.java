@@ -13,17 +13,18 @@ public class SongDto {
         private String title;
         private String singer;
         private String coverImage;
-        private Boolean isLike;
-        private Long likeId;
+//        private Boolean isLike;
+//        private Long likeId;
 
-        public static SongDto from(Song song, boolean isLike, Long likeId) {
+        //, boolean isLike, Long likeId
+        public static SongDto from(Song song) {
                 return SongDto.builder()
                         .number(song.getNumber())
                         .title(song.getTitle())
                         .singer(song.getSinger())
                         .coverImage(song.getCoverImage())
-                        .isLike(isLike)
-                        .likeId(likeId)
+//                        .isLike(isLike)
+//                        .likeId(likeId)
                         .build();
         }
 }
