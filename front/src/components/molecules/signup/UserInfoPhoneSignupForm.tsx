@@ -10,6 +10,7 @@ type UserInfoPhoneSignupFormProps = {
   onChange: (phone: string) => void;
   onValidation: (isValid: boolean) => void;
   showLabel?: boolean;
+  purpose?: 'signup' | 'findPassword' | 'findLoginId';
 };
 
 const UserInfoPhoneSignupForm = ({
@@ -18,6 +19,7 @@ const UserInfoPhoneSignupForm = ({
   onChange,
   onValidation,
   showLabel = true,
+  purpose = 'signup',
 }: UserInfoPhoneSignupFormProps) => {
   const [phone, setPhone] = useState('');
   const [isPhoneValid, setIsPhoneValid] = useState(false);
@@ -68,7 +70,7 @@ const UserInfoPhoneSignupForm = ({
   const handleVerify = useCallback(async () => {
     if (isPhoneValid && isPhoneAvailable) {
       console.log('Sending phone verification:', phone);
-      const { isSuccess, message } = await sendPhoneVerification(phone, 'signup');
+      const { isSuccess, message } = await sendPhoneVerification(phone, purpose);
       console.log('Phone verification send result:', isSuccess, message);
       if (isSuccess) {
         setShowAuthCodeForm(true);
@@ -76,7 +78,7 @@ const UserInfoPhoneSignupForm = ({
       }
       setMessage(message);
     }
-  }, [isPhoneValid, isPhoneAvailable, phone, sendPhoneVerification, onVerify]);
+  }, [isPhoneValid, isPhoneAvailable, phone, sendPhoneVerification, purpose, onVerify]);
 
   const handleRetry = useCallback(() => {
     setShowAuthCodeForm(false);

@@ -65,4 +65,11 @@ export default [
       },
     },
   },
+  {
+    files: ['vite.config.ts'],
+    rules: {
+      'camelcase': 'off', // vite.config.ts 파일에서 camelcase 규칙 비활성화
+      '@typescript-eslint/naming-convention': 'off', // TypeScript 네이밍 규칙 비활성화 (필요한 경우)
+    },
+  },
 ];
