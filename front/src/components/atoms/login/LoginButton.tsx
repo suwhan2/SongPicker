@@ -1,11 +1,11 @@
-import React from 'react'
+import React from 'react';
 
 type LoginButtonProps = {
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   children: React.ReactNode;
-}
+};
 
-const LoginButton = ({ onClick, children }:LoginButtonProps) => {
+const LoginButton = ({ onClick, children }: LoginButtonProps) => {
   return (
     <button
       onClick={onClick}
@@ -13,7 +13,7 @@ const LoginButton = ({ onClick, children }:LoginButtonProps) => {
     >
       {children}
     </button>
-  )
-}
+  );
+};
 
-export default LoginButton
+export default LoginButton;

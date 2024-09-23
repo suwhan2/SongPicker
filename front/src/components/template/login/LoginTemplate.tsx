@@ -1,12 +1,12 @@
-import React from 'react'
-import LoginLogo from '../../molecules/login/LoginLogo'
-import LoginForm from '../../organisms/login/LoginForm'
+import React from 'react';
+import LoginLogo from '../../molecules/login/LoginLogo';
+import LoginForm from '../../organisms/login/LoginForm';
 
 const LoginTemplate = () => {
   return (
     <div className="flex flex-col items-center justify-center gap-12 w-full px-4">
       <LoginLogo />
-      <div className='flex flex-col justify-center w-full max-w-sm'>
+      <div className="flex flex-col justify-center w-full max-w-sm">
         <LoginForm />
         <div className="mt-4 text-gray-400 text-center text-sm"></div>
         <div className="mt-4 text-gray-400 text-center">
@@ -15,7 +15,7 @@ const LoginTemplate = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LoginTemplate
+export default LoginTemplate;

@@ -1,40 +1,75 @@
-// ESLint 기본 설정을 가져옵니다.
 import js from '@eslint/js';
-// 전역 변수 설정을 가져옵니다.
 import globals from 'globals';
-// React Hooks 관련 ESLint 플러그인을 가져옵니다.
 import reactHooks from 'eslint-plugin-react-hooks';
-// React Refresh 관련 ESLint 플러그인을 가져옵니다.
 import reactRefresh from 'eslint-plugin-react-refresh';
-// TypeScript ESLint 설정을 가져옵니다.
-import tseslint from 'typescript-eslint';
+import tseslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import reactPlugin from 'eslint-plugin-react';
+import prettierPlugin from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier'; // Prettier와의 충돌 방지
 
-// ESLint 설정을 내보냅니다.
-export default tseslint.config(
-  // 'dist' 폴더를 ESLint 검사에서 제외합니다.
-  { ignores: ['dist'] },
+export default [
   {
-    // 권장 설정을 확장합니다.
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    // TypeScript 파일에 대해 설정을 적용합니다.
-    files: ['**/*.{ts,tsx}'],
+    ignores: ['dist'],
+    files: ['**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
-      // ECMAScript 2020 문법을 사용합니다.
-      ecmaVersion: 2020,
-      // 브라우저 전역 변수를 사용합니다.
-      globals: globals.browser,
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+        ...globals.es2021,
+      },
+      parser: tsParser,
     },
-    // 사용할 플러그인을 설정합니다.
     plugins: {
+      '@typescript-eslint': tseslint,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      'react': reactPlugin,
+      'prettier': prettierPlugin,
     },
-    // ESLint 규칙을 설정합니다.
     rules: {
-      // React Hooks 규칙을 적용합니다.
+      ...js.configs.recommended.rules,
+      ...tseslint.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      // React Refresh 관련 규칙을 설정합니다.
+      ...prettierConfig.rules, // Prettier와 충돌하지 않도록 규칙 포함
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'prettier/prettier': [
+        'error',
+        {
+          semi: true, // 세미콜론 강제
+          singleQuote: true, // 쌍따옴표 사용
+          endOfLine: 'auto', // EOL 통일
+        },
+      ],
+      'react/react-in-jsx-scope': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': 'off',
+      'camelcase': 'error', // camelCase 사용 강제
+      'eqeqeq': ['error', 'always'], // === 사용 강제
+      'prefer-const': 'error', // const 권장
+      'no-var': 'error', // var 사용 금지
     },
-  }
-);
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './tsconfig.app.json',
+      },
+    },
+  },
+  {
+    files: ['vite.config.ts'],
+    rules: {
+      'camelcase': 'off', // vite.config.ts 파일에서 camelcase 규칙 비활성화
+      '@typescript-eslint/naming-convention': 'off', // TypeScript 네이밍 규칙 비활성화 (필요한 경우)
+    },
+  },
+];

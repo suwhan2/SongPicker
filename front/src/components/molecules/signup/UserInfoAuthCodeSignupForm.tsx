@@ -1,25 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import SignupInput from '../../atoms/signup/SignupInput';
 import SignupButton from '../../atoms/signup/SignupButton';
+import useAuthStore from '../../../stores/useAuthStore';
 
 type UserInfoAuthCodeSignupFormProps = {
-  onVerify: () => void; // 인증번호 확인 후 상태 업데이트
-  resetAuthCode: boolean; // 인증번호 초기화 여부
+  onVerify: () => void;
+  resetAuthCode: boolean;
+  phone: string;
+  purpose?: 'signup' | 'findPassword' | 'findLoginId';
 };
 
-const UserInfoAuthCodeSignupForm = ({ onVerify, resetAuthCode }: UserInfoAuthCodeSignupFormProps) => {
+const UserInfoAuthCodeSignupForm = ({
+  onVerify,
+  resetAuthCode,
+  phone,
+  purpose = 'signup',
+}: UserInfoAuthCodeSignupFormProps) => {
   const [authCode, setAuthCode] = useState('');
-  const [timeLeft, setTimeLeft] = useState(180); // 3분 타이머
+  const [timeLeft, setTimeLeft] = useState(180);
   const [isVerified, setIsVerified] = useState(false);
+  const [message, setMessage] = useState('');
 
-  // 인증번호 초기화
+  const verifyPhoneCode = useAuthStore(state => state.verifyPhoneCode);
+  const sendPhoneVerification = useAuthStore(state => state.sendPhoneVerification);
+
   useEffect(() => {
     if (resetAuthCode) {
-      setAuthCode(''); // 인증번호 입력란을 초기화
-      setIsVerified(false); // 인증 완료 상태 초기화
-      setTimeLeft(180); // 타이머 리셋
+      setAuthCode('');
+      setIsVerified(false);
+      setTimeLeft(180);
+      setMessage('');
+      sendPhoneVerification(phone, purpose);
     }
-  }, [resetAuthCode]);
+  }, [resetAuthCode, phone, sendPhoneVerification, purpose]);
 
   useEffect(() => {
     if (timeLeft > 0 && !isVerified) {
@@ -32,12 +45,20 @@ const UserInfoAuthCodeSignupForm = ({ onVerify, resetAuthCode }: UserInfoAuthCod
     setAuthCode(e.target.value);
   };
 
-  const handleVerify = () => {
-    if (authCode.length === 6) {
-      setIsVerified(true); // 인증 완료 상태로 변경
-      onVerify(); // 부모 컴포넌트에 인증 완료 전달
+  const handleVerify = useCallback(async () => {
+    if (authCode.trim() !== '') {
+      console.log('Verifying phone code:', authCode);
+      const { isSuccess, message } = await verifyPhoneCode(authCode, phone);
+      console.log('Phone code verification result:', isSuccess, message);
+      if (isSuccess) {
+        setIsVerified(true);
+        onVerify();
+      }
+      setMessage(message);
+    } else {
+      setMessage('인증번호를 입력해주세요.');
     }
-  };
+  }, [authCode, verifyPhoneCode, phone, onVerify]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -47,42 +68,51 @@ const UserInfoAuthCodeSignupForm = ({ onVerify, resetAuthCode }: UserInfoAuthCod
 
   return (
     <div className="h-24">
-      <label htmlFor="authCode" className="block text-lg text-white mb-2">인증번호</label>
+      <label htmlFor="authCode" className="block text-lg text-white mb-2">
+        인증번호
+      </label>
       <div className="flex items-center">
         <SignupInput
           id="authCode"
           name="authCode"
-          type="number"
+          type="text"
           placeholder="인증번호를 입력해주세요"
           value={authCode}
           onChange={handleChange}
           className="flex-grow"
-          disabled={isVerified} // 인증 완료 시 입력 비활성화
+          disabled={isVerified || timeLeft === 0}
         />
         <div className="ml-[18px]">
           <SignupButton
-            disabled={authCode.length !== 6 || isVerified}
+            disabled={authCode.trim() === '' || isVerified || timeLeft === 0}
             onClick={handleVerify}
           >
             확인하기
           </SignupButton>
         </div>
       </div>
-      {!isVerified && timeLeft > 0 && (
-        <ul className="list-disc list-inside text-yellow-500 text-sm mt-1">
-          <li>남은 시간: {formatTime(timeLeft)}</li>
-        </ul>
-      )}
-      {isVerified && (
-        <ul className="list-disc list-inside text-green-500 text-sm mt-1">
-          <li>인증이 완료되었습니다.</li>
-        </ul>
-      )}
-      {!isVerified && timeLeft === 0 && (
-        <ul className="list-disc list-inside text-red-500 text-sm mt-1">
-          <li>인증 시간이 만료되었습니다. 다시 시도해주세요.</li>
-        </ul>
-      )}
+      <div className="h-6 mt-1">
+        {!isVerified && timeLeft > 0 && (
+          <ul className="list-disc list-inside text-yellow-500 text-sm">
+            <li>남은 시간: {formatTime(timeLeft)}</li>
+          </ul>
+        )}
+        {isVerified && (
+          <ul className="list-disc list-inside text-green-500 text-sm">
+            <li>{message}</li>
+          </ul>
+        )}
+        {!isVerified && timeLeft === 0 && (
+          <ul className="list-disc list-inside text-red-500 text-sm">
+            <li>인증 시간이 만료되었습니다.</li>
+          </ul>
+        )}
+        {!isVerified && message && (
+          <ul className="list-disc list-inside text-red-500 text-sm">
+            <li>{message}</li>
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

@@ -12,16 +12,16 @@ type SignupInputProps = {
   maxLength?: number;
 };
 
-const SignupInput = ({ 
-  id, 
-  name, 
-  type, 
-  placeholder, 
-  value, 
-  onChange, 
-  className, 
+const SignupInput = ({
+  id,
+  name,
+  type,
+  placeholder,
+  value,
+  onChange,
+  className,
   disabled,
-  maxLength
+  maxLength,
 }: SignupInputProps) => {
   return (
     <div className="form-control w-full">

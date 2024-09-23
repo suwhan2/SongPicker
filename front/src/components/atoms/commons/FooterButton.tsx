@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 
 type FooterButtonProps = {
+  // eslint-disable-next-line no-undef
   onClick: (e?: React.MouseEvent | React.FormEvent) => void;
   isValid: boolean;
+  // eslint-disable-next-line no-undef
   children: React.ReactNode;
 };
 
@@ -13,6 +15,7 @@ const FooterButton = ({ onClick, isValid, children }: FooterButtonProps) => {
     setIsActive(isValid);
   }, [isValid]);
 
+  // eslint-disable-next-line no-undef
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault(); // 버튼 클릭 시 새로고침 방지
     if (isActive) {

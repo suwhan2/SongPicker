@@ -5,5 +5,4 @@ public class RedisSessionConstants {
     public static final String CHECK_NICKNAME = "CheckNickname";
     public static final String CHECK_PHONE = "CheckPhone";
     public static final String AUTH_PHONE = "AuthPhone";
-    public static final String AUTH_CODE = "AuthCode";
 }

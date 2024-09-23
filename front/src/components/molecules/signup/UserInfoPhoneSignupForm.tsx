@@ -1,44 +1,100 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { debounce } from 'lodash';
 import SignupInput from '../../atoms/signup/SignupInput';
 import SignupButton from '../../atoms/signup/SignupButton';
+import useAuthStore from '../../../stores/useAuthStore';
 
 type UserInfoPhoneSignupFormProps = {
   onVerify: () => void;
   onResetAuthCode: () => void;
   onChange: (phone: string) => void;
+  onValidation: (isValid: boolean) => void;
   showLabel?: boolean;
+  purpose?: 'signup' | 'findPassword' | 'findLoginId';
 };
 
-const UserInfoPhoneSignupForm = ({ onVerify, onResetAuthCode, onChange, showLabel = true }: UserInfoPhoneSignupFormProps) => {
+const UserInfoPhoneSignupForm = ({
+  onVerify,
+  onResetAuthCode,
+  onChange,
+  onValidation,
+  showLabel = true,
+  purpose = 'signup',
+}: UserInfoPhoneSignupFormProps) => {
   const [phone, setPhone] = useState('');
-  const [isAvailable, setIsAvailable] = useState(false);
+  const [isPhoneValid, setIsPhoneValid] = useState(false);
+  const [isPhoneAvailable, setIsPhoneAvailable] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
+  const [message, setMessage] = useState('');
   const [showAuthCodeForm, setShowAuthCodeForm] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, '');
-    setPhone(value);
-    setIsAvailable(value.length === 11);
-    onChange(value);
-  };
+  const checkPhoneAvailability = useAuthStore(state => state.checkPhoneAvailability);
+  const sendPhoneVerification = useAuthStore(state => state.sendPhoneVerification);
 
-  const handleVerify = () => {
-    if (isAvailable) {
-      setShowAuthCodeForm(true);
-      onVerify();
+  const debouncedCheckAvailability = useCallback(
+    debounce(async (phoneNumber: string) => {
+      if (phoneNumber.length === 11) {
+        setIsChecking(true);
+        console.log('Checking phone availability:', phoneNumber);
+        try {
+          const { isAvailable, message } = await checkPhoneAvailability(phoneNumber);
+          console.log('Phone availability result:', isAvailable, message);
+          setIsPhoneAvailable(isAvailable);
+          setMessage(message);
+          onValidation(isAvailable);
+        } finally {
+          setIsChecking(false);
+        }
+      }
+    }, 300),
+    [checkPhoneAvailability, onValidation]
+  );
+
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value.replace(/[^0-9]/g, '');
+      setPhone(value);
+      onChange(value);
+      setIsPhoneValid(value.length === 11);
+      if (value.length === 11) {
+        debouncedCheckAvailability(value);
+      } else {
+        setIsPhoneAvailable(false);
+        onValidation(false);
+        setMessage('');
+      }
+    },
+    [onChange, debouncedCheckAvailability, onValidation]
+  );
+
+  const handleVerify = useCallback(async () => {
+    if (isPhoneValid && isPhoneAvailable) {
+      console.log('Sending phone verification:', phone);
+      const { isSuccess, message } = await sendPhoneVerification(phone, purpose);
+      console.log('Phone verification send result:', isSuccess, message);
+      if (isSuccess) {
+        setShowAuthCodeForm(true);
+        onVerify();
+      }
+      setMessage(message);
     }
-  };
+  }, [isPhoneValid, isPhoneAvailable, phone, sendPhoneVerification, purpose, onVerify]);
 
-  const handleRetry = () => {
+  const handleRetry = useCallback(() => {
     setShowAuthCodeForm(false);
     setPhone('');
-    setIsAvailable(false);
+    setIsPhoneValid(false);
+    setIsPhoneAvailable(false);
+    setMessage('');
     onResetAuthCode();
-  };
+  }, [onResetAuthCode]);
 
   return (
     <div className="h-24">
       {showLabel && (
-        <label htmlFor="phone" className="block text-lg text-white mb-2">휴대폰 번호</label>
+        <label htmlFor="phone" className="block text-lg text-white mb-2">
+          휴대폰 번호
+        </label>
       )}
       <div className="flex items-center">
         <SignupInput
@@ -55,29 +111,27 @@ const UserInfoPhoneSignupForm = ({ onVerify, onResetAuthCode, onChange, showLabe
         <div className="ml-[18px]">
           {!showAuthCodeForm && (
             <SignupButton
-              disabled={!isAvailable}
+              disabled={!isPhoneValid || !isPhoneAvailable || isChecking}
               onClick={handleVerify}
             >
               인증하기
             </SignupButton>
           )}
-          {showAuthCodeForm && (
-            <SignupButton onClick={handleRetry}>
-              다시 받기
-            </SignupButton>
-          )}
+          {showAuthCodeForm && <SignupButton onClick={handleRetry}>다시 받기</SignupButton>}
         </div>
       </div>
-      {isAvailable && !showAuthCodeForm && (
-        <ul className="list-disc list-inside text-green-500 text-sm mt-2">
-          <li>사용 가능한 번호입니다.</li>
-        </ul>
-      )}
-      {!isAvailable && phone.length > 0 && (
-        <ul className="list-disc list-inside text-red-500 text-sm mt-2">
-          <li>올바른 휴대폰 번호를 입력해주세요.</li>
-        </ul>
-      )}
+      <div className="h-6 mt-1">
+        {isChecking && (
+          <ul className="list-disc list-inside text-yellow-500 text-sm">
+            <li>확인 중...</li>
+          </ul>
+        )}
+        {!isChecking && message && (
+          <ul className="list-disc list-inside text-sm">
+            <li className={isPhoneAvailable ? 'text-green-500' : 'text-red-500'}>{message}</li>
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

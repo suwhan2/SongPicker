@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import UserInfoNameSignupForm from '../../molecules/signup/UserInfoNameSignupForm';
 import UserInfoNicknameSignupForm from '../../molecules/signup/UserInfoNicknameSignupForm';
 import UserInfoPhoneSignupForm from '../../molecules/signup/UserInfoPhoneSignupForm';
@@ -20,7 +20,6 @@ type UserInfoSignupFormProps = {
 const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps) => {
   const [showAuthCode, setShowAuthCode] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
-  const [isAuthCodeVerified, setIsAuthCodeVerified] = useState(false);
   const [resetAuthCode, setResetAuthCode] = useState(false);
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState('');
@@ -28,22 +27,23 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
   const [phone, setPhone] = useState('');
   const [gender, setGender] = useState<'MALE' | 'FEMALE'>('MALE');
 
+  const [isNicknameValid, setIsNicknameValid] = useState(false);
+  const [isPhoneValid, setIsPhoneValid] = useState(false);
+
   const formatBirthDate = (dateString: string): string => {
-    // 입력된 날짜가 YYYYMMDD 형식이라고 가정
     if (dateString.length === 8) {
       return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
     }
-    return dateString; // 형식이 맞지 않으면 원래 문자열 반환
+    return dateString;
   };
 
   useEffect(() => {
     const isValid =
       isPhoneVerified &&
-      isAuthCodeVerified &&
+      isNicknameValid &&
       name.trim() !== '' &&
-      nickname.trim() !== '' &&
       birth.trim() !== '' &&
-      phone.trim() !== '';
+      isPhoneValid;
     onValidChange(isValid);
 
     if (isValid) {
@@ -58,7 +58,8 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
     }
   }, [
     isPhoneVerified,
-    isAuthCodeVerified,
+    isNicknameValid,
+    isPhoneValid,
     name,
     nickname,
     birth,
@@ -68,59 +69,43 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
     onSubmit,
   ]);
 
-  const handlePhoneVerification = () => {
+  const handlePhoneVerification = useCallback(() => {
     setShowAuthCode(true);
+  }, []);
+
+  const handleAuthCodeVerification = useCallback(() => {
     setIsPhoneVerified(true);
-  };
+  }, []);
 
-  const handleAuthCodeVerification = () => {
-    setIsAuthCodeVerified(true);
-  };
-
-  const handleResetAuthCode = () => {
+  const handleResetAuthCode = useCallback(() => {
     setShowAuthCode(false);
-    setResetAuthCode(true);
-    setTimeout(() => setResetAuthCode(false), 0);
+    setResetAuthCode(prev => !prev);
     setIsPhoneVerified(false);
-  };
+  }, []);
 
   const handleGenderChange = (selectedGender: 'male' | 'female') => {
     const genderValue = selectedGender === 'male' ? 'MALE' : 'FEMALE';
     setGender(genderValue);
   };
 
-  const handleNameChange = (value: string) => {
-    setName(value);
-  };
-
-  const handleNicknameChange = (value: string) => {
-    setNickname(value);
-  };
-
-  const handleBirthChange = (value: string) => {
-    setBirth(value);
-  };
-
-  const handlePhoneChange = (value: string) => {
-    setPhone(value);
-  };
-
   return (
-    <div className="flex flex-col space-y-12 min-w-72 w-full">
-      <UserInfoNameSignupForm onChange={handleNameChange} />
-      <UserInfoNicknameSignupForm onChange={handleNicknameChange} />
+    <div className="flex flex-col space-y-12 min-w-72 w-full ">
+      <UserInfoNameSignupForm onChange={setName} />
+      <UserInfoNicknameSignupForm onChange={setNickname} onValidation={setIsNicknameValid} />
       <UserInfoPhoneSignupForm
         onVerify={handlePhoneVerification}
         onResetAuthCode={handleResetAuthCode}
-        onChange={handlePhoneChange}
+        onChange={setPhone}
+        onValidation={setIsPhoneValid}
       />
       {showAuthCode && (
         <UserInfoAuthCodeSignupForm
           onVerify={handleAuthCodeVerification}
           resetAuthCode={resetAuthCode}
+          phone={phone}
         />
       )}
-      <UserInfoBirthSignupForm onChange={handleBirthChange} />
+      <UserInfoBirthSignupForm onChange={setBirth} />
       <UserInfoGenderSignupForm onChange={handleGenderChange} />
     </div>
   );
