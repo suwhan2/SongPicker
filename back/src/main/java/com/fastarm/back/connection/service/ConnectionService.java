@@ -2,10 +2,12 @@ package com.fastarm.back.connection.service;
 
 import com.fastarm.back.common.constants.RedisConstants;
 import com.fastarm.back.common.service.RedisService;
-import com.fastarm.back.connection.Type;
+import com.fastarm.back.connection.enums.Type;
 import com.fastarm.back.connection.dto.*;
 import com.fastarm.back.connection.exception.CannotConnectException;
 import com.fastarm.back.connection.exception.CannotReserveException;
+import com.fastarm.back.karaoke.dto.ChargeDto;
+import com.fastarm.back.karaoke.dto.SaveReservationDto;
 import com.fastarm.back.song.exception.NotFoundSongException;
 import com.fastarm.back.song.repository.SongRepository;
 import lombok.RequiredArgsConstructor;
@@ -59,21 +61,21 @@ public class ConnectionService {
             throw new NotFoundSongException();
         }
 
+        SaveReservationDto saveReservationDto;
         if (connectInfoDto.getType() == Type.TEAM) {
-            SaveReservationDto saveReservationDto = SaveReservationDto.builder()
+            saveReservationDto = SaveReservationDto.builder()
                     .number(reservationDto.getNumber())
                     .groupId(connectInfoDto.getGroupId())
                     .type(Type.TEAM)
                     .build();
-            redisService.addToList(RedisConstants.RESERVATION_INFO + connectInfoDto.getSerialNumber(), saveReservationDto);
         } else {
-            SaveReservationDto saveReservationDto = SaveReservationDto.builder()
+            saveReservationDto = SaveReservationDto.builder()
                     .number(reservationDto.getNumber())
                     .nickname(reservationDto.getNickname())
                     .type(Type.INDIVIDUAL)
                     .build();
-            redisService.addToList(RedisConstants.RESERVATION_INFO + connectInfoDto.getSerialNumber(), saveReservationDto);
         }
+        redisService.addToList(RedisConstants.RESERVATION_INFO + connectInfoDto.getSerialNumber(), saveReservationDto);
     }
 
     private boolean checkCharge(String serialNumber) {
