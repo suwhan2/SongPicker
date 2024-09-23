@@ -7,12 +7,14 @@ type UserInfoAuthCodeSignupFormProps = {
   onVerify: () => void;
   resetAuthCode: boolean;
   phone: string;
+  purpose?: 'signup' | 'findPassword' | 'findLoginId';
 };
 
 const UserInfoAuthCodeSignupForm = ({
   onVerify,
   resetAuthCode,
   phone,
+  purpose = 'signup',
 }: UserInfoAuthCodeSignupFormProps) => {
   const [authCode, setAuthCode] = useState('');
   const [timeLeft, setTimeLeft] = useState(180);
@@ -28,9 +30,9 @@ const UserInfoAuthCodeSignupForm = ({
       setIsVerified(false);
       setTimeLeft(180);
       setMessage('');
-      sendPhoneVerification(phone, 'signup');
+      sendPhoneVerification(phone, purpose);
     }
-  }, [resetAuthCode, phone, sendPhoneVerification]);
+  }, [resetAuthCode, phone, sendPhoneVerification, purpose]);
 
   useEffect(() => {
     if (timeLeft > 0 && !isVerified) {
