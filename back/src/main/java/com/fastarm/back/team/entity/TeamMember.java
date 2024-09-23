@@ -1,4 +1,4 @@
-package com.fastarm.back.group.entity;
+package com.fastarm.back.team.entity;
 
 import com.fastarm.back.member.entity.Member;
 import jakarta.persistence.*;
@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Builder
-@Table(name = "member_group")
-public class MemberGroup {
+@Table(name = "member_team")
+public class TeamMember {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,8 +27,8 @@ public class MemberGroup {
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "group_id", nullable = false)
-    private Group group;
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
 
     @CreatedDate
     @Column(name = "join_at", nullable = false)

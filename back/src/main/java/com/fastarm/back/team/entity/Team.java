@@ -1,4 +1,4 @@
-package com.fastarm.back.group.entity;
+package com.fastarm.back.team.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Builder
-public class Group {
+public class Team {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,8 +23,8 @@ public class Group {
     private String name;
 
 
-    @Column(name = "group_image", length = 256)
-    private String groupImage;
+    @Column(name = "team_image", length = 256)
+    private String teamImage;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
