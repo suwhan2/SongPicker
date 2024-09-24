@@ -2,10 +2,11 @@ package com.fastarm.back.connection.service;
 
 import com.fastarm.back.common.constants.RedisConstants;
 import com.fastarm.back.common.service.RedisService;
+import com.fastarm.back.connection.exception.AlreadyExistConnectionException;
+import com.fastarm.back.connection.exception.CannotReserveException;
 import com.fastarm.back.karaoke.enums.Type;
 import com.fastarm.back.connection.dto.*;
 import com.fastarm.back.connection.exception.CannotConnectException;
-import com.fastarm.back.connection.exception.CannotReserveException;
 import com.fastarm.back.karaoke.dto.ChargeDto;
 import com.fastarm.back.karaoke.dto.SaveReservationDto;
 import com.fastarm.back.song.entity.Song;
@@ -22,18 +23,33 @@ public class ConnectionService {
     private final RedisService redisService;
     private final SongRepository songRepository;
 
-    public void setConnection(ConnectionDto connectionDto) {
+    public int setConnection(ConnectionDto connectionDto) {
 
         if (checkCharge(connectionDto.getSerialNumber())) {
             throw new CannotConnectException();
         }
 
+        String ExistConnection= (String) redisService.getData(RedisConstants.CONNECT_MACHINE + connectionDto.getNickname());
+
+        if (ExistConnection != null) {
+            if (checkCharge(ExistConnection)) {
+                redisService.deleteData(RedisConstants.CONNECT_MACHINE + connectionDto.getNickname());
+            } else {
+                throw new AlreadyExistConnectionException();
+            }
+        }
+
+        redisService.setData(RedisConstants.CONNECT_MACHINE + connectionDto.getNickname(), connectionDto.getSerialNumber());
+
         ConnectInfoDto connectInfoDto = ConnectInfoDto.builder()
-                .serialNumber(connectionDto.getSerialNumber())
                 .type(Type.INDIVIDUAL)
+                .nickname(connectionDto.getNickname())
                 .build();
 
-        redisService.setData(RedisConstants.CONNECT_INFO + connectionDto.getNickname(), connectInfoDto);
+        redisService.addToList(RedisConstants.CONNECT_INFO + connectionDto.getSerialNumber(), connectInfoDto);
+
+        ChargeDto chargeDto = (ChargeDto) redisService.getData(RedisConstants.CHARGE_INFO + connectionDto.getSerialNumber());
+        return chargeDto.getRemaining();
     }
 
     public void setGroupConnection(TeamConnectionDto groupConnection) {
@@ -45,25 +61,27 @@ public class ConnectionService {
 
         // 그룹에 모든 인원 추가
 
-        ConnectInfoDto connectInfoDto = ConnectInfoDto.builder()
-                .serialNumber(groupConnection.getSerialNumber())
-                .type(Type.TEAM)
-                .groupId(groupConnection.getTeamId())
-                .build();
+//        ConnectInfoDto connectInfoDto = ConnectInfoDto.builder()
+//                .serialNumber(groupConnection.getSerialNumber())
+//                .type(Type.TEAM)
+//                .groupId(groupConnection.getTeamId())
+//                .build();
 
         //redisService.setData(RedisConstants.CONNECT_INFO + groupConnection.getNickname(), connectInfoDto);
     }
 
     public void reserveSong(ReservationDto reservationDto) {
 
-        ConnectInfoDto connectInfoDto = (ConnectInfoDto) redisService.getData(RedisConstants.CONNECT_INFO + reservationDto.getNickname());
+        String serialNumber = (String) redisService.getData(RedisConstants.CONNECT_MACHINE + reservationDto.getNickname());
 
-        if (checkCharge(connectInfoDto.getSerialNumber())) {
+        if (checkCharge(serialNumber)) {
             throw new CannotReserveException();
         }
 
         Song song = songRepository.findByNumber(reservationDto.getNumber())
                 .orElseThrow(NotFoundSongException::new);
+
+        ConnectInfoDto connectInfoDto = (ConnectInfoDto) redisService.getFistData(RedisConstants.CONNECT_INFO + serialNumber);
 
         SaveReservationDto saveReservationDto;
         if (connectInfoDto.getType() == Type.TEAM) {
@@ -83,7 +101,7 @@ public class ConnectionService {
                     .type(Type.INDIVIDUAL)
                     .build();
         }
-        redisService.addToList(RedisConstants.RESERVATION_INFO + connectInfoDto.getSerialNumber(), saveReservationDto);
+        redisService.addToList(RedisConstants.RESERVATION_INFO + serialNumber, saveReservationDto);
     }
 
     private boolean checkCharge(String serialNumber) {

@@ -5,4 +5,5 @@ public class RedisConstants {
     public static final String CHARGE_INFO = "ChargeInfo:";
     public static final String RESERVATION_INFO = "ReservationInfo:";
     public static final String CONNECT_INFO = "ConnectInfo:";
+    public static final String CONNECT_MACHINE = "ConnectMachine:";
 }
