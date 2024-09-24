@@ -11,6 +11,7 @@ public class TeamAddDto {
     private String teamName;
     private MultipartFile teamImage;
     private String loginId;
+
     public Team toEntity(String imagePath){
         return Team.builder()
                 .name(teamName)

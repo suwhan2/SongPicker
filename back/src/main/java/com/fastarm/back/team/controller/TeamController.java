@@ -6,6 +6,7 @@ import com.fastarm.back.team.controller.dto.TeamAddRequest;
 import com.fastarm.back.team.dto.TeamDetailDto;
 import com.fastarm.back.team.dto.TeamDto;
 import com.fastarm.back.team.service.TeamService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,10 +37,9 @@ public class TeamController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> teamCreate(@ModelAttribute("teamImage") MultipartFile teamImage,
-                                         @ModelAttribute("teamName") String teamName,
+    public ResponseEntity<?> teamCreate(@Valid @ModelAttribute("teamImage") TeamAddRequest teamAddRequest,
                                          @AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
-        TeamAddRequest teamAddRequest = new TeamAddRequest(teamImage,teamName);
+
         teamService.createTeam(teamAddRequest.toDto(loginMemberInfo.getLoginId()));
         return new ResponseEntity<>(new ApiResponse<>("TE100", "그룹 생성 성공", null), HttpStatus.CREATED);
     }
