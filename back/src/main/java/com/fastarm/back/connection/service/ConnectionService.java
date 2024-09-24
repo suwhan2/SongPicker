@@ -91,8 +91,6 @@ public class ConnectionService {
 
         ChargeDto chargeDto = (ChargeDto) redisService.getData(key);
 
-        System.out.println("============" + key);
-
         return chargeDto == null || chargeDto.getRemaining() == 0;
     }
 }
