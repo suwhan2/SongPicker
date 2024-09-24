@@ -6,27 +6,33 @@ import useAuthStore from '../../../stores/useAuthStore';
 type UserInfoAuthCodeSignupFormProps = {
   onVerify: () => void;
   resetAuthCode: boolean;
+  phone: string;
+  purpose?: 'signup' | 'findPassword' | 'findLoginId';
 };
 
 const UserInfoAuthCodeSignupForm = ({
   onVerify,
   resetAuthCode,
+  phone,
+  purpose = 'signup',
 }: UserInfoAuthCodeSignupFormProps) => {
   const [authCode, setAuthCode] = useState('');
   const [timeLeft, setTimeLeft] = useState(180);
   const [isVerified, setIsVerified] = useState(false);
-  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
   const verifyPhoneCode = useAuthStore(state => state.verifyPhoneCode);
+  const sendPhoneVerification = useAuthStore(state => state.sendPhoneVerification);
 
   useEffect(() => {
     if (resetAuthCode) {
       setAuthCode('');
       setIsVerified(false);
       setTimeLeft(180);
-      setError('');
+      setMessage('');
+      sendPhoneVerification(phone, purpose);
     }
-  }, [resetAuthCode]);
+  }, [resetAuthCode, phone, sendPhoneVerification, purpose]);
 
   useEffect(() => {
     if (timeLeft > 0 && !isVerified) {
@@ -42,19 +48,17 @@ const UserInfoAuthCodeSignupForm = ({
   const handleVerify = useCallback(async () => {
     if (authCode.trim() !== '') {
       console.log('Verifying phone code:', authCode);
-      const verified = await verifyPhoneCode(authCode, ''); // 전화번호는 상위 컴포넌트에서 관리되므로 빈 문자열 전달
-      console.log('Phone code verification result:', verified);
-      if (verified) {
+      const { isSuccess, message } = await verifyPhoneCode(authCode, phone);
+      console.log('Phone code verification result:', isSuccess, message);
+      if (isSuccess) {
         setIsVerified(true);
         onVerify();
-        setError('');
-      } else {
-        setError('인증번호가 올바르지 않습니다.');
       }
+      setMessage(message);
     } else {
-      setError('인증번호를 입력해주세요.');
+      setMessage('인증번호를 입력해주세요.');
     }
-  }, [authCode, verifyPhoneCode, onVerify]);
+  }, [authCode, verifyPhoneCode, phone, onVerify]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -76,10 +80,13 @@ const UserInfoAuthCodeSignupForm = ({
           value={authCode}
           onChange={handleChange}
           className="flex-grow"
-          disabled={isVerified}
+          disabled={isVerified || timeLeft === 0}
         />
         <div className="ml-[18px]">
-          <SignupButton disabled={authCode.trim() === '' || isVerified} onClick={handleVerify}>
+          <SignupButton
+            disabled={authCode.trim() === '' || isVerified || timeLeft === 0}
+            onClick={handleVerify}
+          >
             확인하기
           </SignupButton>
         </div>
@@ -92,17 +99,17 @@ const UserInfoAuthCodeSignupForm = ({
         )}
         {isVerified && (
           <ul className="list-disc list-inside text-green-500 text-sm">
-            <li>인증이 완료되었습니다.</li>
+            <li>{message}</li>
           </ul>
         )}
         {!isVerified && timeLeft === 0 && (
           <ul className="list-disc list-inside text-red-500 text-sm">
-            <li>인증 시간이 만료되었습니다. 다시 시도해주세요.</li>
+            <li>인증 시간이 만료되었습니다.</li>
           </ul>
         )}
-        {error && (
+        {!isVerified && message && (
           <ul className="list-disc list-inside text-red-500 text-sm">
-            <li>{error}</li>
+            <li>{message}</li>
           </ul>
         )}
       </div>

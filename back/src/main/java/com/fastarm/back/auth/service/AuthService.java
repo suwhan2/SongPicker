@@ -4,6 +4,7 @@ import com.fastarm.back.auth.dto.PhoneSendDto;
 import com.fastarm.back.auth.dto.PhoneVerifyDto;
 import com.fastarm.back.auth.enums.PhoneAuthPurpose;
 import com.fastarm.back.auth.exception.PhoneAuthenticationException;
+import com.fastarm.back.common.constants.RedisConstants;
 import com.fastarm.back.common.constants.RedisSessionConstants;
 import com.fastarm.back.common.constants.RedisExpiredTimeConstants;
 import com.fastarm.back.common.service.RedisService;
@@ -75,7 +76,7 @@ public class AuthService {
     }
 
     private String generatePrefixedKey(String phone) {
-        return RedisSessionConstants.AUTH_CODE + ":" + phone;
+        return RedisConstants.AUTH_CODE + phone;
     }
 }
 

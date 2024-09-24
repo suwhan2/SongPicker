@@ -6,6 +6,8 @@ import com.fastarm.back.song.controller.dto.SongDetailRequest;
 import com.fastarm.back.song.controller.dto.SongSearchRequest;
 import com.fastarm.back.song.controller.dto.SongSearchResponse;
 import com.fastarm.back.song.dto.SongDetailDto;
+import com.fastarm.back.song.dto.SongDto;
+
 import com.fastarm.back.song.service.SongService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 @RestController
 @RequestMapping("/songs")
@@ -27,6 +30,25 @@ public class SongController {
         return new ResponseEntity<>(new ApiResponse<>("SO100", "노래 상세 조회 성공", songDetail), HttpStatus.OK);
 
     }
+    @GetMapping("/my/recommendations")
+    public ResponseEntity<?> mySongsRecommend(){
+        List<SongDto> songRecommendDtos = songService.recommendMySong();
+        return new ResponseEntity<>(new ApiResponse<>("SO102","선곡 추천 성공",songRecommendDtos), HttpStatus.OK);
+    }
+
+
+
+//    @GetMapping("/my/recommendations")
+//    public ResponseEntity<?> mySongsRecommend(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
+//        List<SongRecommendDto> songRecommendDtoList = songService.recommendMySong(loginMemberInfo.getLoginId());
+//        return new ResponseEntity<>(new ApiResponse<>("SO102","선곡 추천 성공",songRecommendDtoList), HttpStatus.OK);
+//    }
+//
+//    @GetMapping("/team/recommendations")
+//    public ResponseEntity<?> teamSongsRecommend(@RequestParam Long teamId){
+//        List<SongRecommendDto> songRecommendDtoList = songService.recommendTeamSong(teamId);
+//        return new ResponseEntity<>(new ApiResponse<>("SO102","선곡 추천 성공",songRecommendDtoList), HttpStatus.OK);
+//    }
 
 
     @GetMapping("/search")
