@@ -1,23 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQRConnectionStore } from '../../../stores/useQRConnectionStore ';
 import useAuthStore from '../../../stores/useAuthStore';
+import axiosInstance from '../../../services/axiosInstance';
 
 const LinkmodeCircle = () => {
-  const { isConnected, machineNumber } = useQRConnectionStore();
+  const [isConnected, setIsConnected] = useState(false);
+  const [machineNumber, setMachineNumber] = useState('');
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const navigate = useNavigate();
 
-  const handleClick = () => {
+  useEffect(() => {
+    const checkConnectionStatus = async () => {
+      try {
+        const response = await axiosInstance.get('/api/connections/status');
+        setIsConnected(response.data.isConnected);
+        setMachineNumber(response.data.machineNumber || '');
+      } catch (error) {
+        console.error('Failed to fetch connection status:', error);
+        setIsConnected(false);
+        setMachineNumber('');
+      }
+    };
+
+    checkConnectionStatus();
+    const intervalId = setInterval(checkConnectionStatus, 5000); // 5초마다 연결 상태 확인
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const handleClick = async () => {
     if (!isAuthenticated) {
       alert('로그인 후 이용하실 수 있습니다.');
-      // 알림 창이 완전히 닫힌 후 라우팅하기 위해 setTimeout 사용
-      setTimeout(() => {
-        // 라우팅 직전에 다시 한 번 인증 상태 확인
-        if (!useAuthStore.getState().isAuthenticated) {
-          navigate('/login');
-        }
-      }, 100);
+      navigate('/login');
     } else {
       navigate('/member-select');
     }

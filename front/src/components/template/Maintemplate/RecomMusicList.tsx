@@ -1,6 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import MusicItem from '../../organisms/commons/MusicItem';
 
+type Props = {
+  onShowNotification: (title: string, description: string) => void;
+  onShowConnectionModal: (message: string) => void;
+};
+
 // 하드코딩된 음악 데이터
 const hardcodedMusicList = [
   { id: '1', title: 'Song 1', artist: 'Artist 1', imageUrl: 'url1' },
@@ -25,7 +30,14 @@ const hardcodedMusicList = [
   { id: '20', title: 'Song 20', artist: 'Artist 20', imageUrl: 'url20' },
 ];
 
-const RecomMusicList = () => {
+const RecomMusicList = ({ onShowNotification, onShowConnectionModal }: Props) => {
+  const handleLike = () => {
+    onShowNotification(
+      '찜 완료!',
+      '찜한곡 리스트에 추가되었습니다!\n찜보관함에서 목록을 확인하실 수 있습니다.'
+    );
+  };
+
   const [currentPage, setCurrentPage] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -88,13 +100,17 @@ const RecomMusicList = () => {
           {Array.from({ length: totalPages }).map((_, pageIndex) => (
             <div key={pageIndex} className="w-[22.5%] flex-shrink-0 mr-[2.5%]">
               <div className="py-6 px-3">
-                {hardcodedMusicList
-                  .slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage)
-                  .map((item, index) => (
-                    <div key={item.id} className={index !== 0 ? 'mt-4' : ''}>
-                      <MusicItem title={item.title} artist={item.artist} imageUrl={item.imageUrl} />
-                    </div>
-                  ))}
+                {hardcodedMusicList.map((item, index) => (
+                  <div key={item.id} className={index !== 0 ? 'mt-4' : ''}>
+                    <MusicItem
+                      title={item.title}
+                      artist={item.artist}
+                      imageUrl={item.imageUrl}
+                      onLike={handleLike}
+                      onShowConnectionModal={onShowConnectionModal}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           ))}

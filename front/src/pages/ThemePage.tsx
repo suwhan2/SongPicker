@@ -1,19 +1,8 @@
 import React from 'react';
-import TopNavbar from '../components/organisms/commons/TopNavbar';
-import BottomNavbar from '../components/organisms/commons/BottomNavbar';
+import MainLayout from '../layouts/MainLayout';
 
 const ThemePage = () => {
-  return (
-    <div>
-      <TopNavbar />
-
-      {/* 테마페이지 내용 */}
-      <div>ThemePage</div>
-
-      {/* 하단 네브 */}
-      <BottomNavbar />
-    </div>
-  );
+  return <MainLayout title="테마별 노래 추천" children={undefined}></MainLayout>;
 };
 
 export default ThemePage;
