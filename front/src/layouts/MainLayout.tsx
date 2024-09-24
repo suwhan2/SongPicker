@@ -13,7 +13,7 @@ const MainLayout = ({ children, title }: MainLayoutProps) => {
       <div className="flex-shrink-0">
         <TopNavbar title={title} />
       </div>
-      <div className="flex-grow overflow-y-auto">{children}</div>
+      <div className="flex-grow overflow-y-auto relative">{children}</div>
       <div className="flex-shrink-0">
         <BottomNavbar />
       </div>
