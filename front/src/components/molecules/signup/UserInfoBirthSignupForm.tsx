@@ -27,7 +27,9 @@ const UserInfoBirthSignupForm = ({ onChange }: UserInfoBirthSignupFormProps) => 
 
   return (
     <div className="h-24">
-      <label htmlFor="birth" className="block text-lg text-white mb-2">생년월일</label>
+      <label htmlFor="birth" className="block text-lg text-white mb-2">
+        생년월일
+      </label>
       <SignupInput
         id="birth"
         name="birth"

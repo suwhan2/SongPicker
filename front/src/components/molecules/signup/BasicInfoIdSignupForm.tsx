@@ -17,7 +17,7 @@ const validateId = (id: string) => {
 const BasicInfoIdForm = ({ loginId, onChange, onValidation }: BasicInfoIdFormProps) => {
   const [isIdValid, setIsIdValid] = useState(false);
   const [isIdAvailable, setIsIdAvailable] = useState(false);
-  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const [isChecking, setIsChecking] = useState(false);
 
   const checkLoginIdAvailability = useAuthStore(state => state.checkLoginIdAvailability);
@@ -28,15 +28,11 @@ const BasicInfoIdForm = ({ loginId, onChange, onValidation }: BasicInfoIdFormPro
         setIsChecking(true);
         console.log('Checking login ID availability:', id);
         try {
-          const available = await checkLoginIdAvailability(id);
-          console.log('Login ID availability result:', available);
-          setIsIdAvailable(available);
-          setError(available ? '' : '이미 사용 중인 아이디입니다.');
-          onValidation(true, available);
-        } catch (error) {
-          console.error('Login ID check failed:', error);
-          setError('아이디 확인 중 오류가 발생했습니다.');
-          onValidation(false, false);
+          const { isAvailable, message } = await checkLoginIdAvailability(id);
+          console.log('Login ID availability result:', isAvailable, message);
+          setIsIdAvailable(isAvailable);
+          setMessage(message);
+          onValidation(true, isAvailable);
         } finally {
           setIsChecking(false);
         }
@@ -48,13 +44,12 @@ const BasicInfoIdForm = ({ loginId, onChange, onValidation }: BasicInfoIdFormPro
   useEffect(() => {
     const valid = validateId(loginId);
     setIsIdValid(valid);
-    setError(valid ? '' : '4~16자의 영문 소문자, 숫자만 사용 가능합니다.');
-
     if (valid) {
       debouncedCheckAvailability(loginId);
     } else {
       setIsIdAvailable(false);
       onValidation(false, false);
+      setMessage('');
     }
   }, [loginId, debouncedCheckAvailability, onValidation]);
 
@@ -83,14 +78,14 @@ const BasicInfoIdForm = ({ loginId, onChange, onValidation }: BasicInfoIdFormPro
             <li>확인 중...</li>
           </ul>
         )}
-        {!isChecking && isIdValid && isIdAvailable && (
-          <ul className="list-disc list-inside text-green-500 text-sm">
-            <li>사용 가능한 아이디입니다.</li>
+        {!isChecking && message && (
+          <ul className="list-disc list-inside text-sm">
+            <li className={isIdAvailable ? 'text-green-500' : 'text-red-500'}>{message}</li>
           </ul>
         )}
-        {!isChecking && error && (
+        {!isChecking && !isIdValid && loginId && (
           <ul className="list-disc list-inside text-sm text-red-500">
-            <li>{error}</li>
+            <li>4~16자의 영문 소문자, 숫자만 사용 가능합니다.</li>
           </ul>
         )}
       </div>

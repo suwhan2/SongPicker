@@ -7,7 +7,7 @@ type GenderButtonProps = {
   label: string;
 };
 
-const SignupGenderButton = ({ onClick, isSelected, label }:GenderButtonProps) => {
+const SignupGenderButton = ({ onClick, isSelected, label }: GenderButtonProps) => {
   return (
     <button
       type="button"

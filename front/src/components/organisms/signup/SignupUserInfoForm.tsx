@@ -20,7 +20,6 @@ type UserInfoSignupFormProps = {
 const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps) => {
   const [showAuthCode, setShowAuthCode] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
-  const [isAuthCodeVerified, setIsAuthCodeVerified] = useState(false);
   const [resetAuthCode, setResetAuthCode] = useState(false);
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState('');
@@ -29,6 +28,7 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
   const [gender, setGender] = useState<'MALE' | 'FEMALE'>('MALE');
 
   const [isNicknameValid, setIsNicknameValid] = useState(false);
+  const [isPhoneValid, setIsPhoneValid] = useState(false);
 
   const formatBirthDate = (dateString: string): string => {
     if (dateString.length === 8) {
@@ -40,11 +40,10 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
   useEffect(() => {
     const isValid =
       isPhoneVerified &&
-      isAuthCodeVerified &&
       isNicknameValid &&
       name.trim() !== '' &&
       birth.trim() !== '' &&
-      phone.trim() !== '';
+      isPhoneValid;
     onValidChange(isValid);
 
     if (isValid) {
@@ -59,8 +58,8 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
     }
   }, [
     isPhoneVerified,
-    isAuthCodeVerified,
     isNicknameValid,
+    isPhoneValid,
     name,
     nickname,
     birth,
@@ -72,17 +71,15 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
 
   const handlePhoneVerification = useCallback(() => {
     setShowAuthCode(true);
-    setIsPhoneVerified(true);
   }, []);
 
   const handleAuthCodeVerification = useCallback(() => {
-    setIsAuthCodeVerified(true);
+    setIsPhoneVerified(true);
   }, []);
 
   const handleResetAuthCode = useCallback(() => {
     setShowAuthCode(false);
-    setResetAuthCode(true);
-    setTimeout(() => setResetAuthCode(false), 0);
+    setResetAuthCode(prev => !prev);
     setIsPhoneVerified(false);
   }, []);
 
@@ -91,42 +88,24 @@ const SignupUserInfoForm = ({ onValidChange, onSubmit }: UserInfoSignupFormProps
     setGender(genderValue);
   };
 
-  const handleNameChange = (value: string) => {
-    setName(value);
-  };
-
-  const handleNicknameChange = (value: string) => {
-    setNickname(value);
-  };
-
-  const handleBirthChange = (value: string) => {
-    setBirth(value);
-  };
-
-  const handlePhoneChange = (value: string) => {
-    setPhone(value);
-  };
-
   return (
-    <div className="flex flex-col space-y-12 min-w-72 w-full">
-      <UserInfoNameSignupForm onChange={handleNameChange} />
-      <UserInfoNicknameSignupForm
-        onChange={handleNicknameChange}
-        onValidation={setIsNicknameValid}
-      />
+    <div className="flex flex-col space-y-12 min-w-72 w-full ">
+      <UserInfoNameSignupForm onChange={setName} />
+      <UserInfoNicknameSignupForm onChange={setNickname} onValidation={setIsNicknameValid} />
       <UserInfoPhoneSignupForm
         onVerify={handlePhoneVerification}
         onResetAuthCode={handleResetAuthCode}
-        onChange={handlePhoneChange}
-        onValidation={setIsPhoneVerified}
+        onChange={setPhone}
+        onValidation={setIsPhoneValid}
       />
       {showAuthCode && (
         <UserInfoAuthCodeSignupForm
           onVerify={handleAuthCodeVerification}
           resetAuthCode={resetAuthCode}
+          phone={phone}
         />
       )}
-      <UserInfoBirthSignupForm onChange={handleBirthChange} />
+      <UserInfoBirthSignupForm onChange={setBirth} />
       <UserInfoGenderSignupForm onChange={handleGenderChange} />
     </div>
   );
