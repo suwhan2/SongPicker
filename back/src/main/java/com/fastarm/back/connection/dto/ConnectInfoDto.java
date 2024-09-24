@@ -1,6 +1,6 @@
 package com.fastarm.back.connection.dto;
 
-import com.fastarm.back.connection.enums.Type;
+import com.fastarm.back.karaoke.enums.Type;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
