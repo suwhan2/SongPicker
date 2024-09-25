@@ -4,8 +4,8 @@ import com.fastarm.back.auth.security.dto.LoginMemberInfo;
 import com.fastarm.back.auth.security.entity.RefreshToken;
 import com.fastarm.back.auth.security.service.JwtService;
 import com.fastarm.back.auth.security.util.JwtUtil;
-import com.fastarm.back.basesong.constants.BaseSongConstants;
-import com.fastarm.back.basesong.repository.BaseSongRepository;
+import com.fastarm.back.basedata.constants.BaseDataConstants;
+import com.fastarm.back.basedata.repository.BaseDataRepository;
 import com.fastarm.back.common.constants.JwtConstants;
 import com.fastarm.back.auth.security.service.ResponseService;
 import com.fastarm.back.member.controller.dto.MemberLoginRequest;
@@ -32,13 +32,13 @@ import java.util.Iterator;
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
-    private final BaseSongRepository baseSongRepository;
+    private final BaseDataRepository baseDataRepository;
     private final JwtService jwtService;
 
-    public AuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService, BaseSongRepository baseSongRepository) {
+    public AuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService, BaseDataRepository baseDataRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
-        this.baseSongRepository = baseSongRepository;
+        this.baseDataRepository = baseDataRepository;
         setFilterProcessesUrl("/auths/login");
     }
 
@@ -86,7 +86,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         response.setHeader("Authorization", "Bearer " + access);
         response.addCookie(ResponseService.createCookie("refresh", refresh));
 
-        if (baseSongRepository.findByLoginId(loginId).size() >= BaseSongConstants.MINIMUM_CHOICE) {
+        if (baseDataRepository.findByLoginId(loginId).size() >= BaseDataConstants.MINIMUM_CHOICE) {
             ResponseService.setResponse(response, "AU100", "일반 로그인 성공", true, HttpStatus.OK);
         } else {
             ResponseService.setResponse(response, "AU100", "일반 로그인 성공", false, HttpStatus.OK);
