@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import LoginInput from '../../atoms/login/LoginInput';
 import LoginButton from '../../atoms/login/LoginButton';
 import PasswordVisibilityToggle from '../../atoms/commons/PasswordVisibilityToggle';
+import axiosInstance from '../../../services/axiosInstance';
+import useAuthStore from '../../../stores/useAuthStore';
 
 const LoginForm = () => {
   const [userId, setUserId] = useState('');
@@ -10,29 +12,49 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
+  const login = useAuthStore(state => state.login);
 
   useEffect(() => {
     if (errorMessage) {
       const timer = setTimeout(() => {
         setErrorMessage('');
       }, 3000);
-
       return () => clearTimeout(timer);
     }
   }, [errorMessage]);
 
-  const handleLogin = (e: React.MouseEvent) => {
+  const handleLogin = async (e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (!userId && !userPassword) {
-      setErrorMessage('아이디와 비밀번호를 입력해주세요.');
-    } else if (!userId) {
-      setErrorMessage('아이디를 입력해주세요.');
-    } else if (!userPassword) {
-      setErrorMessage('비밀번호를 입력해주세요.');
-    } else {
-      // TODO: Implement login logic
-      navigate('/');
+    if (!userId || !userPassword) {
+      setErrorMessage('아이디와 비밀번호를 모두 입력해주세요.');
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post('/api/auths/login', {
+        loginId: userId,
+        password: userPassword,
+      });
+
+      if (response.data.code === 'AU100') {
+        const authToken = response.headers['authorization'];
+        if (authToken) {
+          login(userId, authToken);
+          if (response.data.data === false) {
+            navigate('/song-select');
+          } else {
+            navigate('/');
+          }
+        } else {
+          setErrorMessage('인증 토큰을 받지 못했습니다.');
+        }
+      } else {
+        setErrorMessage(response.data.message || '로그인에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setErrorMessage('로그인 중 오류가 발생했습니다.');
     }
   };
 
