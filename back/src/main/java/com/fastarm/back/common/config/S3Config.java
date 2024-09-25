@@ -32,7 +32,9 @@ public class S3Config {
 
     @Bean
     public S3Service s3Service(AmazonS3 amazonS3) {
-       return new S3Service(amazonS3,bucket);
+       S3Service s3Service = new S3Service(amazonS3);
+       s3Service.setBucket(bucket);
+        return s3Service;
     }
 
 }

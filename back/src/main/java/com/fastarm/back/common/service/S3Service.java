@@ -21,9 +21,8 @@ public class S3Service implements FileService {
     private String bucket;
     private String aiS3Url;
 
-    public S3Service(AmazonS3 amazonS3, String bucket) {
+    public S3Service(AmazonS3 amazonS3) {
         this.amazonS3 = amazonS3;
-        this.bucket = bucket;
     }
 
     public String uploadFile(MultipartFile multipartFile) throws IOException {
