@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/auths/phone/*", "/members/check-nickname", "/members/check-phone", "/members/check-id", "/health-check").permitAll()
                         .requestMatchers("/songs/my/recommendations").permitAll()
                         .anyRequest().authenticated());
+
         http
                 .addFilterBefore(new CustomLogoutFilter(redisService), LogoutFilter.class);
         http
