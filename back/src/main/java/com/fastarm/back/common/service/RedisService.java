@@ -21,16 +21,8 @@ public class RedisService {
         redisTemplate.opsForValue().set(key, value);
     }
 
-    public void setHashData(String key, String field, Object value) {
-        redisTemplate.opsForHash().put(key, field, value);
-    }
-
     public Object getData(String key) {
         return redisTemplate.opsForValue().get(key);
-    }
-
-    public Object getHashData(String key, String field) {
-        return redisTemplate.opsForHash().get(key, field);
     }
 
     public void addToList(String key, Object value) {
@@ -39,6 +31,10 @@ public class RedisService {
 
     public List<Object> getList(String key) {
         return redisTemplate.opsForList().range(key, 0, -1);
+    }
+
+    public Object getFistData(String key) {
+        return redisTemplate.opsForList().leftPop(key);
     }
 
     public void deleteData(String key) {

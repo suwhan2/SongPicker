@@ -28,11 +28,11 @@ public class ConnectionController {
     @PostMapping
     public ResponseEntity<?> connectionSet(@RequestBody ConnectionRequest connectionRequest,
                                            @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
-        connectionService.setConnection(ConnectionDto.builder()
-                        .serialNumber(connectionRequest.getSerialNumber())
-                        .nickname(loginMemberInfo.getNickname())
-                        .build());
-        return ResponseEntity.ok(new ApiResponse<>("CO100", "서비스 연동 성공", null));
+        int remaining = connectionService.setConnection(ConnectionDto.builder()
+                            .serialNumber(connectionRequest.getSerialNumber())
+                            .nickname(loginMemberInfo.getNickname())
+                            .build());
+        return ResponseEntity.ok(new ApiResponse<>("CO100", "서비스 연동 성공", remaining));
     }
 
     @PostMapping("/group")
