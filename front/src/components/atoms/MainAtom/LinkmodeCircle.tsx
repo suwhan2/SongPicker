@@ -9,24 +9,24 @@ const LinkmodeCircle = () => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkConnectionStatus = async () => {
-      try {
-        const response = await axiosInstance.get('/api/connections/status');
-        setIsConnected(response.data.isConnected);
-        setMachineNumber(response.data.machineNumber || '');
-      } catch (error) {
-        console.error('Failed to fetch connection status:', error);
-        setIsConnected(false);
-        setMachineNumber('');
-      }
-    };
+  // useEffect(() => {
+  //   const checkConnectionStatus = async () => {
+  //     try {
+  //       const response = await axiosInstance.get('/api/connections');
+  //       setIsConnected(response.data.isConnected);
+  //       setMachineNumber(response.data.machineNumber || '');
+  //     } catch (error) {
+  //       console.error('Failed to fetch connection status:', error);
+  //       setIsConnected(false);
+  //       setMachineNumber('');
+  //     }
+  //   };
 
-    checkConnectionStatus();
-    const intervalId = setInterval(checkConnectionStatus, 5000); // 5초마다 연결 상태 확인
+  //   checkConnectionStatus();
+  //   const intervalId = setInterval(checkConnectionStatus, 5000); // 5초마다 연결 상태 확인
 
-    return () => clearInterval(intervalId);
-  }, []);
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   const handleClick = async () => {
     if (!isAuthenticated) {

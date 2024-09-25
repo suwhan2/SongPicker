@@ -5,24 +5,24 @@ const LinkModeSubtext = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [selectedMode, setSelectedMode] = useState('');
 
-  useEffect(() => {
-    const checkConnectionStatus = async () => {
-      try {
-        const response = await axiosInstance.get('/api/connections/status');
-        setIsConnected(response.data.isConnected);
-        setSelectedMode(response.data.selectedMode || '');
-      } catch (error) {
-        console.error('Failed to fetch connection status:', error);
-        setIsConnected(false);
-        setSelectedMode('');
-      }
-    };
+  // useEffect(() => {
+  //   const checkConnectionStatus = async () => {
+  //     try {
+  //       const response = await axiosInstance.get('/api/connections');
+  //       setIsConnected(response.data.isConnected);
+  //       setSelectedMode(response.data.selectedMode || '');
+  //     } catch (error) {
+  //       console.error('Failed to fetch connection status:', error);
+  //       setIsConnected(false);
+  //       setSelectedMode('');
+  //     }
+  //   };
 
-    checkConnectionStatus();
-    const intervalId = setInterval(checkConnectionStatus, 5000); // 5초마다 연결 상태 확인
+  //   checkConnectionStatus();
+  //   const intervalId = setInterval(checkConnectionStatus, 5000); // 5초마다 연결 상태 확인
 
-    return () => clearInterval(intervalId);
-  }, []);
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   const getSubtext = () => {
     if (!isConnected) return '연결을 해주세요';

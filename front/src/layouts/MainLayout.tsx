@@ -9,14 +9,16 @@ type MainLayoutProps = {
 
 const MainLayout = ({ children, title }: MainLayoutProps) => {
   return (
-    <div className="flex flex-col w-full h-screen bg-black text-white">
-      <div className="flex-shrink-0">
-        <TopNavbar title={title} />
+    <div className="flex flex-col w-full min-h-screen bg-black text-white">
+      {/* <div className="flex-shrink-0"> */}
+      <TopNavbar title={title} />
+      {/* </div> */}
+      <div className="flex-grow overflow-y-auto overflow-x-hidden relative pb-[60px]">
+        {children}
       </div>
-      <div className="flex-grow overflow-y-auto relative">{children}</div>
-      <div className="flex-shrink-0">
-        <BottomNavbar />
-      </div>
+      {/* <div className="flex-shrink-0"> */}
+      <BottomNavbar />
+      {/* </div> */}
     </div>
   );
 };
