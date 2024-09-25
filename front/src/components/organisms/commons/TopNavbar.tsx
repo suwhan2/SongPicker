@@ -8,7 +8,7 @@ type Props = {
 
 const TopNavbar = ({ title }: Props) => {
   return (
-    <nav className="sticky w-screen max-w-[640px] mx-auto top-0 left-0 h-[60px] bg-[#222] flex items-center px-4 py-2 justify-between">
+    <nav className="sticky w-screen max-w-[640px] mx-auto top-0 left-0 h-[60px] bg-black flex items-center px-4 py-2 justify-between z-[999] border-b border-[#222]">
       <TopNavbarLeftList title={title} />
       <TopNavbarRightList />
     </nav>

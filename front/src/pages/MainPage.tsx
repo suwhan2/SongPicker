@@ -39,7 +39,7 @@ const MainPage = () => {
 
   return (
     <MainLayout>
-      <div className="flex flex-col space-y-8 p-5">
+      <div className="flex flex-col space-y-8 px-2 py-4">
         {/* 노래방 연결 */}
         <div className="w-full">
           <KaraokeLinkMode />
