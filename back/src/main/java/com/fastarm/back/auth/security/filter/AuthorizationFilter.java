@@ -39,14 +39,14 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         try {
             JwtUtil.isExpired(accessToken);
         } catch (ExpiredJwtException e) {
-            ResponseService.setResponse(response, "AU005", "엑세스 토큰 만료", HttpStatus.UNAUTHORIZED);
+            ResponseService.setResponse(response, "AU005", "엑세스 토큰 만료", null, HttpStatus.UNAUTHORIZED);
             return;
         }
 
         String category = JwtUtil.getCategory(accessToken);
 
         if (!category.equals("access")) {
-            ResponseService.setResponse(response, "AU006", "엑세스 토큰 인증 실패", HttpStatus.UNAUTHORIZED);
+            ResponseService.setResponse(response, "AU006", "엑세스 토큰 인증 실패", null, HttpStatus.UNAUTHORIZED);
             return;
         }
 

@@ -4,6 +4,7 @@ import com.fastarm.back.auth.security.filter.AuthenticationFilter;
 import com.fastarm.back.auth.security.filter.AuthorizationFilter;
 import com.fastarm.back.auth.security.filter.CustomLogoutFilter;
 import com.fastarm.back.auth.security.service.JwtService;
+import com.fastarm.back.basesong.repository.BaseSongRepository;
 import com.fastarm.back.common.service.RedisService;
 import com.fastarm.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final BaseSongRepository baseSongRepository;
     private final MemberRepository memberRepository;
     private final RedisService redisService;
     private final JwtService jwtService;
@@ -62,7 +64,7 @@ public class SecurityConfig {
         http
                 .addFilterBefore(new AuthorizationFilter(memberRepository), AuthenticationFilter.class);
         http
-                .addFilterAt(new AuthenticationFilter(authenticationManager(authenticationConfiguration), jwtService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new AuthenticationFilter(authenticationManager(authenticationConfiguration), jwtService, baseSongRepository), UsernamePasswordAuthenticationFilter.class);
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
