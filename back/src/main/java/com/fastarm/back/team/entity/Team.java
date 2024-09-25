@@ -35,6 +35,10 @@ public class Team {
     @Column(name = "used_at")
     private LocalDateTime usedAt;
 
+    public void changeTeam(String name, String teamImage){
+        this.name = name;
+        this.teamImage = teamImage;
+    }
 
 
 }
