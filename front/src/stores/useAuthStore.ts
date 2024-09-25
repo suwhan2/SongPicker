@@ -154,7 +154,7 @@ const useAuthStore = create<AuthState>()(
             requestBody.loginId = loginId;
           }
 
-          const response = await axiosInstance.post('/api/auth/phone/send', requestBody);
+          const response = await axiosInstance.post('/api/auths/phone/send', requestBody);
           const { code, message } = response.data;
           switch (code) {
             case 'AU101':
@@ -176,7 +176,7 @@ const useAuthStore = create<AuthState>()(
 
       verifyPhoneCode: async (authCode: string, phone: string) => {
         try {
-          const response = await axiosInstance.post('/api/auth/phone/verify', { authCode, phone });
+          const response = await axiosInstance.post('/api/auths/phone/verify', { authCode, phone });
           const { code, message } = response.data;
           switch (code) {
             case 'AU102':
