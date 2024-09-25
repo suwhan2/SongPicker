@@ -23,7 +23,7 @@ public class ConnectionService {
     private final RedisService redisService;
     private final SongRepository songRepository;
 
-    public int setConnection(ConnectionDto connectionDto) {
+    public void setConnection(ConnectionDto connectionDto) {
 
         if (checkCharge(connectionDto.getSerialNumber())) {
             throw new CannotConnectException();
@@ -47,9 +47,6 @@ public class ConnectionService {
                 .build();
 
         redisService.addToList(RedisConstants.CONNECT_INFO + connectionDto.getSerialNumber(), connectInfoDto);
-
-        ChargeDto chargeDto = (ChargeDto) redisService.getData(RedisConstants.CHARGE_INFO + connectionDto.getSerialNumber());
-        return chargeDto.getRemaining();
     }
 
     public void setGroupConnection(TeamConnectionDto groupConnection) {
