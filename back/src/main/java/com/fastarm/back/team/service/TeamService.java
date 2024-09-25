@@ -1,5 +1,6 @@
 package com.fastarm.back.team.service;
 
+import com.fastarm.back.common.service.S3Service;
 import com.fastarm.back.team.dto.TeamAddDto;
 import com.fastarm.back.team.dto.TeamDetailDto;
 import com.fastarm.back.team.dto.TeamDto;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fastarm.back.member.exception.MemberNotFoundException;
 import com.fastarm.back.team.exception.TeamNotFoundException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,8 @@ public class TeamService {
     private final TeamMemberRepository memberGroupRepository;
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
+    private final S3Service s3Service;
+
 
     @Transactional(readOnly = true)
     public List<TeamDto> getMyTeams(String loginId){
@@ -65,16 +69,15 @@ public class TeamService {
     }
 
     @Transactional
-    public void createTeam(TeamAddDto dto){
-        String imagePath="";
-//        String imagePath = saveImage(dto.getGroupImage()); S3 업로드 로직 추가
+    public void createTeam(TeamAddDto dto) throws IOException {
+
+        String imagePath = s3Service.uploadFile(dto.getTeamImage());
         Team team = dto.toEntity(imagePath);
         Team savedTeam = teamRepository.save(team);
 
         Member member = memberRepository.findByLoginId(dto.getLoginId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        // 방장 그룹에 자동 추가
         TeamMember teamMember = TeamMember.builder()
                 .member(member)
                 .team(savedTeam)

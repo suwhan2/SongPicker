@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -38,11 +39,13 @@ public class TeamController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> teamCreate(@Valid @ModelAttribute("teamImage") TeamAddRequest teamAddRequest,
-                                         @AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
+                                         @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) throws IOException {
 
         teamService.createTeam(teamAddRequest.toDto(loginMemberInfo.getLoginId()));
         return new ResponseEntity<>(new ApiResponse<>("TE100", "그룹 생성 성공", null), HttpStatus.CREATED);
     }
+
+
 
 
 }

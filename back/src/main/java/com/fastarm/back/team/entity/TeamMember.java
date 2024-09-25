@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Builder
-@Table(name = "member_team")
+@Table(name = "team_member")
 public class TeamMember {
 
     @Id
@@ -30,8 +31,8 @@ public class TeamMember {
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
-    @CreatedDate
-    @Column(name = "join_at", nullable = false)
+    @CreationTimestamp
+    @Column(name = "join_at", nullable = false, updatable = false)
     private LocalDateTime joinAt;
 
     //필요한가?

@@ -1,6 +1,7 @@
 package com.fastarm.back.team.validation.validator;
 
-import com.fastarm.back.member.validation.annotation.Name;
+
+import com.fastarm.back.team.validation.annotation.Name;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
