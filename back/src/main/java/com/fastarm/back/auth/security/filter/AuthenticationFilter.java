@@ -4,6 +4,8 @@ import com.fastarm.back.auth.security.dto.LoginMemberInfo;
 import com.fastarm.back.auth.security.entity.RefreshToken;
 import com.fastarm.back.auth.security.service.JwtService;
 import com.fastarm.back.auth.security.util.JwtUtil;
+import com.fastarm.back.basedata.constants.BaseDataConstants;
+import com.fastarm.back.basedata.repository.BaseDataRepository;
 import com.fastarm.back.common.constants.JwtConstants;
 import com.fastarm.back.auth.security.service.ResponseService;
 import com.fastarm.back.member.controller.dto.MemberLoginRequest;
@@ -30,11 +32,13 @@ import java.util.Iterator;
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+    private final BaseDataRepository baseDataRepository;
     private final JwtService jwtService;
 
-    public AuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService) {
+    public AuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService, BaseDataRepository baseDataRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.baseDataRepository = baseDataRepository;
         setFilterProcessesUrl("/auths/login");
     }
 
@@ -81,12 +85,18 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         response.setHeader("Authorization", "Bearer " + access);
         response.addCookie(ResponseService.createCookie("refresh", refresh));
-        ResponseService.setResponse(response, "AU100", "일반 로그인 성공", HttpStatus.OK);
+
+        if (baseDataRepository.findByLoginId(loginId).size() >= BaseDataConstants.MINIMUM_CHOICE) {
+            ResponseService.setResponse(response, "AU100", "일반 로그인 성공", true, HttpStatus.OK);
+        } else {
+            ResponseService.setResponse(response, "AU100", "일반 로그인 성공", false, HttpStatus.OK);
+        }
+
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        ResponseService.setResponse(response, "AU000", "일반 로그인 실패", HttpStatus.UNAUTHORIZED);
+        ResponseService.setResponse(response, "AU000", "일반 로그인 실패", null, HttpStatus.UNAUTHORIZED);
     }
 
 }

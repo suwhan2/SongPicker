@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ConnectionExceptionConstants implements ExceptionConstants {
     CANNOT_CONNECT("CO000", "서비스 연동 실패", HttpStatus.BAD_REQUEST),
-    CANNOT_RESERVE("C001", "예약 실패", HttpStatus.BAD_REQUEST);
+    CANNOT_RESERVE("CO001", "예약 실패", HttpStatus.BAD_REQUEST),
+    ALREADY_CONNECT("CO002", "연동된 기기 존재", HttpStatus.CONFLICT);
 
     final String code;
     final String message;

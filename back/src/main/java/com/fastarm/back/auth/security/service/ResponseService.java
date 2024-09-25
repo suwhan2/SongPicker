@@ -11,12 +11,12 @@ import java.io.IOException;
 
 public class ResponseService {
 
-    public static void setResponse(HttpServletResponse response, String code, String message, HttpStatus status) throws IOException {
+    public static void setResponse(HttpServletResponse response, String code, String message, Object data, HttpStatus status) throws IOException {
         response.setStatus(status.value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        ApiResponse<?> apiResponse = new ApiResponse<>(code, message, null);
+        ApiResponse<?> apiResponse = new ApiResponse<>(code, message, data);
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonResponse = objectMapper.writeValueAsString(apiResponse);
         response.getWriter().write(jsonResponse);

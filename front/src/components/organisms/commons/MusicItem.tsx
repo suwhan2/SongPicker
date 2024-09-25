@@ -6,19 +6,20 @@ type Props = {
   title: string;
   artist: string;
   imageUrl: string;
+  onLike: () => void;
+  onShowConnectionModal: (message: string) => void;
 };
 
-const MusicItem = ({ title, artist, imageUrl }: Props) => {
+const MusicItem = ({ title, artist, imageUrl, onLike, onShowConnectionModal }: Props) => {
   return (
-    <div className="flex items-center justify-between w-full">
+    <div className="flex items-center justify-between w-full px-2 py-1 rounded-md">
       <div className="flex-grow overflow-hidden mr-2">
         <LeftMusicItem title={title} artist={artist} imageUrl={imageUrl} />
       </div>
       <div className="flex-shrink-0">
-        <RightMusicItem />
+        <RightMusicItem onLike={onLike} onShowConnectionModal={onShowConnectionModal} />
       </div>
     </div>
   );
 };
-
 export default MusicItem;
