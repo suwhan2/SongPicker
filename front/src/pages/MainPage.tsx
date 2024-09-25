@@ -4,6 +4,7 @@ import KaraokeLinkMode from '../components/organisms/MainOrganism/KaraokeLinkMod
 import RecomMusicList from '../components/template/Maintemplate/RecomMusicList';
 import CustomAlert from '../components/template/commons/CustomAlert';
 import ConnectionModal from '../components/template/commons/ConnectionModal';
+import UserStatisticsBanner from '../components/template/Maintemplate/UserStatisticsBanner';
 
 const MainPage = () => {
   const [showNotification, setShowNotification] = useState(false);
@@ -39,14 +40,14 @@ const MainPage = () => {
 
   return (
     <MainLayout>
-      <div className="flex flex-col space-y-8 px-2 py-4">
+      <div className="flex flex-col space-y-8 py-4">
         {/* 노래방 연결 */}
-        <div className="w-full">
+        <div className="w-full px-2">
           <KaraokeLinkMode />
         </div>
 
         {/* 사용자 맞춤 추천곡 */}
-        <div className="w-full">
+        <div className="w-full px-2">
           <RecomMusicList
             onShowNotification={handleShowNotification}
             onShowConnectionModal={handleShowConnectionModal}
@@ -57,7 +58,9 @@ const MainPage = () => {
         {/* 추가 예정 */}
 
         {/* 사용자 통계 배너 */}
-        {/* 추가 예정 */}
+        <div className="w-full">
+          <UserStatisticsBanner />
+        </div>
 
         {/* 사용자 추천 아티스트 */}
         {/* 추가 예정 */}
