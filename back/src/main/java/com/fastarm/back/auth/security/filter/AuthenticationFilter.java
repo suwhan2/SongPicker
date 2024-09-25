@@ -4,6 +4,7 @@ import com.fastarm.back.auth.security.dto.LoginMemberInfo;
 import com.fastarm.back.auth.security.entity.RefreshToken;
 import com.fastarm.back.auth.security.service.JwtService;
 import com.fastarm.back.auth.security.util.JwtUtil;
+import com.fastarm.back.basesong.constants.BaseSongConstants;
 import com.fastarm.back.basesong.repository.BaseSongRepository;
 import com.fastarm.back.common.constants.JwtConstants;
 import com.fastarm.back.auth.security.service.ResponseService;
@@ -85,7 +86,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         response.setHeader("Authorization", "Bearer " + access);
         response.addCookie(ResponseService.createCookie("refresh", refresh));
 
-        if (baseSongRepository.findByLoginId(loginId).isPresent()) {
+        if (baseSongRepository.findByLoginId(loginId).size() >= BaseSongConstants.MINIMUM_CHOICE) {
             ResponseService.setResponse(response, "AU100", "일반 로그인 성공", true, HttpStatus.OK);
         } else {
             ResponseService.setResponse(response, "AU100", "일반 로그인 성공", false, HttpStatus.OK);

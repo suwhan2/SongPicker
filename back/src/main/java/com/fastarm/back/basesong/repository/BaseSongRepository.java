@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface BaseSongRepository extends JpaRepository<BaseSong, Long> {
 
@@ -14,5 +14,5 @@ public interface BaseSongRepository extends JpaRepository<BaseSong, Long> {
         FROM BaseSong bs
         WHERE bs.member.loginId = :loginId
    """)
-    Optional<BaseSong> findByLoginId(@Param("loginId") String loginId);
+    List<BaseSong> findByLoginId(@Param("loginId") String loginId);
 }
