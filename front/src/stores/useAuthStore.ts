@@ -9,10 +9,10 @@ interface AuthState {
   role: string | null;
   loginId: string | null;
   register: (userData: RegisterData) => Promise<void>;
-  login: (accessToken: string, role: string, loginId: string) => void;
+  login: (accessToken: string, loginId: string) => void;
   logout: () => void;
   getAccessToken: () => string | null;
-  getRole: () => string | null;
+  // getRole: () => string | null;
   getLoginId: () => string | null;
   checkLoginIdAvailability: (loginId: string) => Promise<{ isAvailable: boolean; message: string }>;
   checkNicknameAvailability: (
@@ -74,14 +74,16 @@ const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
-      login: (accessToken: string, role: string, loginId: string) => {
-        set({ isAuthenticated: true, accessToken, role, loginId });
+      login: (loginId: string, accessToken: string) => {
+        set({ isAuthenticated: true, loginId, accessToken });
+        axiosInstance.defaults.headers.common['Authorization'] = accessToken;
       },
       logout: () => {
-        set({ isAuthenticated: false, accessToken: null, role: null, loginId: null });
+        set({ isAuthenticated: false, accessToken: null, loginId: null });
+        delete axiosInstance.defaults.headers.common['Authorization'];
       },
       getAccessToken: () => get().accessToken,
-      getRole: () => get().role,
+      // getRole: () => get().role,
       getLoginId: () => get().loginId,
 
       checkLoginIdAvailability: async (loginId: string) => {
