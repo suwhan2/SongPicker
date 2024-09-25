@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -6,7 +5,6 @@ import svgr from 'vite-plugin-svgr';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// ESM 환경에서 __dirname 사용을 위한 설정
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -47,7 +45,6 @@ export default defineConfig(({ command }) => ({
   },
   publicDir: 'public',
 
-  // 개발 서버 설정
   server: {
     proxy: {
       '/api': {
@@ -59,7 +56,7 @@ export default defineConfig(({ command }) => ({
           proxy.on('error', (err, _req, _res) => {
             console.log('proxy error', err);
           });
-          proxy.on('proxyReq', (proxyReq, req, _res) => {
+          proxy.on('proxyReq', (_proxyReq, req, _res) => {
             console.log('Sending Request to the Target:', req.method, req.url);
           });
           proxy.on('proxyRes', (proxyRes, req, _res) => {
