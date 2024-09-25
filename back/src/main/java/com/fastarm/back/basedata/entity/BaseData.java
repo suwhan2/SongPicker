@@ -1,18 +1,16 @@
-package com.fastarm.back.basesong.entity;
+package com.fastarm.back.basedata.entity;
 
 import com.fastarm.back.member.entity.Member;
 import com.fastarm.back.song.entity.Song;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class BaseSong {
+public class BaseData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
