@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -16,8 +17,24 @@ public class RedisService {
         redisTemplate.opsForValue().set(key, value, expiredTime, TimeUnit.MILLISECONDS);
     }
 
+    public void setData(String key, Object value) {
+        redisTemplate.opsForValue().set(key, value);
+    }
+
     public Object getData(String key) {
         return redisTemplate.opsForValue().get(key);
+    }
+
+    public void addToList(String key, Object value) {
+        redisTemplate.opsForList().rightPush(key, value);
+    }
+
+    public List<Object> getList(String key) {
+        return redisTemplate.opsForList().range(key, 0, -1);
+    }
+
+    public Object getFistData(String key) {
+        return redisTemplate.opsForList().leftPop(key);
     }
 
     public void deleteData(String key) {
