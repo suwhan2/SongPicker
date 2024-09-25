@@ -23,9 +23,9 @@ const App = () => {
       <div className="flex flex-col min-h-screen w-screen max-w-[640px] mx-auto relative bg-black">
         <Routes>
           {/* 인증된 사용자만 접근 가능한 라우트 */}
+          <Route path="/" element={<MainPage />} />
           {isAuthenticated ? (
             <>
-              <Route path="/" element={<MainPage />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/theme" element={<ThemePage />} />
               <Route path="/group" element={<GroupPage />} />
@@ -46,7 +46,7 @@ const App = () => {
               <Route path="/signup/*" element={<SignupPage />} />
               <Route path="/find-account/*" element={<FindAccountPage />} />
               {/* 비인증 사용자가 다른 페이지 접근 시 로그인 페이지로 리다이렉트 */}
-              <Route path="*" element={<Navigate to="/login" replace />} />
+              {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
             </>
           )}
         </Routes>
