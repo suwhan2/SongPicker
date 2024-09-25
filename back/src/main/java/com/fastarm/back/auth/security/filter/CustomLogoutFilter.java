@@ -77,7 +77,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         cookie.setSecure(true);
 
         response.addCookie(cookie);
-        ResponseService.setResponse(response, "AU105", "로그아웃 성공", HttpStatus.OK);
+        ResponseService.setResponse(response, "AU105", "로그아웃 성공", null, HttpStatus.OK);
     }
 
     private String generatePrefixedKey(String key) {
