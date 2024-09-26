@@ -12,6 +12,7 @@ interface AuthState {
   login: (accessToken: string, loginId: string) => void;
   logout: () => void;
   getAccessToken: () => string | null;
+  setAccessToken: (token: string) => void;
   // getRole: () => string | null;
   getLoginId: () => string | null;
   checkLoginIdAvailability: (loginId: string) => Promise<{ isAvailable: boolean; message: string }>;
@@ -75,12 +76,22 @@ const useAuthStore = create<AuthState>()(
         }
       },
       login: (loginId: string, accessToken: string) => {
-        set({ isAuthenticated: true, loginId, accessToken });
-        axiosInstance.defaults.headers.common['Authorization'] = accessToken;
+        const formattedToken = accessToken.startsWith('Bearer ')
+          ? accessToken
+          : `Bearer ${accessToken}`;
+        console.log('Setting token in login:', formattedToken); // 로그인 시 토큰 출력
+        set({ isAuthenticated: true, loginId, accessToken: formattedToken });
       },
+
+      setAccessToken: (token: string) => {
+        const formattedToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+        console.log('Setting new access token:', formattedToken);
+        set({ accessToken: formattedToken, isAuthenticated: true });
+      },
+
       logout: () => {
+        console.log('Logging out, clearing token'); // 로그아웃 시 메시지 출력
         set({ isAuthenticated: false, accessToken: null, loginId: null });
-        delete axiosInstance.defaults.headers.common['Authorization'];
       },
       getAccessToken: () => get().accessToken,
       // getRole: () => get().role,

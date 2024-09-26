@@ -10,6 +10,7 @@ type FooterButtonLayoutProps = {
   onButtonClick: () => void;
   isButtonValid: boolean;
   currentStep?: number;
+  onBackButtonClick?: () => void;
 };
 
 const FooterButtonLayout = ({
@@ -19,13 +20,14 @@ const FooterButtonLayout = ({
   onButtonClick,
   isButtonValid,
   currentStep,
+  onBackButtonClick,
 }: FooterButtonLayoutProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="flex flex-col w-full h-screen bg-black text-white">
       <div className="flex-shrink-0">
-        <SubTopNavbar title={title} />
+        <SubTopNavbar title={title} onBackButtonClick={onBackButtonClick} />
       </div>
       {currentStep && (
         <div className="flex-shrink-0">

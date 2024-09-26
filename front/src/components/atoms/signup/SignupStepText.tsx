@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 type SignupStepTextProps = {
-  text: string;
+  text: ReactNode;
+  className?: string;
 };
 
-const SignupStepText = ({ text }: SignupStepTextProps) => {
-  return <p className="text-center text-xl">{text}</p>;
+const SignupStepText = ({ text, className = '' }: SignupStepTextProps) => {
+  return (
+    <div className={` text-xl ${className}`}>{typeof text === 'string' ? <p>{text}</p> : text}</div>
+  );
 };
 
 export default SignupStepText;

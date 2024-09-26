@@ -1,63 +1,57 @@
-import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig, AxiosError } from 'axios';
+import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
+import useAuthStore from '../stores/useAuthStore';
 
-interface RefreshTokenResponse {
+interface ApiErrorResponse {
   code: string;
   message: string;
-  data: null;
+  data: unknown;
 }
 
-// ApiError 인터페이스를 AxiosError를 확장하도록 수정
+interface ApiSuccessResponse<T = unknown> {
+  code: string;
+  message: string;
+  data: T;
+}
+
+type ApiResponse<T = unknown> = ApiErrorResponse | ApiSuccessResponse<T>;
+
 interface ApiError extends AxiosError {
-  response?: AxiosError['response'] & {
-    data: {
-      code: string;
-      message: string;
-    };
-  };
-  config: InternalAxiosRequestConfig & { _retry?: boolean };
+  response?: AxiosResponse<ApiResponse>;
 }
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: '/',
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },
-  validateStatus: function (status: number): boolean {
-    return status >= 200 && status < 500;
-  },
 });
 
-const getAccessToken = (): string | null => localStorage.getItem('accessToken');
-const setAccessToken = (token: string): void => localStorage.setItem('accessToken', token);
-const getRefreshToken = (): string | null => localStorage.getItem('refreshToken');
+const isApiErrorResponse = (response: ApiResponse): response is ApiErrorResponse => {
+  return response.code.startsWith('AU') && response.code !== 'AU104';
+};
 
 const refreshAccessToken = async (): Promise<string> => {
-  console.log('Attempting to refresh access token');
   try {
-    const response: AxiosResponse<RefreshTokenResponse> = await axios.post(
+    console.log('Attempting to refresh token...');
+    const response = await axios.post<ApiResponse>(
       '/api/auths/refresh',
       {},
-      {
-        withCredentials: true, // HttpOnly 쿠키를 위해 추가
-      }
+      { withCredentials: true }
     );
-
     console.log('Refresh token response:', response.data);
 
     if (response.data.code === 'AU104') {
       const newAccessToken = response.headers['authorization'];
       if (typeof newAccessToken === 'string') {
-        setAccessToken(newAccessToken);
-        console.log('New access token received and set');
-        return newAccessToken;
-      } else {
-        console.error('New access token is missing in headers');
-        throw new Error('New access token is missing in headers');
+        const formattedToken = newAccessToken.startsWith('Bearer ')
+          ? newAccessToken
+          : `Bearer ${newAccessToken}`;
+        useAuthStore.getState().setAccessToken(formattedToken);
+        console.log('New access token set in store:', formattedToken);
+        return formattedToken;
       }
-    } else {
-      console.error(`Failed to refresh token: ${response.data.message}`);
-      throw new Error(`Failed to refresh token: ${response.data.message}`);
     }
+    throw new Error('Failed to refresh token');
   } catch (error) {
     console.error('Error refreshing token:', error);
     throw error;
@@ -66,10 +60,12 @@ const refreshAccessToken = async (): Promise<string> => {
 
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    const token = getAccessToken();
+    const token = useAuthStore.getState().getAccessToken();
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-      console.log('Added token to request:', config.url);
+      config.headers['Authorization'] = token;
+      console.log('Added token to request:', config.url, token);
+    } else {
+      console.log('No token available for request:', config.url);
     }
     return config;
   },
@@ -80,29 +76,29 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-  (response: AxiosResponse): AxiosResponse => {
-    console.log('Response received:', response.config.url, response.status);
-    return response;
-  },
-  async (error: AxiosError): Promise<AxiosResponse> => {
-    const apiError = error as ApiError;
-    console.error('Response error:', apiError.response?.status, apiError.response?.data);
-
-    if (apiError.response?.data.code === 'AU005' && !apiError.config._retry) {
-      console.log('Access token expired, attempting refresh');
-      apiError.config._retry = true;
-
-      try {
-        const newAccessToken = await refreshAccessToken();
-        apiError.config.headers['Authorization'] = `Bearer ${newAccessToken}`;
-        console.log('Retrying original request with new token');
-        return axiosInstance(apiError.config);
-      } catch (refreshError) {
-        console.error('Failed to refresh token:', refreshError);
-        return Promise.reject(refreshError);
+  response => response,
+  async (error: ApiError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    if (
+      error.response?.status === 401 &&
+      error.response.data &&
+      isApiErrorResponse(error.response.data)
+    ) {
+      if (error.response.data.code === 'AU005' && !originalRequest._retry) {
+        console.log('Token expired, attempting to refresh...');
+        originalRequest._retry = true;
+        try {
+          const newAccessToken = await refreshAccessToken();
+          originalRequest.headers['Authorization'] = newAccessToken;
+          console.log('Retrying original request with new token');
+          return axiosInstance(originalRequest);
+        } catch (refreshError) {
+          console.error('Failed to refresh token, logging out');
+          useAuthStore.getState().logout();
+          return Promise.reject(refreshError);
+        }
       }
     }
-
     return Promise.reject(error);
   }
 );
