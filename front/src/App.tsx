@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import SearchPage from './pages/SearchPage';
 import ThemePage from './pages/ThemePage';
@@ -15,40 +15,143 @@ import SongSelectPage from './pages/SongSelectPage';
 import useAuthStore from './stores/useAuthStore';
 import './App.css';
 
-const App = () => {
+// PrivateRoute 컴포넌트 정의
+interface PrivateRouteProps {
+  children: ReactNode;
+}
+
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// PublicRoute 컴포넌트 정의
+interface PublicRouteProps {
+  children: ReactNode;
+}
+
+const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const App = () => {
   return (
     <Router>
-      <div className="flex flex-col min-h-screen w-screen max-w-[640px] mx-auto relative bg-black">
+      <div className="flex flex-col  min-h-screen w-screen max-w-[640px] mx-auto relative bg-black">
         <Routes>
-          {/* 인증된 사용자만 접근 가능한 라우트 */}
-          <Route path="/" element={<MainPage />} />
-          {isAuthenticated ? (
-            <>
-              <Route path="/search" element={<SearchPage />} />
-              <Route path="/theme" element={<ThemePage />} />
-              <Route path="/group" element={<GroupPage />} />
-              <Route path="/members/:id" element={<ProfilePage />} />
-              <Route path="/member-select" element={<MemberSelectPage />} />
-              <Route path="/group-select" element={<GroupSelectPage />} />
-              <Route path="/qr-scan" element={<QrScanPage />} />
-              <Route path="/song-select" element={<SongSelectPage />} />
-              {/* 로그인한 사용자가 로그인/회원가입/계정찾기 페이지 접근 시 메인으로 리다이렉트 */}
-              <Route path="/login" element={<Navigate to="/" replace />} />
-              <Route path="/signup/*" element={<Navigate to="/" replace />} />
-              <Route path="/find-account/*" element={<Navigate to="/" replace />} />
-            </>
-          ) : (
-            <>
-              {/* 비인증 사용자용 라우트 */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup/*" element={<SignupPage />} />
-              <Route path="/find-account/*" element={<FindAccountPage />} />
-              {/* 비인증 사용자가 다른 페이지 접근 시 로그인 페이지로 리다이렉트 */}
-              {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
-            </>
-          )}
+          {/* 공개 라우트 (인증된 사용자는 접근 불가) */}
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/signup/*"
+            element={
+              <PublicRoute>
+                <SignupPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/find-account/*"
+            element={
+              <PublicRoute>
+                <FindAccountPage />
+              </PublicRoute>
+            }
+          />
+
+          {/* 인증이 필요한 라우트 */}
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <MainPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/search"
+            element={
+              <PrivateRoute>
+                <SearchPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/theme"
+            element={
+              <PrivateRoute>
+                <ThemePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/group"
+            element={
+              <PrivateRoute>
+                <GroupPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/members/:id"
+            element={
+              <PrivateRoute>
+                <ProfilePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/member-select"
+            element={
+              <PrivateRoute>
+                <MemberSelectPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/group-select"
+            element={
+              <PrivateRoute>
+                <GroupSelectPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/qr-scan"
+            element={
+              <PrivateRoute>
+                <QrScanPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/song-select"
+            element={
+              <PrivateRoute>
+                <SongSelectPage />
+              </PrivateRoute>
+            }
+          />
+
+          {/* 기타 모든 라우트는 메인 페이지로 리다이렉트 */}
+          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
         </Routes>
       </div>
     </Router>
