@@ -48,7 +48,7 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
 const App = () => {
   return (
     <Router>
-      <div className="flex flex-col min-h-screen w-screen max-w-[640px] mx-auto relative bg-black">
+      <div className="flex flex-col  min-h-screen w-screen max-w-[640px] mx-auto relative bg-black">
         <Routes>
           {/* 공개 라우트 (인증된 사용자는 접근 불가) */}
           <Route
