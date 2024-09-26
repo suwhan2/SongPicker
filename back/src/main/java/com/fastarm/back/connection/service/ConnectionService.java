@@ -1,6 +1,7 @@
 package com.fastarm.back.connection.service;
 
 import com.fastarm.back.common.constants.RedisConstants;
+import com.fastarm.back.common.constants.RedisExpiredTimeConstants;
 import com.fastarm.back.common.service.RedisService;
 import com.fastarm.back.connection.exception.AlreadyExistConnectionException;
 import com.fastarm.back.connection.exception.CannotReserveException;
@@ -39,14 +40,14 @@ public class ConnectionService {
             }
         }
 
-        redisService.setData(RedisConstants.CONNECT_MACHINE + connectionDto.getNickname(), connectionDto.getSerialNumber());
+        redisService.setData(RedisConstants.CONNECT_MACHINE + connectionDto.getNickname(), connectionDto.getSerialNumber(), RedisExpiredTimeConstants.CONNECTION_EXPIRED);
 
         ConnectInfoDto connectInfoDto = ConnectInfoDto.builder()
                 .type(Type.INDIVIDUAL)
                 .nickname(connectionDto.getNickname())
                 .build();
 
-        redisService.addToList(RedisConstants.CONNECT_INFO + connectionDto.getSerialNumber(), connectInfoDto);
+        redisService.addToList(RedisConstants.CONNECT_INFO + connectionDto.getSerialNumber(), connectInfoDto, RedisExpiredTimeConstants.CONNECTION_EXPIRED);
     }
 
     public void setGroupConnection(TeamConnectionDto groupConnection) {
@@ -98,7 +99,7 @@ public class ConnectionService {
                     .type(Type.INDIVIDUAL)
                     .build();
         }
-        redisService.addToList(RedisConstants.RESERVATION_INFO + serialNumber, saveReservationDto);
+        redisService.addToList(RedisConstants.RESERVATION_INFO + serialNumber, saveReservationDto, RedisExpiredTimeConstants.CONNECTION_EXPIRED);
     }
 
     private boolean checkCharge(String serialNumber) {
