@@ -34,7 +34,7 @@ const refreshAccessToken = async (): Promise<string> => {
   try {
     console.log('Attempting to refresh token...');
     const response = await axios.post<ApiResponse>(
-      '/api/auths/refresh',
+      '/api/api/auths/refresh',
       {},
       { withCredentials: true }
     );

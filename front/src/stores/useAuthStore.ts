@@ -8,6 +8,8 @@ interface AuthState {
   accessToken: string | null;
   role: string | null;
   loginId: string | null;
+  isSongSelected: boolean; // 곡 선택 여부
+  setSongSelected: (isSelected: boolean) => void; // 곡 선택 상태 설정 함수
   register: (userData: RegisterData) => Promise<void>;
   login: (accessToken: string, loginId: string) => void;
   logout: () => void;
@@ -52,6 +54,10 @@ const useAuthStore = create<AuthState>()(
       accessToken: null,
       role: null,
       loginId: null,
+      isSongSelected: false, // 기본값은 false
+      setSongSelected: (isSelected: boolean) => {
+        set({ isSongSelected: isSelected });
+      },
       register: async (userData: RegisterData) => {
         console.log('Registering user with data:', JSON.stringify(userData, null, 2));
         try {
