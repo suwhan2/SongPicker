@@ -91,7 +91,7 @@ public class HistoryService {
         Member member = memberRepository.findByLoginId(teamRecentSongsDto.getLoginId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        Team team = teamRepository.findById(teamRecentSongsDto.getGroupId())
+        Team team = teamRepository.findById(teamRecentSongsDto.getTeamId())
                 .orElseThrow(TeamNotFoundException::new);
 
         teamService.checkPermission(member, team);
