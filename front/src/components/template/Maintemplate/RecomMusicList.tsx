@@ -2,13 +2,17 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import MusicItem from '../../organisms/commons/MusicItem';
 import MusicDetailModal from '../commons/MusicDetailModal';
 import { IoMdRefreshCircle } from 'react-icons/io';
+import { TbMoodSadSquint } from 'react-icons/tb';
+
 import { getPersonalRecommendations } from '../../../services/songservices';
 
+// Props 타입 정의
 type Props = {
   onShowNotification: (title: string, description: string) => void;
   onShowConnectionModal: (message: string) => void;
 };
 
+// 추천 곡 인터페이스 정의
 interface RecommendedSong {
   number: string;
   title: string;
@@ -24,8 +28,8 @@ const RecomMusicList = ({ onShowNotification, onShowConnectionModal }: Props) =>
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMusic, setSelectedMusic] = useState<RecommendedSong | null>(null);
   const [recommendedSongs, setRecommendedSongs] = useState<RecommendedSong[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const itemsPerPage = 5;
   const totalPages = useMemo(
@@ -33,44 +37,75 @@ const RecomMusicList = ({ onShowNotification, onShowConnectionModal }: Props) =>
     [recommendedSongs.length]
   );
 
+  // 에러 메시지 컴포넌트
+  const ErrorMessage = ({ message }: { message: string }) => (
+    <div className="w-full h-[300px] bg-[#333] rounded-md flex items-center justify-center">
+      <div className="text-center p-6">
+        <TbMoodSadSquint className="text-6xl mx-auto mb-4" />
+        <h4 className="text-xl font-bold text-white mb-2">앗! 문제가 발생했어요</h4>
+        <p className="text-gray-300 mb-4 whitespace-pre-line">{message}</p>
+        <button
+          onClick={handleRefresh}
+          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+          disabled={isRefreshing}
+        >
+          {isRefreshing ? '시도 중...' : '다시 시도하기'}
+        </button>
+      </div>
+    </div>
+  );
+
+  // 추천 곡 목록을 가져오는 함수
   const fetchRecommendations = useCallback(async () => {
-    setIsLoading(true);
+    setIsRefreshing(true);
     setError(null);
     try {
       const response = await getPersonalRecommendations();
       if (response.code === 'SO102') {
         if (Array.isArray(response.data) && response.data.length > 0) {
-          setRecommendedSongs(response.data);
+          setRecommendedSongs(prevSongs => {
+            if (JSON.stringify(prevSongs) !== JSON.stringify(response.data)) {
+              return response.data;
+            }
+            return prevSongs;
+          });
           setCurrentPage(0);
         } else {
-          setError('No recommendations available at the moment.');
+          setError('현재 추천할 노래가 없어요.\n잠시 후 다시 시도해 주세요!');
         }
       } else {
-        setError(`Failed to fetch recommendations: ${response.message}`);
+        setError('노래 정보를 불러오는 데 문제가 발생했어요.\n다시 시도해 볼까요?');
       }
     } catch (err) {
-      setError('An error occurred while fetching recommendations. Please try again later.');
+      setError('일시적으로 노래 정보를 불러올 수 없어요.\n잠시 후 다시 시도해 주세요!');
     } finally {
-      setIsLoading(false);
+      setIsRefreshing(false);
     }
   }, []);
 
+  // 컴포넌트 마운트 시 추천 곡 목록 가져오기
   useEffect(() => {
     fetchRecommendations();
   }, [fetchRecommendations]);
 
+  // 페이지 변경 시 컨테이너 위치 조정
   useEffect(() => {
     const container = containerRef.current;
     if (container) {
+      container.style.transition = currentPage === 0 ? 'none' : 'transform 0.3s ease-in-out';
       container.style.transform = `translateX(-${currentPage * 100}%)`;
     }
   }, [currentPage]);
 
+  // 새로고침 버튼 핸들러
   const handleRefresh = useCallback(() => {
-    fetchRecommendations();
-    onShowNotification('♪ 추천리스트 변경', '새로운 추천 목록을 불러왔습니다.');
-  }, [fetchRecommendations, onShowNotification]);
+    if (!isRefreshing) {
+      fetchRecommendations();
+      onShowNotification('♪ 추천리스트 갱신 중', '새로운 추천 목록을 불러오고 있어요.');
+    }
+  }, [fetchRecommendations, onShowNotification, isRefreshing]);
 
+  // 좋아요 버튼 핸들러
   const handleLike = useCallback(() => {
     onShowNotification(
       '찜 완료!',
@@ -78,11 +113,13 @@ const RecomMusicList = ({ onShowNotification, onShowConnectionModal }: Props) =>
     );
   }, [onShowNotification]);
 
+  // 곡 선택 핸들러
   const handleItemClick = useCallback((music: RecommendedSong) => {
     setSelectedMusic(music);
     setIsModalOpen(true);
   }, []);
 
+  // 터치 이벤트 핸들러
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     const container = containerRef.current;
@@ -122,6 +159,7 @@ const RecomMusicList = ({ onShowNotification, onShowConnectionModal }: Props) =>
     [currentPage, totalPages]
   );
 
+  // 음악 아이템 렌더링
   const renderMusicItems = useMemo(
     () =>
       Array.from({ length: totalPages }).map((_, pageIndex) => (
@@ -148,27 +186,31 @@ const RecomMusicList = ({ onShowNotification, onShowConnectionModal }: Props) =>
     [recommendedSongs, totalPages, handleLike, onShowConnectionModal, handleItemClick]
   );
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-4">
         <h3 className="w-full text-xl font-semibold">김해피님의 취향저격 선곡리스트</h3>
-        <IoMdRefreshCircle className="size-8 cursor-pointer" onClick={handleRefresh} />
+        <IoMdRefreshCircle
+          className={`size-8 cursor-pointer ${isRefreshing ? 'animate-spin' : ''}`}
+          onClick={handleRefresh}
+        />
       </div>
-      <div className="w-full relative overflow-hidden bg-[#333] rounded-md">
-        <div
-          ref={containerRef}
-          className="flex transition-transform duration-300 ease-in-out"
-          style={{ width: `${totalPages * 100}%` }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {renderMusicItems}
+      {error ? (
+        <ErrorMessage message={error} />
+      ) : (
+        <div className="w-full relative overflow-hidden bg-[#333] rounded-md">
+          <div
+            ref={containerRef}
+            className="flex transition-transform duration-300 ease-in-out"
+            style={{ width: `${totalPages * 23.5}%` }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            {renderMusicItems}
+          </div>
         </div>
-      </div>
+      )}
       <div className="mt-4 flex justify-center items-center">
         {Array.from({ length: totalPages }).map((_, index) => (
           <div
