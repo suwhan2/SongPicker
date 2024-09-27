@@ -25,7 +25,7 @@ const LinkModeSubtext = () => {
   // }, []);
 
   const getSubtext = () => {
-    if (!isConnected) return '연결을 해주세요';
+    if (!isConnected) return '연결하고 더 많은 서비스를 이용해보세요 ';
     return `${selectedMode} 이용중`;
   };
 
