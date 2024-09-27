@@ -11,7 +11,7 @@ import MemberSelectPage from './pages/LinkPages/MemberSelectPage';
 import GroupSelectPage from './pages/LinkPages/GroupSelectPage';
 import QrScanPage from './pages/LinkPages/QrScanPage';
 import FindAccountPage from './pages/FindAccountPage';
-import SongSelectPage from './pages/SongSelectPage';
+import SongSelectPage from './pages/SongsSelectPage';
 import useAuthStore from './stores/useAuthStore';
 import './App.css';
 
@@ -46,6 +46,8 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
 };
 
 const App = () => {
+  const isSongSelected = useAuthStore(state => state.isSongSelected); // 곡 선택 여부 확인
+
   return (
     <Router>
       <div className="flex flex-col  min-h-screen w-screen max-w-[640px] mx-auto relative bg-black">
@@ -144,9 +146,13 @@ const App = () => {
           <Route
             path="/song-select"
             element={
-              <PrivateRoute>
-                <SongSelectPage />
-              </PrivateRoute>
+              isSongSelected ? (
+                <Navigate to="/" replace /> // 곡이 이미 선택되었으면 메인 페이지로 리다이렉트
+              ) : (
+                <PrivateRoute>
+                  <SongSelectPage />
+                </PrivateRoute>
+              )
             }
           />
 

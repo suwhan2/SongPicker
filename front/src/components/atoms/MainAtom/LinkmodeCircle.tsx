@@ -40,7 +40,7 @@ const LinkmodeCircle = () => {
   return (
     <div
       onClick={handleClick}
-      className={`cursor-pointer font-semibold text-center size-24 rounded-full flex flex-col items-center justify-center ${
+      className={`cursor-pointer text-sm font-semibold text-center size-[82px] rounded-full flex flex-col items-center justify-center ${
         isConnected ? 'border-[#50FFB3] border-2' : 'border-2'
       }`}
     >
