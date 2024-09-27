@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum TeamExceptionConstants implements ExceptionConstants {
 
     Team_Not_Found_Exception("TE001", "그룹 조회 실패", HttpStatus.BAD_REQUEST),
-    Team_Unauthorized_Exception("TE002", "그룹 권한 없음", HttpStatus.BAD_REQUEST);
+    Team_Member_Not_Found_Exception("TE000", "그룹 권한 없음", HttpStatus.BAD_REQUEST);
 
     final String code;
     final String message;

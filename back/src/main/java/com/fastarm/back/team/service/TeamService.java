@@ -7,7 +7,7 @@ import com.fastarm.back.team.dto.TeamDto;
 import com.fastarm.back.team.dto.TeamModifyDto;
 import com.fastarm.back.team.entity.Team;
 import com.fastarm.back.team.entity.TeamMember;
-import com.fastarm.back.team.exception.TeamUnauthorizedException;
+import com.fastarm.back.team.exception.TeamMemberNotFoundException;
 import com.fastarm.back.team.repository.TeamRepository;
 import com.fastarm.back.team.repository.TeamMemberRepository;
 import com.fastarm.back.member.entity.Member;
@@ -111,8 +111,8 @@ public class TeamService {
     }
 
     private void checkPermission(Member member, Team team) {
-        boolean isMember = memberGroupRepository.existsByMemberAndTeam(member, team);
-        if (!isMember) throw new TeamUnauthorizedException();
+        boolean isMember = memberGroupRepository.existsByTeamAndMember(team, member);
+        if (!isMember) throw new TeamMemberNotFoundException();
     }
 
 
