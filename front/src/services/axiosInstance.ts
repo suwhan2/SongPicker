@@ -18,7 +18,7 @@ interface ApiError extends AxiosError {
 }
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: '/',
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },
