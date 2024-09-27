@@ -9,9 +9,6 @@ import com.fastarm.back.song.dto.SongDetailDto;
 import com.fastarm.back.song.dto.SongDto;
 import com.fastarm.back.song.entity.Song;
 import com.fastarm.back.song.exception.NotFoundSongDetailException;
-
-import com.fastarm.back.song.dto.SongDto;
-
 import com.fastarm.back.song.repository.SongRepository;
 import com.fastarm.back.member.exception.MemberNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +26,6 @@ import java.util.stream.Collectors;
 public class SongService {
     private final SongRepository songRepository;
     private final MemberRepository memberRepository;
-    // 좋아요 레포 추가
     private final RestTemplate restTemplate;
     private static final String DJANGO_API_URL = "http://django-server/recommendations";
 
@@ -43,6 +39,8 @@ public class SongService {
                         .title(song.getTitle())
                         .singer(song.getSinger())
                         .coverImage(song.getCoverImage())
+                        .isLike(false)
+                        .likeId(null)
                         .build())
                 .collect(Collectors.toList());
 
@@ -76,27 +74,28 @@ public class SongService {
 
     @Transactional(readOnly = true)
     public SongDetailDto getSongDetails(SongDetailRequest dto) {
-        // 노래 조회
+
         Song song = songRepository.findById(dto.getSongId())
                 .orElseThrow(NotFoundSongDetailException::new);
-        //id 찾기
+
         Member member = memberRepository.findByLoginId(dto.getLoginId())
                 .orElseThrow(MemberNotFoundException::new);
 
-//        Optional<Long> likeId = likesRepository.findByMemberIdAndSongId(member.getId(),songId);
+        List<SongDto> songDtoList = songRepository.findSongsWithLikeStatus(List.of(song.getId()), member.getId());
+        SongDto songDto = songDtoList.get(0);
 
         return SongDetailDto.builder()
-                .number(song.getNumber())
-                .title(song.getTitle())
-                .singer(song.getSinger())
-                .coverImage(song.getCoverImage())
+                .number(songDto.getNumber())
+                .title(songDto.getTitle())
+                .singer(songDto.getSinger())
+                .coverImage(songDto.getCoverImage())
                 .genre(song.getGenre())
                 .lyricist(song.getLyricist())
                 .composer(song.getComposer())
                 .lyrics(song.getLyrics())
                 .releasedAt(song.getReleasedAt())
-//                .isLike(likeId.isPresent())
-//                .likeId(likeId.orElse(null))
+                .isLike(songDto.getIsLike())
+                .likeId(songDto.getLikeId())
                 .build();
    }
 

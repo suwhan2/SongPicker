@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import MainLayout from '../layouts/MainLayout';
 import KaraokeLinkMode from '../components/organisms/MainOrganism/KaraokeLinkMode';
 import RecomMusicList from '../components/template/Maintemplate/RecomMusicList';
-import CustomAlert from '../components/template/commons/CustomAlert';
+import CustomAlert from '../components/template/commons/CustomAlertModal';
 import ConnectionModal from '../components/template/commons/ConnectionModal';
 import UserStatisticsBanner from '../components/template/Maintemplate/UserStatisticsBanner';
+import RecomThemeBanner from '../components/template/Maintemplate/RecomThemeBanner';
 
 const MainPage = () => {
   const [showNotification, setShowNotification] = useState(false);
@@ -40,14 +41,14 @@ const MainPage = () => {
 
   return (
     <MainLayout>
-      <div className="flex flex-col space-y-8 py-4">
+      <div className="flex flex-col space-y-8 py-4 w-full">
         {/* 노래방 연결 */}
-        <div className="w-full px-2">
+        <div className="px-2">
           <KaraokeLinkMode />
         </div>
 
         {/* 사용자 맞춤 추천곡 */}
-        <div className="w-full px-2">
+        <div className="px-2">
           <RecomMusicList
             onShowNotification={handleShowNotification}
             onShowConnectionModal={handleShowConnectionModal}
@@ -55,10 +56,12 @@ const MainPage = () => {
         </div>
 
         {/* 테마 추천 */}
-        {/* 추가 예정 */}
+        <div className="px-2">
+          <RecomThemeBanner />
+        </div>
 
         {/* 사용자 통계 배너 */}
-        <div className="w-full">
+        <div>
           <UserStatisticsBanner />
         </div>
 
