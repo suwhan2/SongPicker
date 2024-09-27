@@ -62,7 +62,7 @@ public class HistoryController {
             @RequestParam int year,
             @AuthenticationPrincipal LoginMemberInfo loginMemberInfo
     ) {
-        List<LocalDate> result = historyService.findSingDateList(new SingDateDto(year, loginMemberInfo.getLoginId()));
+        SingDateResponse result = historyService.findSingDateList(new SingDateDto(year, loginMemberInfo.getLoginId()));
         return ResponseEntity.ok(new ApiResponse<>("HI103", "부른 날짜 조회 성공", result));
     }
 

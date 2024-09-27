@@ -126,7 +126,7 @@ public class HistoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<LocalDate> findSingDateList(SingDateDto singDateDto) {
+    public SingDateResponse findSingDateList(SingDateDto singDateDto) {
         Member member = memberRepository.findByLoginId(singDateDto.getLoginId())
                 .orElseThrow(MemberNotFoundException::new);
 
@@ -139,7 +139,7 @@ public class HistoryService {
             result.add(date.toLocalDate());
         }
 
-        return new ArrayList<>(result);
+        return new SingDateResponse(member.getCreatedAt().toLocalDate(), new ArrayList<>(result));
     }
 
     @Transactional(readOnly = true)
