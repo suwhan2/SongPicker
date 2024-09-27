@@ -2,10 +2,9 @@ package com.fastarm.back.history.controller;
 
 import com.fastarm.back.auth.security.dto.LoginMemberInfo;
 import com.fastarm.back.common.controller.dto.ApiResponse;
-import com.fastarm.back.history.controller.dto.TeamRecentSongsResponse;
-import com.fastarm.back.history.controller.dto.MostSingersResponse;
-import com.fastarm.back.history.controller.dto.MostSongsResponse;
-import com.fastarm.back.history.controller.dto.MyRecentSongsResponse;
+import com.fastarm.back.history.controller.dto.*;
+import com.fastarm.back.history.dto.DateSongsDto;
+import com.fastarm.back.history.dto.SingDateDto;
 import com.fastarm.back.history.dto.TeamRecentSongsDto;
 import com.fastarm.back.history.service.HistoryService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -57,4 +57,21 @@ public class HistoryController {
         return ResponseEntity.ok(new ApiResponse<>("HI106", "그룹 최근 부른 곡 조회 성공", result));
     }
 
+    @GetMapping("/date")
+    public ResponseEntity<?> singDateList(
+            @RequestParam int year,
+            @AuthenticationPrincipal LoginMemberInfo loginMemberInfo
+    ) {
+        SingDateResponse result = historyService.findSingDateList(new SingDateDto(year, loginMemberInfo.getLoginId()));
+        return ResponseEntity.ok(new ApiResponse<>("HI103", "부른 날짜 조회 성공", result));
+    }
+
+    @GetMapping("/date/songs")
+    public ResponseEntity<?> dateSongsList(
+            @RequestParam int year, int month, int day,
+            @AuthenticationPrincipal LoginMemberInfo loginMemberInfo
+    ) {
+        List<DateSongsResponse> result = historyService.findDateSongsList(new DateSongsDto(year, month, day, loginMemberInfo.getLoginId()));
+        return ResponseEntity.ok(new ApiResponse<>("HI104", "날짜별 부른 곡 조회 성공", result));
+    }
 }

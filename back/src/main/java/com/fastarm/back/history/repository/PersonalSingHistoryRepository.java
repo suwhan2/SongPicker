@@ -8,6 +8,7 @@ import com.fastarm.back.song.entity.Song;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PersonalSingHistoryRepository extends JpaRepository<PersonalSingHistory, Long> {
@@ -58,4 +59,18 @@ public interface PersonalSingHistoryRepository extends JpaRepository<PersonalSin
             """
     )
     List<Song> findByMember(Member member);
+
+    @Query("""
+            SELECT ph.singAt
+            FROM PersonalSingHistory ph
+            WHERE ph.member = :member AND ph.singAt between :startDate and NOW()
+            """)
+    List<LocalDateTime> singDateList(Member member, LocalDateTime startDate);
+
+    @Query("""
+            SELECT ph.song
+            FROM PersonalSingHistory ph
+            WHERE ph.singAt between :start and :end
+            """)
+    List<Song> dateSongsInfo(LocalDateTime start, LocalDateTime end);
 }
