@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TeamRecentSongsDto {
 
-    private Long groupId;
+    private Long teamId;
     private String loginId;
 
 }
