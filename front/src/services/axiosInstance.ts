@@ -20,7 +20,7 @@ interface ApiError extends AxiosError {
 }
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: '/api',
+  baseURL: '/',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -34,7 +34,7 @@ const refreshAccessToken = async (): Promise<string> => {
   try {
     console.log('Attempting to refresh token...');
     const response = await axios.post<ApiResponse>(
-      '/api/api/auths/refresh',
+      '/api/auths/refresh',
       {},
       { withCredentials: true }
     );
