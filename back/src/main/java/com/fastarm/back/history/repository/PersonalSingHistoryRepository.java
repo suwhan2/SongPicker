@@ -3,6 +3,8 @@ package com.fastarm.back.history.repository;
 import com.fastarm.back.history.controller.dto.MostSingersResponse;
 import com.fastarm.back.history.controller.dto.MostSongsResponse;
 import com.fastarm.back.history.entity.PersonalSingHistory;
+import com.fastarm.back.member.entity.Member;
+import com.fastarm.back.song.entity.Song;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -46,4 +48,14 @@ public interface PersonalSingHistoryRepository extends JpaRepository<PersonalSin
     )
     List<String> personalMostGenreInfo(String loginId);
 
+    @Query(
+            """
+            SELECT ph.song
+            FROM PersonalSingHistory ph
+            WHERE ph.member = :member
+            ORDER BY ph.singAt DESC
+            LIMIT 50
+            """
+    )
+    List<Song> findByMember(Member member);
 }
