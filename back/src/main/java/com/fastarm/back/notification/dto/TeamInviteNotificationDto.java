@@ -15,6 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class TeamInviteNotificationDto {
     @NotNull
     private Long notificationId;
-    private String response;
+    private Boolean accept;
     private String loginId;
 }

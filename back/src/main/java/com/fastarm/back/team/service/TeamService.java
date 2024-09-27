@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TeamService {
 
-    private final TeamMemberRepository memberGroupRepository;
+    private final TeamMemberRepository teamMemberRepository;
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
     private final S3Service s3Service;
@@ -38,12 +38,12 @@ public class TeamService {
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        return memberGroupRepository.findByMemberId(member.getId()).stream()
+        return teamMemberRepository.findByMemberId(member.getId()).stream()
                 .map(memberGroup -> {
                     Team team = memberGroup.getTeam();
                     String teamImage = team.getTeamImage();
                     String teamName = team.getName();
-                    int groupMemberCount = memberGroupRepository.countByTeamId(team.getId());
+                    int groupMemberCount = teamMemberRepository.countByTeamId(team.getId());
 
                     return TeamDto.from(teamImage, teamName, groupMemberCount);
                 })
@@ -54,7 +54,7 @@ public class TeamService {
     @Transactional(readOnly = true)
     public TeamDetailDto getTeamDetail(Long teamId){
         Team team = teamRepository.findById(teamId).orElseThrow(TeamNotFoundException::new);
-        List<TeamDetailDto.Member> members = memberGroupRepository.findByTeamId(teamId).stream()
+        List<TeamDetailDto.Member> members = teamMemberRepository.findByTeamId(teamId).stream()
                 .map(teamMember ->{
                     Member member = teamMember.getMember();
                     return TeamDetailDto.Member.builder()
@@ -87,7 +87,7 @@ public class TeamService {
                 .member(member)
                 .team(savedTeam)
                 .build();
-        memberGroupRepository.save(teamMember);
+        teamMemberRepository.save(teamMember);
     }
 
     @Transactional
@@ -111,7 +111,7 @@ public class TeamService {
     }
 
     private void checkPermission(Member member, Team team) {
-        boolean isMember = memberGroupRepository.existsByTeamAndMember(team, member);
+        boolean isMember = teamMemberRepository.existsByTeamAndMember(team, member);
         if (!isMember) throw new TeamMemberNotFoundException();
     }
 
