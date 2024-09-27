@@ -15,8 +15,8 @@ import com.fastarm.back.member.repository.MemberRepository;
 import com.fastarm.back.song.entity.Song;
 import com.fastarm.back.team.entity.Team;
 import com.fastarm.back.team.exception.TeamNotFoundException;
-import com.fastarm.back.team.repository.TeamMemberRepository;
 import com.fastarm.back.team.repository.TeamRepository;
+import com.fastarm.back.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +34,7 @@ public class HistoryService {
     private final MemberRepository memberRepository;
     private final LikesRepository likesRepository;
     private final TeamRepository teamRepository;
-    private final TeamMemberRepository teamMemberRepository;
+    private final TeamService teamService;
 
     @Transactional(readOnly = true)
     public List<MostSongsResponse> findMostSongsList(String loginId) {
@@ -93,6 +93,8 @@ public class HistoryService {
 
         Team team = teamRepository.findById(teamRecentSongsDto.getGroupId())
                 .orElseThrow(TeamNotFoundException::new);
+
+        teamService.checkPermission(member, team);
 
         List<Song> songs = teamSingHistoryRepository.findByTeam(team);
 

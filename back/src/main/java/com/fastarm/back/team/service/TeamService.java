@@ -110,7 +110,7 @@ public class TeamService {
 
     }
 
-    private void checkPermission(Member member, Team team) {
+    public void checkPermission(Member member, Team team) {
         boolean isMember = memberGroupRepository.existsByTeamAndMember(team, member);
         if (!isMember) throw new TeamMemberNotFoundException();
     }
