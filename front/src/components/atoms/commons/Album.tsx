@@ -1,13 +1,13 @@
 import React from 'react';
-import albumImage from '../../../assets/exampleAlbum.png';
+import { IoMusicalNoteSharp } from 'react-icons/io5';
 
 type Props = {
-  size?: number;
+  size?: number | string;
   imageUrl?: string;
   number: string;
 };
 
-const Album = ({ size = 50, imageUrl, number }: Props) => {
+const Album = ({ size = '100%', imageUrl, number }: Props) => {
   return (
     <div
       className="aspect-square relative rounded-sm overflow-hidden"
@@ -15,7 +15,16 @@ const Album = ({ size = 50, imageUrl, number }: Props) => {
     >
       {/* 앨범 표지 */}
       <div className="absolute inset-0">
-        <img src={imageUrl || albumImage} alt="앨범이미지" className="w-full h-full object-cover" />
+        {imageUrl ? (
+          <img src={imageUrl} alt="앨범이미지" className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-700 rounded-sm overflow-hidden">
+            <IoMusicalNoteSharp
+              className="text-white"
+              size={size === '100%' ? 48 : Number(size) / 2}
+            />
+          </div>
+        )}
       </div>
 
       {/* 곡 번호 */}

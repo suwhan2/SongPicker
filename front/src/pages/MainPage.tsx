@@ -15,6 +15,33 @@ const MainPage = () => {
   const [modalIcon, setModalIcon] = useState<'link' | 'spinner' | 'reservation'>('link');
   const [autoCloseDelay, setAutoCloseDelay] = useState<number | undefined>(undefined);
 
+  const kpopTheme = {
+    title: '신나는 K-POP 여자 아이돌 노래',
+    gradientColors: 'bg-gradient-to-r from-red-400 to-pink-500',
+    themeLink: '/theme/k-pop',
+    items: [
+      { imageUrl: '', number: '154353', title: 'Ditto', artist: 'NewJeans' },
+      { imageUrl: '', number: '234233', title: 'Hype Boy', artist: 'NewJeans' },
+      { imageUrl: '', number: '343424', title: 'OMG', artist: 'NewJeans' },
+    ],
+  };
+
+  const balladeTheme = {
+    title: '감성적인 발라드 모음',
+    gradientColors: 'bg-gradient-to-r from-blue-400 to-purple-500',
+    themeLink: '/theme/ballad',
+    items: [
+      { imageUrl: '', number: '167575', title: '사랑은 늘 도망가', artist: '임영웅' },
+      { imageUrl: '', number: '276535', title: '취중고백', artist: '김민석' },
+      {
+        imageUrl: '',
+        number: '334242',
+        title: '그날에 나는 맘이 편했을까',
+        artist: '이예준',
+      },
+    ],
+  };
+
   const handleShowNotification = (title: string, description: string) => {
     setNotificationMessage({ title, description });
     setShowNotification(true);
@@ -41,14 +68,14 @@ const MainPage = () => {
 
   return (
     <MainLayout>
-      <div className="flex flex-col space-y-8 py-4 w-full">
+      <div className="flex flex-col py-4 w-full">
         {/* 노래방 연결 */}
-        <div className="px-2">
+        <div className="px-2 mb-8">
           <KaraokeLinkMode />
         </div>
 
         {/* 사용자 맞춤 추천곡 */}
-        <div className="px-2">
+        <div className="px-2 mb-8">
           <RecomMusicList
             onShowNotification={handleShowNotification}
             onShowConnectionModal={handleShowConnectionModal}
@@ -57,16 +84,14 @@ const MainPage = () => {
 
         {/* 테마 추천 */}
         <div className="px-2">
-          <RecomThemeBanner />
+          <RecomThemeBanner {...kpopTheme} />
+          <RecomThemeBanner {...balladeTheme} />
         </div>
 
         {/* 사용자 통계 배너 */}
         <div>
           <UserStatisticsBanner />
         </div>
-
-        {/* 사용자 추천 아티스트 */}
-        {/* 추가 예정 */}
       </div>
 
       {showNotification && (

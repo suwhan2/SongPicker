@@ -14,7 +14,7 @@ const LeftMusicItem = ({ title, artist, imageUrl, number }: Props) => {
     <div className="flex max-w-full">
       {/* 앨범 */}
       <div className="mr-2 flex-shrink-0">
-        <Album imageUrl={imageUrl} number={number} />
+        <Album imageUrl={imageUrl} number={number} size={50} />
       </div>
 
       {/* 곡제목 및 가수 */}
