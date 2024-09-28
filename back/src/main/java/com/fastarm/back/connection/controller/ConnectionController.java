@@ -12,10 +12,7 @@ import com.fastarm.back.connection.service.ConnectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -44,6 +41,18 @@ public class ConnectionController {
                         .loginId(loginMemberInfo.getLoginId())
                         .build());
         return ResponseEntity.ok(new ApiResponse<>("CO100", "서비스 연동 성공", null));
+    }
+
+    @GetMapping
+    public ResponseEntity<?> statusGet(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
+        boolean result = connectionService.getConnectionStatus(loginMemberInfo.getLoginId());
+        return ResponseEntity.ok(new ApiResponse<>("CO102", "서비스 연동 상태 조회 성공", result));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> statusRemove(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
+        connectionService.removeConnection(loginMemberInfo.getLoginId());
+        return ResponseEntity.ok(new ApiResponse<>("CO103", "서비스 연동 해지 성공", null));
     }
 
     @PostMapping("/reservations")

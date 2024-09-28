@@ -17,10 +17,6 @@ public class RedisService {
         redisTemplate.opsForValue().set(key, value, expiredTime, TimeUnit.MILLISECONDS);
     }
 
-    public void setData(String key, Object value) {
-        redisTemplate.opsForValue().set(key, value);
-    }
-
     public Object getData(String key) {
         return redisTemplate.opsForValue().get(key);
     }
@@ -28,14 +24,6 @@ public class RedisService {
     public void addToList(String key, Object value, Long expiredTime) {
         redisTemplate.opsForList().rightPush(key, value);
         redisTemplate.expire(key, expiredTime, TimeUnit.MILLISECONDS);
-    }
-
-    public List<Object> getList(String key) {
-        return redisTemplate.opsForList().range(key, 0, -1);
-    }
-
-    public Object getFistData(String key) {
-        return redisTemplate.opsForList().leftPop(key);
     }
 
     public void deleteData(String key) {
