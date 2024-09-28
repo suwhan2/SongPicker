@@ -31,19 +31,17 @@ public class SongService {
 
 
     @Transactional
-    public List<SongDto> recommendMySong(){
-        return songRepository.findRandomSongs()
-                .stream()
-                .map(song -> SongDto.builder()
-                        .songId(song.getId())
-                        .number(song.getNumber())
-                        .title(song.getTitle())
-                        .singer(song.getSinger())
-                        .coverImage(song.getCoverImage())
-                        .isLike(false)
-                        .likeId(null)
-                        .build())
-                .collect(Collectors.toList());
+    public List<SongDto> recommendMySong(String loginId){
+
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(MemberNotFoundException::new);
+
+        List<Song> randomSongs = songRepository.findRandomSongs();
+        List<Long> songIds = randomSongs.stream().map(Song::getId).collect(Collectors.toList());
+
+        List<SongDto> songDtoList = songRepository.findSongsWithLikeStatus(songIds, member.getId());
+
+        return songDtoList;
 
     }
 
@@ -129,7 +127,7 @@ public class SongService {
 //                likeId = likeResult.get();
 //            }
             //, isLike, likeId
-            SongDto songDto = SongDto.from(song);
+            SongDto songDto = SongDto.from(song,isLike, likeId);
             songDtoList.add(songDto);
         }
         return songDtoList;
