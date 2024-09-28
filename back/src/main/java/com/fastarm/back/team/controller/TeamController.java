@@ -6,8 +6,10 @@ import com.fastarm.back.team.controller.dto.TeamAddRequest;
 import com.fastarm.back.team.controller.dto.TeamModifyRequest;
 import com.fastarm.back.team.dto.TeamDetailDto;
 import com.fastarm.back.team.dto.TeamDto;
+import com.fastarm.back.team.dto.TeamWithdrawDto;
 import com.fastarm.back.team.service.TeamService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.http.HttpStatus;
@@ -54,6 +56,18 @@ public class TeamController {
                                         @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) throws IOException, URISyntaxException {
         teamService.modifyTeam(teamModifyRequest.toDto(teamId,loginMemberInfo.getLoginId()));
         return new ResponseEntity<>(new ApiResponse<>("TE105","그룹 정보 수정 성공",null),HttpStatus.OK);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> teamWithdraw(@NotNull @RequestParam Long teamId,
+                                          @AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
+
+        teamService.withdrawTeam(TeamWithdrawDto.builder()
+                .loginId(loginMemberInfo.getLoginId())
+                .teamId(teamId)
+                .build());
+
+        return new ResponseEntity<>(new ApiResponse<>("TE102","그룹 나가기 성공",null),HttpStatus.OK);
     }
 
 

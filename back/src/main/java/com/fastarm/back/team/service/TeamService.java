@@ -1,13 +1,10 @@
 package com.fastarm.back.team.service;
 
 import com.fastarm.back.common.service.S3Service;
-import com.fastarm.back.team.dto.TeamAddDto;
-import com.fastarm.back.team.dto.TeamDetailDto;
-import com.fastarm.back.team.dto.TeamDto;
-import com.fastarm.back.team.dto.TeamModifyDto;
+import com.fastarm.back.team.dto.*;
 import com.fastarm.back.team.entity.Team;
 import com.fastarm.back.team.entity.TeamMember;
-import com.fastarm.back.team.exception.TeamUnauthorizedException;
+import com.fastarm.back.team.exception.TeamMemberNotFoundException;
 import com.fastarm.back.team.repository.TeamRepository;
 import com.fastarm.back.team.repository.TeamMemberRepository;
 import com.fastarm.back.member.entity.Member;
@@ -27,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TeamService {
 
-    private final TeamMemberRepository memberGroupRepository;
+    private final TeamMemberRepository teamMemberRepository;
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
     private final S3Service s3Service;
@@ -38,23 +35,14 @@ public class TeamService {
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        return memberGroupRepository.findByMemberId(member.getId()).stream()
-                .map(memberGroup -> {
-                    Team team = memberGroup.getTeam();
-                    String teamImage = team.getTeamImage();
-                    String teamName = team.getName();
-                    int groupMemberCount = memberGroupRepository.countByTeamId(team.getId());
-
-                    return TeamDto.from(teamImage, teamName, groupMemberCount);
-                })
-                .collect(Collectors.toList());
+        return teamRepository.findTeamsWithMemberCountByMemberId(member.getId());
     }
 
 
     @Transactional(readOnly = true)
     public TeamDetailDto getTeamDetail(Long teamId){
         Team team = teamRepository.findById(teamId).orElseThrow(TeamNotFoundException::new);
-        List<TeamDetailDto.Member> members = memberGroupRepository.findByTeamId(teamId).stream()
+        List<TeamDetailDto.Member> members = teamMemberRepository.findByTeamId(teamId).stream()
                 .map(teamMember ->{
                     Member member = teamMember.getMember();
                     return TeamDetailDto.Member.builder()
@@ -87,7 +75,7 @@ public class TeamService {
                 .member(member)
                 .team(savedTeam)
                 .build();
-        memberGroupRepository.save(teamMember);
+        teamMemberRepository.save(teamMember);
     }
 
     @Transactional
@@ -111,9 +99,21 @@ public class TeamService {
     }
 
     private void checkPermission(Member member, Team team) {
-        boolean isMember = memberGroupRepository.existsByMemberAndTeam(member, team);
-        if (!isMember) throw new TeamUnauthorizedException();
+        boolean isMember = teamMemberRepository.existsByTeamAndMember(team,member);
+        if (!isMember) throw new TeamMemberNotFoundException();
     }
 
+    @Transactional
+    public void withdrawTeam(TeamWithdrawDto dto){
+        Member member = memberRepository.findByLoginId(dto.getLoginId()).orElseThrow(MemberNotFoundException::new);
+        Team team = teamRepository.findById(dto.getTeamId()).orElseThrow(TeamNotFoundException :: new);
+        TeamMember teamMember = teamMemberRepository.findByTeamIdAndMemberId(dto.getTeamId(),member.getId())
+                .orElseThrow(TeamMemberNotFoundException::new);
+
+        teamMemberRepository.delete(teamMember);
+
+        int remainingMembers = teamMemberRepository.countByTeamId(dto.getTeamId());
+        if(remainingMembers==0) teamRepository.delete(team);
+    }
 
 }
