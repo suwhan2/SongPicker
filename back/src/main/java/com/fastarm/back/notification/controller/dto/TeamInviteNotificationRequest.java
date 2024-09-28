@@ -10,10 +10,10 @@ import lombok.*;
 @AllArgsConstructor
 public class TeamInviteNotificationRequest {
     private Boolean accept;
-
-    public TeamInviteNotificationDto toDto(Long notificationId, String loginId){
+    private Long notificationId;
+    public TeamInviteNotificationDto toDto(String loginId){
         return TeamInviteNotificationDto.builder()
-                .notificationId(notificationId)
+                .notificationId(this.notificationId)
                 .loginId(loginId)
                 .accept(this.accept)
                 .build();

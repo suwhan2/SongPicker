@@ -17,11 +17,10 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @PostMapping("/{notificationId}/response")
-    public ResponseEntity<?> teamInvitationRespond(@PathVariable Long notificationId,
-                                                   @RequestBody TeamInviteNotificationRequest teamInviteNotificationRequest,
+    @PostMapping("/response")
+    public ResponseEntity<?> teamInvitationRespond(@RequestBody TeamInviteNotificationRequest teamInviteNotificationRequest,
                                                    @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
-        notificationService.RespondTeamInvitation(teamInviteNotificationRequest.toDto(notificationId,loginMemberInfo.getLoginId()));
+        notificationService.RespondTeamInvitation(teamInviteNotificationRequest.toDto(loginMemberInfo.getLoginId()));
         return new ResponseEntity<>(new ApiResponse<>("NO100","그룹 초대 응답 성공",null), HttpStatus.OK);
 
     }
