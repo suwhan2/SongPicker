@@ -13,7 +13,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Entity
 @Getter
 @Builder
-@SQLDelete(sql = "UPDATE connection_info SET status = 'DISCONNECT' id = ?")
+@SQLDelete(sql = "UPDATE connection_info SET status = 'DISCONNECT' WHERE id = ?")
 @SQLRestriction("status != 'DISCONNECT'")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
