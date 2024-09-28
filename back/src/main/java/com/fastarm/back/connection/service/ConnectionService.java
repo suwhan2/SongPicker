@@ -3,18 +3,30 @@ package com.fastarm.back.connection.service;
 import com.fastarm.back.common.constants.RedisConstants;
 import com.fastarm.back.common.constants.RedisExpiredTimeConstants;
 import com.fastarm.back.common.service.RedisService;
+import com.fastarm.back.connection.entity.ConnectionInfo;
+import com.fastarm.back.connection.enums.Mode;
 import com.fastarm.back.connection.exception.AlreadyExistConnectionException;
 import com.fastarm.back.connection.exception.CannotReserveException;
-import com.fastarm.back.karaoke.enums.Type;
+import com.fastarm.back.connection.repository.ConnectionInfoRepository;
+import com.fastarm.back.karaoke.entity.Machine;
 import com.fastarm.back.connection.dto.*;
 import com.fastarm.back.connection.exception.CannotConnectException;
-import com.fastarm.back.karaoke.dto.ChargeDto;
 import com.fastarm.back.karaoke.dto.SaveReservationDto;
+import com.fastarm.back.karaoke.repository.MachineRepository;
+import com.fastarm.back.member.entity.Member;
+import com.fastarm.back.member.exception.MemberNotFoundException;
+import com.fastarm.back.member.repository.MemberRepository;
 import com.fastarm.back.song.entity.Song;
 import com.fastarm.back.song.exception.NotFoundSongException;
 import com.fastarm.back.song.repository.SongRepository;
+import com.fastarm.back.team.entity.TeamMember;
+import com.fastarm.back.team.exception.TeamNotFoundException;
+import com.fastarm.back.team.repository.TeamMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Service
@@ -23,90 +35,104 @@ public class ConnectionService {
 
     private final RedisService redisService;
     private final SongRepository songRepository;
+    private final TeamMemberRepository teamMemberRepository;
+    private final MachineRepository machineRepository;
+    private final MemberRepository memberRepository;
+    private final ConnectionInfoRepository connectionInfoRepository;
 
+    @Transactional
     public void setConnection(ConnectionDto connectionDto) {
 
-        if (checkCharge(connectionDto.getSerialNumber())) {
+        Machine machine = machineRepository.findBySerialNumber(connectionDto.getSerialNumber())
+                .orElseThrow(CannotConnectException::new);
+
+        if (machine.getCoin() <= 0) {
             throw new CannotConnectException();
         }
 
-        String ExistConnection= (String) redisService.getData(RedisConstants.CONNECT_MACHINE + connectionDto.getNickname());
+        Member member = memberRepository.findByLoginId(connectionDto.getLoginId())
+                .orElseThrow(MemberNotFoundException::new);
 
-        if (ExistConnection != null) {
-            if (checkCharge(ExistConnection)) {
-                redisService.deleteData(RedisConstants.CONNECT_MACHINE + connectionDto.getNickname());
-            } else {
-                throw new AlreadyExistConnectionException();
-            }
+        List<ConnectionInfo> connectionInfoList = connectionInfoRepository.findListByMember(member);
+
+        if (!connectionInfoList.isEmpty()) {
+            throw new AlreadyExistConnectionException();
         }
 
-        redisService.setData(RedisConstants.CONNECT_MACHINE + connectionDto.getNickname(), connectionDto.getSerialNumber(), RedisExpiredTimeConstants.CONNECTION_EXPIRED);
-
-        ConnectInfoDto connectInfoDto = ConnectInfoDto.builder()
-                .type(Type.INDIVIDUAL)
-                .nickname(connectionDto.getNickname())
+        ConnectionInfo connectionInfo = ConnectionInfo.builder()
+                .machine(machine)
+                .member(member)
+                .mode(Mode.INDIVIDUAL)
                 .build();
 
-        redisService.addToList(RedisConstants.CONNECT_INFO + connectionDto.getSerialNumber(), connectInfoDto, RedisExpiredTimeConstants.CONNECTION_EXPIRED);
+        connectionInfoRepository.save(connectionInfo);
     }
 
-    public void setGroupConnection(TeamConnectionDto groupConnection) {
-        if (checkCharge(groupConnection.getSerialNumber())) {
+    @Transactional
+    public void setTeamConnection(TeamConnectionDto teamConnectionDto) {
+
+        Machine machine = machineRepository.findBySerialNumber(teamConnectionDto.getSerialNumber())
+                .orElseThrow(CannotConnectException::new);
+
+        if (machine.getCoin() <= 0) {
             throw new CannotConnectException();
         }
 
-        // 그룹 존재 여부 확인
+        List<TeamMember> teamMemberList = teamMemberRepository.findByTeamId(teamConnectionDto.getTeamId());
 
-        // 그룹에 모든 인원 추가
+        if (teamMemberList.isEmpty()) {
+            throw new TeamNotFoundException();
+        }
 
-//        ConnectInfoDto connectInfoDto = ConnectInfoDto.builder()
-//                .serialNumber(groupConnection.getSerialNumber())
-//                .type(Type.TEAM)
-//                .groupId(groupConnection.getTeamId())
-//                .build();
+        for (TeamMember teamMember : teamMemberList) {
+            List<ConnectionInfo> connectionInfoList = connectionInfoRepository.findListByMember(teamMember.getMember());
 
-        //redisService.setData(RedisConstants.CONNECT_INFO + groupConnection.getNickname(), connectInfoDto);
+            if (!connectionInfoList.isEmpty()) {
+                throw new AlreadyExistConnectionException();
+            }
+
+            ConnectionInfo connectionInfo = ConnectionInfo.builder()
+                    .machine(machine)
+                    .member(teamMember.getMember())
+                    .team(teamMember.getTeam())
+                    .mode(Mode.TEAM)
+                    .build();
+            connectionInfoRepository.save(connectionInfo);
+        }
     }
 
     public void reserveSong(ReservationDto reservationDto) {
 
-        String serialNumber = (String) redisService.getData(RedisConstants.CONNECT_MACHINE + reservationDto.getNickname());
+        Member member = memberRepository.findByLoginId(reservationDto.getLoginId())
+                        .orElseThrow(MemberNotFoundException::new);
 
-        if (checkCharge(serialNumber)) {
-            throw new CannotReserveException();
-        }
+        ConnectionInfo connectionInfo = connectionInfoRepository.findByMember(member)
+                .orElseThrow(CannotReserveException::new);
 
         Song song = songRepository.findByNumber(reservationDto.getNumber())
                 .orElseThrow(NotFoundSongException::new);
 
-        ConnectInfoDto connectInfoDto = (ConnectInfoDto) redisService.getFistData(RedisConstants.CONNECT_INFO + serialNumber);
-
         SaveReservationDto saveReservationDto;
-        if (connectInfoDto.getType() == Type.TEAM) {
+        if (connectionInfo.getMode() == Mode.TEAM) {
             saveReservationDto = SaveReservationDto.builder()
                     .number(song.getNumber())
                     .title(song.getTitle())
                     .singer(song.getSinger())
-                    .groupId(connectInfoDto.getGroupId())
-                    .type(Type.TEAM)
+                    .teamId(connectionInfo.getTeam().getId())
+                    .mode(Mode.TEAM)
                     .build();
         } else {
             saveReservationDto = SaveReservationDto.builder()
                     .number(song.getNumber())
                     .title(song.getTitle())
                     .singer(song.getSinger())
-                    .nickname(reservationDto.getNickname())
-                    .type(Type.INDIVIDUAL)
+                    .nickname(member.getNickname())
+                    .mode(Mode.INDIVIDUAL)
                     .build();
         }
+        String serialNumber = connectionInfo.getMachine().getSerialNumber();
+
         redisService.addToList(RedisConstants.RESERVATION_INFO + serialNumber, saveReservationDto, RedisExpiredTimeConstants.CONNECTION_EXPIRED);
     }
 
-    private boolean checkCharge(String serialNumber) {
-        String key = RedisConstants.CHARGE_INFO + serialNumber;
-
-        ChargeDto chargeDto = (ChargeDto) redisService.getData(key);
-
-        return chargeDto == null || chargeDto.getRemaining() == 0;
-    }
 }

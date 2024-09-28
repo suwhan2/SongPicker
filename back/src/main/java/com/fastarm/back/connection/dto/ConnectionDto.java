@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ConnectionDto {
     private String serialNumber;
-    private String nickname;
+    private String loginId;
 }
