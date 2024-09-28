@@ -24,10 +24,19 @@ public class NotificationTeamInvite {
     private Team team;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    @Builder.Default
+    private Status status = Status.WAIT;
 
     @OneToOne
     @JoinColumn(name = "id", nullable = false)
     private Notification notification;
+
+    public void accept() {
+        this.status = Status.ACCEPT;
+    }
+
+    public void reject() {
+        this.status = Status.REJECT;
+    }
 
 }

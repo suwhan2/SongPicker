@@ -17,7 +17,7 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @PatchMapping("/{notificationId}/response")
+    @PostMapping("/{notificationId}/response")
     public ResponseEntity<?> teamInvitationRespond(@PathVariable Long notificationId,
                                                    @RequestBody TeamInviteNotificationRequest teamInviteNotificationRequest,
                                                    @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
