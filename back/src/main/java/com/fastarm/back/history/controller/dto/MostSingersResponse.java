@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 public class MostSingersResponse {
-
     private String singer;
     private Long count;
-
 }

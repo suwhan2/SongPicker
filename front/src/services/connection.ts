@@ -1,3 +1,4 @@
+import axios from 'axios';
 import axiosInstance from './axiosInstance';
 
 // 서비스연동 (개별)
@@ -31,6 +32,15 @@ export const reserveSong = async (serialNumber: string, songNumber: number) => {
     method: 'POST',
     url: '/api/connections/reservations',
     data: { serialNumber, songNumber },
+  });
+  return response.data;
+};
+
+// 연결상태 확인
+export const checkConnectionStatus = async () => {
+  const response = await axiosInstance({
+    method: 'GET',
+    url: '/api/connections',
   });
   return response.data;
 };

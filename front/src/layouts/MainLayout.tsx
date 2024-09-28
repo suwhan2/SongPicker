@@ -5,20 +5,22 @@ import BottomNavbar from '../components/organisms/commons/BottomNavbar';
 type MainLayoutProps = {
   children: ReactNode;
   title?: string;
+  fixedContent?: ReactNode;
 };
 
-const MainLayout = ({ children, title }: MainLayoutProps) => {
+const MainLayout = ({ children, title, fixedContent }: MainLayoutProps) => {
   return (
-    <div className="flex flex-col w-full min-h-screen bg-black text-white">
-      {/* <div className="flex-shrink-0"> */}
+    <div className="flex flex-col w-full h-screen bg-black text-white">
       <TopNavbar title={title} />
-      {/* </div> */}
-      <div className="flex-grow overflow-y-auto overflow-x-hidden relative pb-[60px]">
-        {children}
+      <div className="flex-grow flex flex-col overflow-hidden">
+        {fixedContent && (
+          <div className="flex-shrink-0 bg-black z-10 sticky top-0 border-b border-primary">
+            {fixedContent}
+          </div>
+        )}
+        <div className="flex-grow overflow-y-auto overflow-x-hidden">{children}</div>
       </div>
-      {/* <div className="flex-shrink-0"> */}
       <BottomNavbar />
-      {/* </div> */}
     </div>
   );
 };

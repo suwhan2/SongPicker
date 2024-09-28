@@ -25,8 +25,9 @@ public class RedisService {
         return redisTemplate.opsForValue().get(key);
     }
 
-    public void addToList(String key, Object value) {
+    public void addToList(String key, Object value, Long expiredTime) {
         redisTemplate.opsForList().rightPush(key, value);
+        redisTemplate.expire(key, expiredTime, TimeUnit.MILLISECONDS);
     }
 
     public List<Object> getList(String key) {

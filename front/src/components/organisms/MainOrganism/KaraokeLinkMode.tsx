@@ -15,9 +15,9 @@ const KaraokeLinkMode = () => {
       className="relative flex justify-between w-full min-w-[320px] h-[150px] ms-auto p-[3px] rounded-2xl"
       style={{ background: 'linear-gradient(to bottom, #D34ADE, #5B2B99)' }}
     >
-      <div className="flex justify-between w-full h-full bg-black rounded-2xl p-6">
+      <div className="flex justify-between w-full h-full bg-black rounded-2xl p-4">
         <LinkmodeLeft />
-        <div onClick={handleLinkModeCircleClick}>
+        <div onClick={handleLinkModeCircleClick} className="self-center ms-2">
           <LinkmodeCircle />
         </div>
       </div>

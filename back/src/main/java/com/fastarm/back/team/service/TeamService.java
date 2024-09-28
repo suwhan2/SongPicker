@@ -35,7 +35,16 @@ public class TeamService {
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        return teamRepository.findTeamsWithMemberCountByMemberId(member.getId());
+        return teamMemberRepository.findByMemberId(member.getId()).stream()
+                .map(memberGroup -> {
+                    Team team = memberGroup.getTeam();
+                    String teamImage = team.getTeamImage();
+                    String teamName = team.getName();
+                    int groupMemberCount = teamMemberRepository.countByTeamId(team.getId());
+
+                    return TeamDto.from(teamImage, teamName, groupMemberCount);
+                })
+                .collect(Collectors.toList());
     }
 
 
@@ -98,8 +107,10 @@ public class TeamService {
 
     }
 
+
     private void checkPermission(Member member, Team team) {
         boolean isMember = teamMemberRepository.existsByTeamAndMember(team,member);
+
         if (!isMember) throw new TeamMemberNotFoundException();
     }
 

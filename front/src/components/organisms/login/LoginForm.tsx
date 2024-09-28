@@ -13,6 +13,7 @@ const LoginForm = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   const login = useAuthStore(state => state.login);
+  const setSongSelected = useAuthStore(state => state.setSongSelected);
 
   useEffect(() => {
     if (errorMessage) {
@@ -41,11 +42,9 @@ const LoginForm = () => {
         const authToken = response.headers['authorization'];
         if (authToken) {
           login(userId, authToken);
-          if (response.data.data === false) {
-            navigate('/song-select');
-          } else {
-            navigate('/');
-          }
+          const isSongSelected = response.data.data;
+          setSongSelected(isSongSelected);
+          navigate(isSongSelected ? '/' : '/song-select');
         } else {
           setErrorMessage('인증 토큰을 받지 못했습니다.');
         }
