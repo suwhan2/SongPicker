@@ -15,93 +15,101 @@ interface ApiSuccessResponse<T = unknown> {
 
 type ApiResponse<T = unknown> = ApiErrorResponse | ApiSuccessResponse<T>;
 
-interface ApiError extends AxiosError {
-  response?: AxiosResponse<ApiResponse>;
-}
-
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: '/',
   headers: {
     'Content-Type': 'application/json',
   },
   validateStatus: function (status) {
-    return status >= 200 && status < 500; // 409를 포함한 4xx 상태 코드를 오류로 처리하지 않음
+    return status >= 200 && status < 500;
   },
+  withCredentials: true,
 });
 
-const isApiErrorResponse = (response: ApiResponse): response is ApiErrorResponse => {
-  return response.code.startsWith('AU') && response.code !== 'AU104';
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+const onRefreshed = (token: string) => {
+  refreshSubscribers.forEach(cb => cb(token));
+  refreshSubscribers = [];
 };
 
 const refreshAccessToken = async (): Promise<string> => {
   try {
-    console.log('Attempting to refresh token...');
     const response = await axios.post<ApiResponse>(
       '/api/auths/refresh',
       {},
-      { withCredentials: true }
+      {
+        baseURL: '/',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      }
     );
-    console.log('Refresh token response:', response.data);
 
-    if (response.data.code === 'AU104') {
-      const newAccessToken = response.headers['authorization'];
-      if (typeof newAccessToken === 'string') {
+    if ('code' in response.data && response.data.code === 'AU104') {
+      const newAccessToken: string | undefined = response.headers['authorization'];
+      if (newAccessToken) {
         const formattedToken = newAccessToken.startsWith('Bearer ')
           ? newAccessToken
           : `Bearer ${newAccessToken}`;
         useAuthStore.getState().setAccessToken(formattedToken);
-        console.log('New access token set in store:', formattedToken);
         return formattedToken;
       }
     }
     throw new Error('Failed to refresh token');
   } catch (error) {
-    console.error('Error refreshing token:', error);
+    useAuthStore.getState().setAccessToken('');
     throw error;
   }
 };
 
-axiosInstance.interceptors.request.use(
-  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    const token = useAuthStore.getState().getAccessToken();
-    if (token) {
-      config.headers['Authorization'] = token;
-      console.log('Added token to request:', config.url, token);
-    } else {
-      console.log('No token available for request:', config.url);
+axiosInstance.interceptors.response.use(
+  async (response: AxiosResponse<ApiResponse>) => {
+    if ('code' in response.data && response.data.code === 'AU005') {
+      const originalRequest = response.config;
+      if (!isRefreshing) {
+        isRefreshing = true;
+        try {
+          const newToken = await refreshAccessToken();
+          isRefreshing = false;
+          onRefreshed(newToken);
+          if (originalRequest.headers) {
+            originalRequest.headers['Authorization'] = newToken;
+          }
+          return axiosInstance(originalRequest);
+        } catch (error) {
+          isRefreshing = false;
+          return Promise.reject(error);
+        }
+      } else {
+        return new Promise(resolve => {
+          refreshSubscribers.push((token: string) => {
+            if (originalRequest.headers) {
+              originalRequest.headers['Authorization'] = token;
+            }
+            resolve(axiosInstance(originalRequest));
+          });
+        });
+      }
     }
-    return config;
+    return response;
   },
-  (error: AxiosError): Promise<AxiosError> => {
-    console.error('Request interceptor error:', error);
+  (error: AxiosError) => {
     return Promise.reject(error);
   }
 );
 
-axiosInstance.interceptors.response.use(
-  response => response,
-  async (error: ApiError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
-    if (
-      error.response?.status === 401 &&
-      error.response.data &&
-      isApiErrorResponse(error.response.data)
-    ) {
-      if (error.response.data.code === 'AU005' && !originalRequest._retry) {
-        console.log('Token expired, attempting to refresh...');
-        originalRequest._retry = true;
-        try {
-          const newAccessToken = await refreshAccessToken();
-          originalRequest.headers['Authorization'] = newAccessToken;
-          console.log('Retrying original request with new token');
-          return axiosInstance(originalRequest);
-        } catch (refreshError) {
-          console.error('Failed to refresh token, logging out');
-          useAuthStore.getState().logout();
-          return Promise.reject(refreshError);
-        }
-      }
+axiosInstance.interceptors.request.use(
+  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+    const token = useAuthStore.getState().getAccessToken();
+    if (token && config.url !== '/api/auths/refresh') {
+      config.headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
     }
+    return config;
+  },
+  (error: AxiosError): Promise<AxiosError> => {
     return Promise.reject(error);
   }
 );

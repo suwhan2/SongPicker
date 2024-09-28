@@ -91,7 +91,7 @@ const useAuthStore = create<AuthState>()(
 
       setAccessToken: (token: string) => {
         const formattedToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-        console.log('Setting new access token:', formattedToken);
+        console.log('Setting new access token:', formattedToken); // 토큰 재발급 시 출력
         set({ accessToken: formattedToken, isAuthenticated: true });
       },
 
