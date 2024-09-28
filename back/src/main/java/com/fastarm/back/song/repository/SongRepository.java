@@ -1,7 +1,6 @@
 package com.fastarm.back.song.repository;
 
 import com.fastarm.back.basedata.controller.dto.GetPopularResponse;
-import com.fastarm.back.song.dto.SongDto;
 import com.fastarm.back.song.entity.Song;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Pageable;
@@ -11,9 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 
 public interface SongRepository extends JpaRepository<Song, Long> , SongRepositoryCustom{
 
