@@ -2,6 +2,8 @@ package com.fastarm.back.likes.repository;
 
 import com.fastarm.back.likes.controller.dto.LikesListResponse;
 import com.fastarm.back.likes.entity.Likes;
+import com.fastarm.back.member.entity.Member;
+import com.fastarm.back.song.entity.Song;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,5 +25,9 @@ public interface LikesRepository extends JpaRepository<Likes, Long> {
             """
     )
     List<LikesListResponse> likesListInfo(String loginId);
+
+    List<Likes> findByMemberAndSongIn(Member member, List<Song> song);
+
+//    Optional<List<Likes>> findByMember(Member member);
 
 }

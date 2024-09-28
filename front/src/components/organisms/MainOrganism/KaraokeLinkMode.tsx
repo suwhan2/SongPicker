@@ -17,7 +17,7 @@ const KaraokeLinkMode = () => {
     >
       <div className="flex justify-between w-full h-full bg-black rounded-2xl p-4">
         <LinkmodeLeft />
-        <div onClick={handleLinkModeCircleClick} className="self-center">
+        <div onClick={handleLinkModeCircleClick} className="self-center ms-2">
           <LinkmodeCircle />
         </div>
       </div>

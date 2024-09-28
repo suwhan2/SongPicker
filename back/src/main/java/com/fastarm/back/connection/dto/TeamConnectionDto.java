@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class TeamConnectionDto {
     private String serialNumber;
     private Long teamId;
-    private String nickname;
+    private String loginId;
 }

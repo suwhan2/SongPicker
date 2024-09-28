@@ -1,25 +1,24 @@
 import React, { useEffect } from 'react';
 import { MdLinkOff } from 'react-icons/md';
 
-import { IconType } from 'react-icons';
-
 interface TwoBtnAlertModalProps {
   isVisible: boolean;
   onClose: () => void;
   onConfirm: () => void;
   message: string;
-  icon?: 'spinner' | 'link' | 'reservation';
 }
 
 const TwoBtnAlertModal = ({ isVisible, onClose, onConfirm, message }: TwoBtnAlertModalProps) => {
   useEffect(() => {
-    console.log('TwoBtnAlertModal isVisible:', isVisible);
   }, [isVisible]);
 
-  if (!isVisible) {
-    console.log('모달이 닫히며 null을 반환');
-    return null;
-  }
+  const handleClose = () => {
+    onClose();
+  };
+
+  const handleConfirm = () => {
+    onConfirm();
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[999] max-w-[640px] mx-auto">
@@ -29,15 +28,13 @@ const TwoBtnAlertModal = ({ isVisible, onClose, onConfirm, message }: TwoBtnAler
 
         {/* 두 개의 버튼 가로 배치 */}
         <div className="flex space-x-4">
-          <button className="mt-4 bg-[#9747FF] text-white px-4 py-2 rounded" onClick={onConfirm}>
+          <button
+            className="mt-4 bg-[#9747FF] text-white px-4 py-2 rounded"
+            onClick={handleConfirm}
+          >
             해제
           </button>
-          <button
-            className="mt-4 bg-gray-500 text-white px-4 py-2 rounded"
-            onClick={() => {
-              onClose();
-            }}
-          >
+          <button className="mt-4 bg-gray-500 text-white px-4 py-2 rounded" onClick={handleClose}>
             닫기
           </button>
         </div>

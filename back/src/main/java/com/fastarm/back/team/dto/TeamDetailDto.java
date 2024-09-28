@@ -1,5 +1,6 @@
 package com.fastarm.back.team.dto;
 
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,23 +11,15 @@ import java.util.List;
 public class TeamDetailDto {
     private String teamImage;
     private String teamName;
-    private int teamMemberCount;
-    private List<Member> members;
+    private int teamMemberCnt;
+    private List<TeamDetailMemberDto> members;
 
-    @Getter
-    @Builder
-    public static class Member {
-        private String profileImage;
-        private String nickname;
-    }
-
-    public static TeamDetailDto from(String teamImage, String teamName, List<Member> members) {
+    public static TeamDetailDto of(String teamImage, String teamName, List<TeamDetailMemberDto> members) {
         return TeamDetailDto.builder()
                 .teamImage(teamImage)
                 .teamName(teamName)
-                .teamMemberCount(members.size())
+                .teamMemberCnt(members.size())
                 .members(members)
                 .build();
     }
-
 }
