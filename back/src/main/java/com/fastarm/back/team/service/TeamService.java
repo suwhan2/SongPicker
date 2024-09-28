@@ -1,6 +1,8 @@
 package com.fastarm.back.team.service;
 
 import com.fastarm.back.common.service.S3Service;
+
+import com.fastarm.back.team.controller.dto.TeamDetailRequest;
 import com.fastarm.back.team.dto.*;
 import com.fastarm.back.team.entity.Team;
 import com.fastarm.back.team.entity.TeamMember;
@@ -18,7 +20,7 @@ import com.fastarm.back.team.exception.TeamNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -32,36 +34,20 @@ public class TeamService {
 
     @Transactional(readOnly = true)
     public List<TeamDto> getMyTeams(String loginId){
-        Member member = memberRepository.findByLoginId(loginId)
-                .orElseThrow(MemberNotFoundException::new);
-
-        return teamMemberRepository.findByMemberId(member.getId()).stream()
-                .map(memberGroup -> {
-                    Team team = memberGroup.getTeam();
-                    String teamImage = team.getTeamImage();
-                    String teamName = team.getName();
-                    int groupMemberCount = teamMemberRepository.countByTeamId(team.getId());
-
-                    return TeamDto.from(teamImage, teamName, groupMemberCount);
-                })
-                .collect(Collectors.toList());
+        Member member = memberRepository.findByLoginId(loginId).orElseThrow(MemberNotFoundException::new);
+        return teamMemberRepository.findTeamsWithMemberCountByMemberId(member.getId());
     }
 
 
     @Transactional(readOnly = true)
-    public TeamDetailDto getTeamDetail(Long teamId){
-        Team team = teamRepository.findById(teamId).orElseThrow(TeamNotFoundException::new);
-        List<TeamDetailDto.Member> members = teamMemberRepository.findByTeamId(teamId).stream()
-                .map(teamMember ->{
-                    Member member = teamMember.getMember();
-                    return TeamDetailDto.Member.builder()
-                            .profileImage(member.getProfileImage())
-                            .nickname(member.getNickname())
-                            .build();
+    public TeamDetailDto getTeamDetail(TeamDetailRequest dto) {
 
-                }).collect(Collectors.toList());
+        Team team = teamRepository.findById(dto.getTeamId()).orElseThrow(TeamNotFoundException::new);
+        Member member = memberRepository.findByLoginId(dto.getLoginId()).orElseThrow(MemberNotFoundException::new);
+        checkPermission(member,team);
+        List<TeamDetailMemberDto> members = teamMemberRepository.findMembersByTeamId(dto.getTeamId());
 
-        return TeamDetailDto.from(
+        return TeamDetailDto.of(
                 team.getTeamImage(),
                 team.getName(),
                 members
@@ -107,8 +93,8 @@ public class TeamService {
 
     }
 
-
-    private void checkPermission(Member member, Team team) {
+    @Transactional
+    public void checkPermission(Member member, Team team) {
         boolean isMember = teamMemberRepository.existsByTeamAndMember(team,member);
 
         if (!isMember) throw new TeamMemberNotFoundException();

@@ -23,11 +23,11 @@ public class TeamMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
@@ -35,8 +35,6 @@ public class TeamMember {
     @Column(name = "join_at", nullable = false, updatable = false)
     private LocalDateTime joinAt;
 
-    //필요한가?
-//    @Column(name = "withdrawn_at")
-//    private LocalDateTime withdrawnAt;
+
 
 }

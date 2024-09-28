@@ -2,7 +2,9 @@ package com.fastarm.back.team.controller;
 
 import com.fastarm.back.auth.security.dto.LoginMemberInfo;
 import com.fastarm.back.common.controller.dto.ApiResponse;
+import com.fastarm.back.song.controller.dto.SongDetailRequest;
 import com.fastarm.back.team.controller.dto.TeamAddRequest;
+import com.fastarm.back.team.controller.dto.TeamDetailRequest;
 import com.fastarm.back.team.controller.dto.TeamModifyRequest;
 import com.fastarm.back.team.dto.TeamDetailDto;
 import com.fastarm.back.team.dto.TeamDto;
@@ -37,8 +39,8 @@ public class TeamController {
     }
 
     @GetMapping("/{teamId}")
-    public ResponseEntity<?> teamDetailGet(@PathVariable Long teamId){
-        TeamDetailDto teamDetailDto = teamService.getTeamDetail(teamId);
+    public ResponseEntity<?> teamDetailGet(@PathVariable Long teamId, @AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
+        TeamDetailDto teamDetailDto = teamService.getTeamDetail(TeamDetailRequest.from(teamId, loginMemberInfo.getLoginId()));
         return ResponseEntity.ok(new ApiResponse<>("TE104", "그룹 상세 조회 성공", teamDetailDto));
     }
 
