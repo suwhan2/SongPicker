@@ -35,6 +35,4 @@ public class TeamMember {
     @Column(name = "join_at", nullable = false, updatable = false)
     private LocalDateTime joinAt;
 
-
-
 }

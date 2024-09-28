@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -24,7 +23,6 @@ public class Team {
     @Column(nullable = false, length = 32)
     private String name;
 
-
     @Column(name = "team_image", length = 256)
     private String teamImage;
 
@@ -39,6 +37,5 @@ public class Team {
         this.name = name;
         this.teamImage = teamImage;
     }
-
 
 }
