@@ -31,19 +31,17 @@ public class SongService {
 
 
     @Transactional
-    public List<SongDto> recommendMySong(){
-        return songRepository.findRandomSongs()
-                .stream()
-                .map(song -> SongDto.builder()
-                        .songId(song.getId())
-                        .number(song.getNumber())
-                        .title(song.getTitle())
-                        .singer(song.getSinger())
-                        .coverImage(song.getCoverImage())
-                        .isLike(false)
-                        .likeId(null)
-                        .build())
-                .collect(Collectors.toList());
+    public List<SongDto> recommendMySong(String loginId){
+
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(MemberNotFoundException::new);
+
+        List<Song> randomSongs = songRepository.findRandomSongs();
+        List<Long> songIds = randomSongs.stream().map(Song::getId).collect(Collectors.toList());
+
+        List<SongDto> songDtoList = songRepository.findSongsWithLikeStatus(songIds, member.getId());
+
+        return songDtoList;
 
     }
 
@@ -98,13 +96,13 @@ public class SongService {
                 .isLike(songDto.getIsLike())
                 .likeId(songDto.getLikeId())
                 .build();
-   }
+    }
 
 
-   @Transactional(readOnly = true)
-   public SongSearchResponse searchSongs(SongSearchRequest dto){
-       Member member = memberRepository.findByLoginId(dto.getLoginId())
-               .orElseThrow(MemberNotFoundException::new);
+    @Transactional(readOnly = true)
+    public SongSearchResponse searchSongs(SongSearchRequest dto){
+        Member member = memberRepository.findByLoginId(dto.getLoginId())
+                .orElseThrow(MemberNotFoundException::new);
 
 
         List<Song> songsByTitle = songRepository.findSongsByKeyword(dto.getKeyword());
@@ -113,8 +111,8 @@ public class SongService {
         List<Song> songsBySinger = songRepository.findSongsBySinger(dto.getKeyword());
         List<SongDto> singerResults = createSongDtoList(songsBySinger, member.getId());
 
-       return SongSearchResponse.from(songResults, singerResults);
-   }
+        return SongSearchResponse.from(songResults, singerResults);
+    }
 
 
     private List<SongDto> createSongDtoList(List<Song> songs, Long memberId) {
@@ -129,7 +127,7 @@ public class SongService {
 //                likeId = likeResult.get();
 //            }
             //, isLike, likeId
-            SongDto songDto = SongDto.from(song);
+            SongDto songDto = SongDto.from(song,isLike, likeId);
             songDtoList.add(songDto);
         }
         return songDtoList;
