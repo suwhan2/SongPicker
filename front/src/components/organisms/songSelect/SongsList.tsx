@@ -23,13 +23,14 @@ interface SongListProps {
   selectedSongs: Song[];
 }
 
-const SongList = ({ onSongSelect, selectedSongs }: SongListProps) => {
+const SongList: React.FC<SongListProps> = ({ onSongSelect, selectedSongs }) => {
   const [songs, setSongs] = useState<Song[]>([]);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
+  const initialLoadDone = useRef(false);
 
   const lastSongElementRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -37,11 +38,7 @@ const SongList = ({ onSongSelect, selectedSongs }: SongListProps) => {
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver(entries => {
         if (entries[0].isIntersecting && hasMore) {
-          setPage(prevPage => {
-            const newPage = prevPage + 1;
-            console.log(`Moving to page ${newPage}`);
-            return newPage;
-          });
+          setPage(prevPage => prevPage + 1);
         }
       });
       if (node) observer.current.observe(node);
@@ -49,20 +46,20 @@ const SongList = ({ onSongSelect, selectedSongs }: SongListProps) => {
     [loading, hasMore]
   );
 
-  const fetchSongs = async () => {
+  const fetchSongs = useCallback(async () => {
+    if (loading || !hasMore) return;
+
     try {
       setLoading(true);
-      setError(null);
       const response = await axiosInstance.get<ApiResponse>(`/api/base-data/initial?page=${page}`);
       if (response.data.code === 'BD100') {
         const newSongs = response.data.data.content;
-        setSongs(prevSongs => {
-          const uniqueSongs = newSongs.filter(
-            (newSong: Song) => !prevSongs.some(prevSong => prevSong.id === newSong.id)
-          );
-          return [...prevSongs, ...uniqueSongs];
-        });
-        setHasMore(!response.data.data.last);
+        if (newSongs.length === 0) {
+          setHasMore(false);
+        } else {
+          setSongs(prevSongs => [...prevSongs, ...newSongs]);
+          setHasMore(!response.data.data.last);
+        }
       } else {
         setError('Failed to fetch songs: Unexpected response code');
       }
@@ -72,11 +69,16 @@ const SongList = ({ onSongSelect, selectedSongs }: SongListProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page]);
 
   useEffect(() => {
-    fetchSongs();
-  }, [page]);
+    if (!initialLoadDone.current) {
+      fetchSongs();
+      initialLoadDone.current = true;
+    } else if (page > 0) {
+      fetchSongs();
+    }
+  }, [page, fetchSongs]);
 
   if (error) {
     return <div className="text-center text-red-500">{error}</div>;
@@ -88,9 +90,9 @@ const SongList = ({ onSongSelect, selectedSongs }: SongListProps) => {
         const isSelected = selectedSongs.some(s => s.id === song.id);
         return (
           <div
-            key={`${page}-${song.id}`}
+            key={`${song.id}-${page}-${index}`}
             ref={songs.length === index + 1 ? lastSongElementRef : null}
-            className="cursor-pointer relative aspect-square "
+            className="cursor-pointer relative aspect-square"
             onClick={() => onSongSelect(song)}
           >
             <div

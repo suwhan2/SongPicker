@@ -15,22 +15,25 @@ import SongSelectPage from './pages/SongsSelectPage';
 import useAuthStore from './stores/useAuthStore';
 import './App.css';
 
-// PrivateRoute 컴포넌트 정의
 interface PrivateRouteProps {
   children: ReactNode;
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const isSongSelected = useAuthStore(state => state.isSongSelected);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
+  if (isAuthenticated && !isSongSelected && window.location.pathname !== '/song-select') {
+    return <Navigate to="/song-select" replace />;
+  }
+
   return <>{children}</>;
 };
 
-// PublicRoute 컴포넌트 정의
 interface PublicRouteProps {
   children: ReactNode;
 }
@@ -46,13 +49,14 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
 };
 
 const App = () => {
-  const isSongSelected = useAuthStore(state => state.isSongSelected); // 곡 선택 여부 확인
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const isSongSelected = useAuthStore(state => state.isSongSelected);
 
   return (
     <Router>
-      <div className="flex flex-col  min-h-screen w-screen max-w-[640px] mx-auto relative bg-black">
+      <div className="flex flex-col min-h-screen w-screen max-w-[640px] mx-auto relative bg-black">
         <Routes>
-          {/* 공개 라우트 (인증된 사용자는 접근 불가) */}
+          {/* 공개 라우트 */}
           <Route
             path="/login"
             element={
@@ -75,6 +79,14 @@ const App = () => {
               <PublicRoute>
                 <FindAccountPage />
               </PublicRoute>
+            }
+          />
+
+          {/* 곡 선택 페이지 */}
+          <Route
+            path="/song-select"
+            element={
+              isAuthenticated && !isSongSelected ? <SongSelectPage /> : <Navigate to="/" replace />
             }
           />
 
@@ -104,7 +116,7 @@ const App = () => {
             }
           />
           <Route
-            path="/group"
+            path="/group/*"
             element={
               <PrivateRoute>
                 <GroupPage />
@@ -143,21 +155,18 @@ const App = () => {
               </PrivateRoute>
             }
           />
-          <Route
-            path="/song-select"
+
+          {/* 기타 모든 라우트는 조건에 따라 리다이렉트 */}
+          {/* <Route
+            path="*"
             element={
-              isSongSelected ? (
-                <Navigate to="/" replace /> // 곡이 이미 선택되었으면 메인 페이지로 리다이렉트
+              isAuthenticated && !isSongSelected ? (
+                <Navigate to="/song-select" replace />
               ) : (
-                <PrivateRoute>
-                  <SongSelectPage />
-                </PrivateRoute>
+                <Navigate to="/" replace />
               )
             }
-          />
-
-          {/* 기타 모든 라우트는 메인 페이지로 리다이렉트 */}
-          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
+          /> */}
         </Routes>
       </div>
     </Router>
