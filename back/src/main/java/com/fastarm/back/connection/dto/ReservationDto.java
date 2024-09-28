@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReservationDto {
     private int number;
-    private String nickname;
+    private String loginId;
 }

@@ -30,18 +30,18 @@ public class ConnectionController {
                                            @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
         connectionService.setConnection(ConnectionDto.builder()
                             .serialNumber(connectionRequest.getSerialNumber())
-                            .nickname(loginMemberInfo.getNickname())
+                            .loginId(loginMemberInfo.getLoginId())
                             .build());
         return ResponseEntity.ok(new ApiResponse<>("CO100", "서비스 연동 성공", null));
     }
 
-    @PostMapping("/group")
+    @PostMapping("/team")
     public ResponseEntity<?> connectionSet(@RequestBody TeamConnectionRequest teamConnectionRequest,
                                            @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
-        connectionService.setGroupConnection(TeamConnectionDto.builder()
+        connectionService.setTeamConnection(TeamConnectionDto.builder()
                         .serialNumber(teamConnectionRequest.getSerialNumber())
                         .teamId(teamConnectionRequest.getTeamId())
-                        .nickname(loginMemberInfo.getNickname())
+                        .loginId(loginMemberInfo.getLoginId())
                         .build());
         return ResponseEntity.ok(new ApiResponse<>("CO100", "서비스 연동 성공", null));
     }
@@ -51,7 +51,7 @@ public class ConnectionController {
                                          @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
         connectionService.reserveSong(ReservationDto.builder()
                         .number(reservationRequest.getNumber())
-                        .nickname(loginMemberInfo.getNickname())
+                        .loginId(loginMemberInfo.getLoginId())
                         .build());
         return ResponseEntity.ok(new ApiResponse<>("CO101", "예약 성공", null));
     }
