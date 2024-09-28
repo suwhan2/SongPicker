@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SongDto {
+        private Long songId;
         private int number;
         private String title;
         private String singer;
@@ -19,6 +20,7 @@ public class SongDto {
         //, boolean isLike, Long likeId
         public static SongDto from(Song song) {
                 return SongDto.builder()
+                        .songId(song.getId())
                         .number(song.getNumber())
                         .title(song.getTitle())
                         .singer(song.getSinger())

@@ -35,6 +35,7 @@ public class SongService {
         return songRepository.findRandomSongs()
                 .stream()
                 .map(song -> SongDto.builder()
+                        .songId(song.getId())
                         .number(song.getNumber())
                         .title(song.getTitle())
                         .singer(song.getSinger())

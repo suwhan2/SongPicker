@@ -34,13 +34,17 @@ public class TeamService {
 
     @Transactional(readOnly = true)
     public List<TeamDto> getMyTeams(String loginId){
+
         Member member = memberRepository.findByLoginId(loginId).orElseThrow(MemberNotFoundException::new);
         return teamMemberRepository.findTeamsWithMemberCountByMemberId(member.getId());
+
     }
 
 
     @Transactional(readOnly = true)
+
     public TeamDetailDto getTeamDetail(TeamDetailRequest dto) {
+
 
         Team team = teamRepository.findById(dto.getTeamId()).orElseThrow(TeamNotFoundException::new);
         Member member = memberRepository.findByLoginId(dto.getLoginId()).orElseThrow(MemberNotFoundException::new);
@@ -92,6 +96,7 @@ public class TeamService {
         teamRepository.save(team);
 
     }
+
 
     @Transactional
     public void checkPermission(Member member, Team team) {
