@@ -53,8 +53,8 @@ public class TeamController {
     public ResponseEntity<?> teamCreate(@Valid @ModelAttribute TeamAddRequest teamAddRequest,
                                          @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) throws IOException {
 
-        teamService.createTeam(teamAddRequest.toDto(loginMemberInfo.getLoginId()));
-        return new ResponseEntity<>(new ApiResponse<>("TE100", "그룹 생성 성공", null), HttpStatus.CREATED);
+        Long teamId = teamService.createTeam(teamAddRequest.toDto(loginMemberInfo.getLoginId()));
+        return new ResponseEntity<>(new ApiResponse<>("TE100", "그룹 생성 성공", teamId), HttpStatus.CREATED);
     }
 
     @PutMapping("/{teamId}")

@@ -121,7 +121,7 @@ public class TeamService {
     }
 
     @Transactional
-    public void createTeam(TeamAddDto dto) throws IOException {
+    public Long createTeam(TeamAddDto dto) throws IOException {
         String imagePath;
         if(dto.getTeamImage().isEmpty()) imagePath="https://songpicker.s3.ap-northeast-2.amazonaws.com/free-icon-mirror-ball-991814.png";
         else imagePath = s3Service.uploadFile(dto.getTeamImage());
@@ -137,6 +137,8 @@ public class TeamService {
                 .team(savedTeam)
                 .build();
         teamMemberRepository.save(teamMember);
+
+        return savedTeam.getId();
     }
 
     @Transactional
