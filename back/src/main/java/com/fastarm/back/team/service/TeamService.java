@@ -123,7 +123,7 @@ public class TeamService {
     @Transactional
     public Long createTeam(TeamAddDto dto) throws IOException {
         String imagePath;
-        if(dto.getTeamImage().isEmpty()) imagePath="https://songpicker.s3.ap-northeast-2.amazonaws.com/free-icon-mirror-ball-991814.png";
+        if(dto.getTeamImage().isEmpty()) imagePath="https://songpicker.s3.ap-northeast-2.amazonaws.com/%EB%B2%BC%EB%9D%BD%EC%9D%B4+(2).png";
         else imagePath = s3Service.uploadFile(dto.getTeamImage());
 
         Team team = dto.toEntity(imagePath);
