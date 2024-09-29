@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +18,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Builder
+@SQLDelete(sql = "UPDATE notification SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 public class Notification {
 
     @Id
@@ -48,4 +52,11 @@ public class Notification {
 
     @OneToOne(mappedBy = "notification",fetch = FetchType.LAZY)
     private NotificationTeamInvite notificationTeamInvite;
+
+    public void read() {
+        this.isRead = true;
+    }
+    public void delete() {
+        this.isDeleted = true;
+    }
 }
