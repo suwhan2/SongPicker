@@ -18,6 +18,7 @@ public class SongRepositoryCustomImpl implements SongRepositoryCustom {
     public List<SongDto> findSongsWithLikeStatus(List<Long> songIds, Long memberId) {
         return queryFactory
                 .select(Projections.constructor(SongDto.class,
+                        song.id,
                         song.number,
                         song.title,
                         song.singer,

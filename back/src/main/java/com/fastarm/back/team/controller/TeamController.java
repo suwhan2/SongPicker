@@ -3,9 +3,7 @@ package com.fastarm.back.team.controller;
 import com.fastarm.back.auth.security.dto.LoginMemberInfo;
 import com.fastarm.back.common.controller.dto.ApiResponse;
 import com.fastarm.back.song.controller.dto.SongDetailRequest;
-import com.fastarm.back.team.controller.dto.TeamAddRequest;
-import com.fastarm.back.team.controller.dto.TeamDetailRequest;
-import com.fastarm.back.team.controller.dto.TeamModifyRequest;
+import com.fastarm.back.team.controller.dto.*;
 import com.fastarm.back.team.dto.TeamDetailDto;
 import com.fastarm.back.team.dto.TeamDto;
 import com.fastarm.back.team.dto.TeamWithdrawDto;
@@ -35,21 +33,28 @@ public class TeamController {
     @GetMapping
     public ResponseEntity<?> myTeamGet(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
         List<TeamDto> teamDtoList = teamService.getMyTeams(loginMemberInfo.getLoginId());
-        return ResponseEntity.ok(new ApiResponse<>("TE103", "내 그룹 목록 조회 성공", teamDtoList));
+        return new ResponseEntity<>(new ApiResponse<>("TE103", "내 그룹 목록 조회 성공", teamDtoList),HttpStatus.OK);
     }
 
     @GetMapping("/{teamId}")
     public ResponseEntity<?> teamDetailGet(@PathVariable Long teamId, @AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
         TeamDetailDto teamDetailDto = teamService.getTeamDetail(TeamDetailRequest.from(teamId, loginMemberInfo.getLoginId()));
-        return ResponseEntity.ok(new ApiResponse<>("TE104", "그룹 상세 조회 성공", teamDetailDto));
+        return new ResponseEntity<>(new ApiResponse<>("TE104", "그룹 상세 조회 성공", teamDetailDto),HttpStatus.OK);
+    }
+
+    @PostMapping("/invite")
+    public ResponseEntity<?> teamInvite(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo,
+                                        @RequestBody TeamInviteRequest teamInviteRequest){
+        TeamInviteResponse teamInviteResponse = teamService.inviteTeam(teamInviteRequest.toDto(loginMemberInfo.getLoginId()));
+        return new ResponseEntity<>(new ApiResponse<>("TE101", "그룹 초대 성공",teamInviteResponse),HttpStatus.OK);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> teamCreate(@Valid @ModelAttribute TeamAddRequest teamAddRequest,
                                          @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) throws IOException {
 
-        teamService.createTeam(teamAddRequest.toDto(loginMemberInfo.getLoginId()));
-        return new ResponseEntity<>(new ApiResponse<>("TE100", "그룹 생성 성공", null), HttpStatus.CREATED);
+        Long teamId = teamService.createTeam(teamAddRequest.toDto(loginMemberInfo.getLoginId()));
+        return new ResponseEntity<>(new ApiResponse<>("TE100", "그룹 생성 성공", teamId), HttpStatus.CREATED);
     }
 
     @PutMapping("/{teamId}")

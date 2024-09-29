@@ -17,16 +17,15 @@ public class SongDto {
         private Boolean isLike;
         private Long likeId;
 
-        //, boolean isLike, Long likeId
-        public static SongDto from(Song song) {
+        public static SongDto from(Song song,Boolean isLike,Long likeId) {
                 return SongDto.builder()
                         .songId(song.getId())
                         .number(song.getNumber())
                         .title(song.getTitle())
                         .singer(song.getSinger())
                         .coverImage(song.getCoverImage())
-//                        .isLike(isLike)
-//                        .likeId(likeId)
+                        .isLike(isLike)
+                        .likeId(likeId)
                         .build();
         }
 }
