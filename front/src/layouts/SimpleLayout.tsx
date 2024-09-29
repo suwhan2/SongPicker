@@ -19,7 +19,7 @@ const SimpleLayout = ({
       <div className="flex-shrink-0">
         <SubTopNavbar title={title} onBackButtonClick={onBackButtonClick} />
       </div>
-      <div className={`flex-grow ${centerContent ? 'flex items-center justify-center' : ''}`}>
+      <div className={`flex-grow  ${centerContent ? 'flex items-center justify-center' : ''}`}>
         {children}
       </div>
     </div>

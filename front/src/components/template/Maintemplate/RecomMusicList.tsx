@@ -4,7 +4,7 @@ import MusicDetailModal from '../commons/MusicDetailModal';
 import { IoMdRefreshCircle } from 'react-icons/io';
 import { TbMoodSadSquint } from 'react-icons/tb';
 
-import { getPersonalRecommendations } from '../../../services/songservices';
+import { getPersonalRecommendations, getSongDetail, SongDetail } from '../../../services/songservices';
 
 // Props 타입 정의
 type Props = {
@@ -14,6 +14,7 @@ type Props = {
 
 // 추천 곡 인터페이스 정의
 interface RecommendedSong {
+  songId: number;
   number: string;
   title: string;
   singer: string;
@@ -21,6 +22,12 @@ interface RecommendedSong {
   isLike: boolean;
   likeId: number | null;
 }
+
+// 에러 처리를 위한 유틸리티 함수
+const handleApiError = (error: unknown, message: string) => {
+  console.error(message, error);
+  return message;
+};
 
 const RecomMusicList = ({ onShowNotification, onShowConnectionModal }: Props) => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -30,6 +37,8 @@ const RecomMusicList = ({ onShowNotification, onShowConnectionModal }: Props) =>
   const [recommendedSongs, setRecommendedSongs] = useState<RecommendedSong[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedSongDetail, setSelectedSongDetail] = useState<SongDetail | null>(null);
+  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
   const itemsPerPage = 5;
   const totalPages = useMemo(
@@ -114,10 +123,24 @@ const RecomMusicList = ({ onShowNotification, onShowConnectionModal }: Props) =>
   }, [onShowNotification]);
 
   // 곡 선택 핸들러
-  const handleItemClick = useCallback((music: RecommendedSong) => {
-    setSelectedMusic(music);
-    setIsModalOpen(true);
-  }, []);
+  const handleItemClick = useCallback(async (music: RecommendedSong) => {
+    setIsLoadingDetail(true);
+    try {
+      const response = await getSongDetail(music.songId);
+      if (response.code === 'SO100') {
+        setSelectedSongDetail(response.data);
+        setIsModalOpen(true);
+      } else {
+        throw new Error(response.message || '노래 상세 정보를 불러오는데 실패했습니다.');
+      }
+    } catch (error) {
+      const errorMessage = handleApiError(error, '노래 상세 정보를 불러오는데 실패했습니다.');
+      onShowNotification('오류 발생', errorMessage);
+    } finally {
+      setIsLoadingDetail(false);
+    }
+  }, [onShowNotification]);
+
 
   // 터치 이벤트 핸들러
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -219,15 +242,14 @@ const RecomMusicList = ({ onShowNotification, onShowConnectionModal }: Props) =>
           />
         ))}
       </div>
-      {selectedMusic && (
+      {selectedSongDetail && (
         <MusicDetailModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          title={selectedMusic.title}
-          artist={selectedMusic.singer}
-          imageUrl={selectedMusic.coverImage}
-          height="80vh"
-        />
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        songDetail={selectedSongDetail}
+        isLoading={isLoadingDetail}
+        height="80vh"
+      />
       )}
     </div>
   );

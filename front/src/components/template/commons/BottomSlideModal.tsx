@@ -63,7 +63,7 @@ const BottomSlideModal = ({
           <div className="w-14 h-[3px] bg-white rounded-full" />
         </div>
         <div className="px-4 py-3 border-b border-purple-500 flex items-center relative">
-          <h2 className="text-white text-lg font-semibold w-full text-center">{title}</h2>
+          <h2 className="text-white text-lg font-semibold text-center w-[75%] mx-auto">{title}</h2>
           <button
             onClick={onClose}
             className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors"

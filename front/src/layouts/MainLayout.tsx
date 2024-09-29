@@ -11,8 +11,10 @@ type MainLayoutProps = {
 const MainLayout = ({ children, title, fixedContent }: MainLayoutProps) => {
   return (
     <div className="flex flex-col w-full h-screen bg-black text-white">
-      <TopNavbar title={title} />
-      <div className="flex-grow flex flex-col overflow-hidden">
+      <div className="flex-shrink-0"> 
+        <TopNavbar title={title} />
+      </div>
+      <div className="flex-grow flex flex-col overflow-hidden relative pb-[60px]">
         {fixedContent && (
           <div className="flex-shrink-0 bg-black z-10 sticky top-0 border-b border-primary">
             {fixedContent}
