@@ -83,19 +83,7 @@ public class SongService {
         List<SongDto> songDtoList = songRepository.findSongsWithLikeStatus(List.of(song.getId()), member.getId());
         SongDto songDto = songDtoList.get(0);
 
-        return SongDetailDto.builder()
-                .number(songDto.getNumber())
-                .title(songDto.getTitle())
-                .singer(songDto.getSinger())
-                .coverImage(songDto.getCoverImage())
-                .genre(song.getGenre())
-                .lyricist(song.getLyricist())
-                .composer(song.getComposer())
-                .lyrics(song.getLyrics())
-                .releasedAt(song.getReleasedAt())
-                .isLike(songDto.getIsLike())
-                .likeId(songDto.getLikeId())
-                .build();
+        return SongDetailDto.of(songDto, song);
     }
 
 
@@ -105,33 +93,12 @@ public class SongService {
                 .orElseThrow(MemberNotFoundException::new);
 
 
-        List<Song> songsByTitle = songRepository.findSongsByKeyword(dto.getKeyword());
-        List<SongDto> songResults = createSongDtoList(songsByTitle, member.getId());
+        List<Long> songsByTitle = songRepository.findTitleByKeyword(dto.getKeyword());
+        List<SongDto> songResults = songRepository.findSongsWithLikeStatus(songsByTitle, member.getId());
 
-        List<Song> songsBySinger = songRepository.findSongsBySinger(dto.getKeyword());
-        List<SongDto> singerResults = createSongDtoList(songsBySinger, member.getId());
+        List<Long> songsBySinger = songRepository.findSingerByKeyword(dto.getKeyword());
+        List<SongDto> singerResults = songRepository.findSongsWithLikeStatus(songsBySinger, member.getId());
 
         return SongSearchResponse.from(songResults, singerResults);
     }
-
-
-    private List<SongDto> createSongDtoList(List<Song> songs, Long memberId) {
-        List<SongDto> songDtoList = new ArrayList<>();
-
-        for (Song song : songs) {
-            boolean isLike = false;
-            Long likeId = null;
-//            Optional<Long> likeResult = likesRepository.findByMemberIdAndSongId(memberId, song.getId());
-//            if (likeResult.isPresent()) {
-//                isLike = true;
-//                likeId = likeResult.get();
-//            }
-            //, isLike, likeId
-            SongDto songDto = SongDto.from(song,isLike, likeId);
-            songDtoList.add(songDto);
-        }
-        return songDtoList;
-    }
-
-
 }

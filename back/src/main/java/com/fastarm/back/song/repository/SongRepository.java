@@ -15,16 +15,40 @@ import java.util.Optional;
 public interface SongRepository extends JpaRepository<Song, Long> , SongRepositoryCustom{
 
 
-    @Query("SELECT s FROM Song s WHERE s.title LIKE %:keyword%")
-    List<Song> findSongsByKeyword(@Param("keyword") String keyword);
+    @Query("""
+        SELECT s.id
+        FROM Song s 
+        WHERE s.title LIKE %:keyword%
+        ORDER BY CASE 
+        WHEN s.title LIKE :keyword THEN 0
+        WHEN s.title LIKE :keyword% THEN 1
+        WHEN s.title LIKE %:keyword THEN 2
+        WHEN s.title LIKE %:keyword% THEN 3
+        ELSE 4
+        END
+        """)
+    List<Long> findTitleByKeyword(@Param("keyword") String keyword);
+
+    @Query("""
+        SELECT s.id
+        FROM Song s 
+        WHERE s.singer LIKE %:keyword%
+        ORDER BY CASE 
+        WHEN s.singer LIKE :keyword THEN 0
+        WHEN s.singer LIKE :keyword% THEN 1
+        WHEN s.singer LIKE %:keyword THEN 2
+        WHEN s.singer LIKE %:keyword% THEN 3
+        ELSE 4
+        END
+        """)
+    List<Long> findSingerByKeyword(@Param("keyword") String keyword);
+
+
 
     @Query("SELECT s FROM Song s ORDER BY RAND() LIMIT 20")
     List<Song> findRandomSongs();
     
     Optional<Song> findByNumber(int number);
-    
-    @Query("SELECT s FROM Song s WHERE s.singer LIKE %:keyword%")
-    List<Song> findSongsBySinger(@Param("keyword") String keyword);
 
     Optional<Song> findById(Long id);
 
