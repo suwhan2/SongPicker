@@ -1,5 +1,6 @@
 package com.fastarm.back.song.dto;
 
+import com.fastarm.back.song.entity.Song;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,4 +22,19 @@ public class SongDetailDto {
     private Boolean isLike;
     private Long likeId;
 
+    public static SongDetailDto of(SongDto songDto, Song song) {
+        return new SongDetailDto(
+                songDto.getNumber(),
+                songDto.getTitle(),
+                songDto.getSinger(),
+                songDto.getCoverImage(),
+                song.getGenre(),
+                song.getLyricist(),
+                song.getComposer(),
+                song.getLyrics(),
+                song.getReleasedAt(),
+                songDto.getIsLike(),
+                songDto.getLikeId()
+        );
+    }
 }
