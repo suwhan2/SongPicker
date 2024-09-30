@@ -24,15 +24,14 @@ public class NotificationController {
     public ResponseEntity<?> teamInvitationRespond(@RequestBody TeamInviteNotificationRequest teamInviteNotificationRequest,
                                                    @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
         notificationService.respondTeamInvitation(teamInviteNotificationRequest.toDto(loginMemberInfo.getLoginId()));
-        return new ResponseEntity<>(new ApiResponse<>("NO100","그룹 초대 응답 성공",null), HttpStatus.OK);
-
+        return ResponseEntity.ok(new ApiResponse<>("NO100","그룹 초대 응답 성공",null));
     }
 
     @PutMapping("/read")
     public ResponseEntity<?> notificationRead(@RequestBody NotificationRequest notificationRequest,
                                               @AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
         notificationService.readNotification(notificationRequest.toDto(loginMemberInfo.getLoginId()));
-        return new ResponseEntity<>(new ApiResponse<>("NO101","알림 읽기 성공",null),HttpStatus.OK);
+        return ResponseEntity.ok(new ApiResponse<>("NO101","알림 읽기 성공",null));
     }
 
     @DeleteMapping("/{notificationId}")
@@ -41,7 +40,7 @@ public class NotificationController {
 
 
         notificationService.removeNotification(NotificationDto.of(notificationId,loginMemberInfo.getLoginId()));
-        return new ResponseEntity<>(new ApiResponse<>("NO102","알림 삭제 성공",null),HttpStatus.OK);
+        return ResponseEntity.ok(new ApiResponse<>("NO102","알림 삭제 성공",null));
     }
 
 
