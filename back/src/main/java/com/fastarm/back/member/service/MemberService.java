@@ -41,10 +41,10 @@ public class MemberService {
 
     @Transactional
     public void addMember(MemberAddDto memberAddDto) {
-//        if (checkSignupPreAuth(memberAddDto)) {
+        if (checkSignupPreAuth(memberAddDto)) {
             String encodedPassword = bcryptPasswordEncoder.encode(memberAddDto.getPassword());
             memberRepository.save(memberAddDto.toEntity(encodedPassword));
-//        }
+        }
     }
 
     private Boolean checkSignupPreAuth(MemberAddDto memberAddDto) {
