@@ -3,6 +3,10 @@ package com.fastarm.back.member.service;
 import com.fastarm.back.auth.exception.NotCheckPhoneAuthenticationException;
 import com.fastarm.back.common.constants.RedisSessionConstants;
 import com.fastarm.back.member.dto.MemberAddDto;
+import com.fastarm.back.member.dto.NicknameModifyDto;
+import com.fastarm.back.member.dto.PasswordFindDto;
+import com.fastarm.back.member.dto.PasswordModifyDto;
+import com.fastarm.back.member.entity.Member;
 import com.fastarm.back.member.exception.*;
 import com.fastarm.back.member.repository.MemberRepository;
 import jakarta.servlet.http.HttpSession;
@@ -45,6 +49,53 @@ public class MemberService {
             String encodedPassword = bcryptPasswordEncoder.encode(memberAddDto.getPassword());
             memberRepository.save(memberAddDto.toEntity(encodedPassword));
         }
+    }
+
+    @Transactional(readOnly = true)
+    public String findNickname(String loginId) {
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(MemberNotFoundException::new);
+        return member.getNickname();
+    }
+
+    @Transactional(readOnly = true)
+    public String findLoginId(String phone) {
+        Member member = memberRepository.findByPhone(phone)
+                .orElseThrow(MemberNotFoundException::new);
+
+        return member.getLoginId();
+    }
+
+    @Transactional
+    public void findPassword(PasswordFindDto passwordFindDto) {
+        Member member = memberRepository.findByLoginId(passwordFindDto.getLoginId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        if (!passwordFindDto.getNewPassword().equals(passwordFindDto.getCheckPassword())) {
+            throw new PasswordModificationException();
+        }
+
+        member.modifyPassword(passwordFindDto.getNewPassword());
+    }
+
+    @Transactional
+    public void modifyPassword(PasswordModifyDto passwordModifyDto) {
+        Member member = memberRepository.findByLoginId(passwordModifyDto.getLoginId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        if (!passwordModifyDto.getNewPassword().equals(passwordModifyDto.getCheckPassword())) {
+            throw new PasswordModificationException();
+        }
+
+        member.modifyPassword(passwordModifyDto.getNewPassword());
+    }
+
+    @Transactional
+    public void modifyNickname(NicknameModifyDto nicknameModifyDto) {
+        Member member = memberRepository.findByLoginId(nicknameModifyDto.getLoginId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        member.modifyNickname(nicknameModifyDto.getNewNickname());
     }
 
     private Boolean checkSignupPreAuth(MemberAddDto memberAddDto) {
