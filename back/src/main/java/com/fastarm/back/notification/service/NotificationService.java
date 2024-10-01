@@ -15,10 +15,19 @@ import com.fastarm.back.team.entity.Team;
 import com.fastarm.back.team.entity.TeamMember;
 import com.fastarm.back.team.repository.TeamMemberRepository;
 import com.fastarm.back.notification.exception.TeamInviteNotificationNotFoundException;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.concurrent.ExecutionException;
+
+import static com.google.firebase.messaging.Notification.*;
+
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
@@ -27,7 +36,6 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationTeamInviteRepository notificationTeamInviteRepository;
     private final MemberRepository memberRepository;
-
     @Transactional
     public void respondTeamInvitation(TeamInviteNotificationDto dto){
         NotificationTeamInvite notificationInvite = notificationTeamInviteRepository.findById(dto.getNotificationId())
@@ -91,4 +99,21 @@ public class NotificationService {
         if(!notification.getReceiver().getId().equals(member.getId()))
             throw new NotificationNotFoundException();
     }
+
+    @Transactional
+    public void sendNotification(String targetToken, String title, String body) throws ExecutionException, InterruptedException {
+
+        Message message = Message.builder()
+                .setToken(targetToken)
+                .setNotification(builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build())
+                .build();
+
+        String response = FirebaseMessaging.getInstance().sendAsync(message).get();
+        log.info("Successfully sent message: {}", response);
+    }
+
+
 }
