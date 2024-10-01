@@ -13,12 +13,14 @@ const SearchBar = ({ onSearch, initialKeyword }: Props) => {
     setSearchTerm(initialKeyword);
   }, [initialKeyword]);
 
+  // Enter 키를 눌렀을 때 검색
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       handleSearch();
     }
   };
 
+  // 검색 버튼 클릭 또는 Enter 키 눌렀을 때 검색 처리
   const handleSearch = () => {
     if (searchTerm.trim()) {
       onSearch(searchTerm);
@@ -26,6 +28,7 @@ const SearchBar = ({ onSearch, initialKeyword }: Props) => {
     }
   };
 
+  // 최근 검색어 업데이트
   const updateRecentSearches = (term: string) => {
     let recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
     recentSearches = recentSearches.filter((item: string) => item !== term);
