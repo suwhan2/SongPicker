@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.service.DefaultMessageService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class AuthService {
     private final DefaultMessageService messageService;
     private final RedisService redisService;
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private static final String senderPhone = "01085914442";
 
@@ -81,7 +83,7 @@ public class AuthService {
         Member member = memberRepository.findByLoginId(passwordVerifyDto.getLoginId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        if (!member.getPassword().equals(passwordVerifyDto.getInputPassword())) {
+        if (!bCryptPasswordEncoder.matches(passwordVerifyDto.getInputPassword(), member.getPassword())) {
             throw new PasswordAuthenticationException();
         }
     }

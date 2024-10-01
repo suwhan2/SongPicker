@@ -2,10 +2,8 @@ package com.fastarm.back.member.service;
 
 import com.fastarm.back.auth.exception.NotCheckPhoneAuthenticationException;
 import com.fastarm.back.common.constants.RedisSessionConstants;
-import com.fastarm.back.member.dto.MemberAddDto;
-import com.fastarm.back.member.dto.NicknameModifyDto;
-import com.fastarm.back.member.dto.PasswordFindDto;
-import com.fastarm.back.member.dto.PasswordModifyDto;
+import com.fastarm.back.common.service.S3Service;
+import com.fastarm.back.member.dto.*;
 import com.fastarm.back.member.entity.Member;
 import com.fastarm.back.member.exception.*;
 import com.fastarm.back.member.repository.MemberRepository;
@@ -14,11 +12,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
+    private final S3Service s3Service;
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bcryptPasswordEncoder;
 
@@ -75,7 +78,7 @@ public class MemberService {
             throw new PasswordModificationException();
         }
 
-        member.modifyPassword(passwordFindDto.getNewPassword());
+        member.modifyPassword(bcryptPasswordEncoder.encode(passwordFindDto.getNewPassword()));
     }
 
     @Transactional
@@ -87,7 +90,7 @@ public class MemberService {
             throw new PasswordModificationException();
         }
 
-        member.modifyPassword(passwordModifyDto.getNewPassword());
+        member.modifyPassword(bcryptPasswordEncoder.encode(passwordModifyDto.getNewPassword()));
     }
 
     @Transactional
@@ -96,6 +99,34 @@ public class MemberService {
                 .orElseThrow(MemberNotFoundException::new);
 
         member.modifyNickname(nicknameModifyDto.getNewNickname());
+    }
+
+    @Transactional
+    public void modifyPhone(PhoneModifyDto phoneModifyDto) {
+        Member member = memberRepository.findByLoginId(phoneModifyDto.getLoginId())
+                .orElseThrow(MemberNotFoundException::new);
+        member.modifyPhone(phoneModifyDto.getNewPhone());
+    }
+
+    @Transactional
+    public void modifyProfileImage(ProfileImageModifyDto profileImageModifyDto) throws URISyntaxException, IOException {
+        Member member = memberRepository.findByLoginId(profileImageModifyDto.getLoginId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        MultipartFile profileImage = profileImageModifyDto.getProfileImage();
+
+        if (profileImage != null) {
+            if (member.getProfileImage() != null) {
+                s3Service.deleteFile(member.getProfileImage());
+            }
+            String newPath = s3Service.uploadFile(profileImageModifyDto.getProfileImage());
+            member.modifyProfileImage(newPath);
+        } else {
+            if (member.getProfileImage() != null) {
+                s3Service.deleteFile(member.getProfileImage());
+            }
+            member.modifyProfileImage(null);
+        }
     }
 
     private Boolean checkSignupPreAuth(MemberAddDto memberAddDto) {

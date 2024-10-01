@@ -5,10 +5,7 @@ import com.fastarm.back.auth.exception.NotCheckPhoneAuthenticationException;
 import com.fastarm.back.auth.security.dto.LoginMemberInfo;
 import com.fastarm.back.common.constants.RedisSessionConstants;
 import com.fastarm.back.common.controller.dto.ApiResponse;
-import com.fastarm.back.member.controller.dto.MemberAddRequest;
-import com.fastarm.back.member.controller.dto.NicknameModifyRequest;
-import com.fastarm.back.member.controller.dto.PasswordFindRequest;
-import com.fastarm.back.member.controller.dto.PasswordModifyRequest;
+import com.fastarm.back.member.controller.dto.*;
 import com.fastarm.back.member.exception.NotCheckNicknameDuplicationException;
 import com.fastarm.back.member.service.MemberService;
 import com.fastarm.back.member.validation.annotation.LoginId;
@@ -21,6 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 @RestController
 @RequiredArgsConstructor
@@ -102,6 +102,24 @@ public class MemberController {
         }
         memberService.modifyNickname(nicknameModifyRequest.toDto(loginMemberInfo.getLoginId()));
         return ResponseEntity.ok(new ApiResponse<>("ME107", "닉네임 수정 성공", null));
+    }
+
+    @PatchMapping("/phone")
+    public ResponseEntity<?> phoneModify(@Valid @RequestBody PhoneModifyRequest phoneModifyRequest,
+                                         @AuthenticationPrincipal LoginMemberInfo loginMemberInfo,
+                                         @SessionAttribute(name = RedisSessionConstants.AUTH_PHONE, required = false) String authPhone) {
+        if (authPhone == null || !authPhone.equals(phoneModifyRequest.getNewPhone())) {
+            throw new NotCheckPhoneAuthenticationException();
+        }
+        memberService.modifyPhone(phoneModifyRequest.toDto(loginMemberInfo.getLoginId()));
+        return ResponseEntity.ok(new ApiResponse<>("ME109", "전화번호 수정 성공", null));
+    }
+
+    @PatchMapping("/profile-image")
+    public ResponseEntity<?> profileImageModify(@ModelAttribute ProfileImageModifyRequest profileImageModifyRequest,
+                                                @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) throws URISyntaxException, IOException {
+        memberService.modifyProfileImage(profileImageModifyRequest.toDto(loginMemberInfo.getLoginId()));
+        return ResponseEntity.ok(new ApiResponse<>("ME108", "프로필 사진 수정 성공", null));
     }
 }
 

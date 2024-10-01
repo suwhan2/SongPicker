@@ -45,7 +45,7 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(length = 256)
+    @Column(length = 512)
     private String profileImage;
 
     @Column(nullable = false)
@@ -68,6 +68,14 @@ public class Member {
         this.nickname = newNickname;
     }
 
+    public void modifyPhone(String newPhone) {
+        this.phone = newPhone;
+    }
+
+    public void modifyProfileImage(String newProfileImage) {
+        this.profileImage = newProfileImage;
+    }
+
     @Builder
     public Member(Role role, Gender gender, String phone, LocalDate birth, String nickname, String name, String password, String loginId) {
         this.role = role;
@@ -83,6 +91,11 @@ public class Member {
     @PrePersist
     protected void onCreate() {
         isWithdraw = false;
+    }
+
+    @PreRemove
+    protected void onDelete() {
+        this.withdrawnAt = LocalDateTime.now();
     }
 }
 
