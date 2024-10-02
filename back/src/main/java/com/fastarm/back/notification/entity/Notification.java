@@ -51,9 +51,6 @@ public class Notification {
     @Enumerated(EnumType.STRING)
     private Type type;
 
-//    @OneToOne(mappedBy = "notification", fetch = FetchType.LAZY)
-//    private NotificationTeamInvite notificationTeamInvite;
-
     public void read() {
         this.isRead = true;
     }

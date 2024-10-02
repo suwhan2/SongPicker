@@ -24,10 +24,6 @@ public class NotificationTeamInvite extends Notification{
     @Enumerated(EnumType.STRING)
     private Status status;
 
-//    @OneToOne
-//    @Column(name = "notification_id", nullable = false)
-//    private Long notificationId;
-
     public void accept() {
         this.status = Status.ACCEPT;
     }
