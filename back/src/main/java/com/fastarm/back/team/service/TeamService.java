@@ -117,7 +117,7 @@ public class TeamService {
     public Long createTeam(TeamAddDto dto) throws IOException {
 
         String imagePath;
-        if(dto.getTeamImage().isEmpty()) imagePath = "https://songpicker.s3.ap-northeast-2.amazonaws.com/cb4a9f84-c6d5-4b8c-a545-295b52808f95_%EB%AF%B8%EB%9F%AC%EB%B3%BC.jpg";
+        if(dto.getTeamImage().isEmpty()) imagePath = "https://songpicker.s3.ap-northeast-2.amazonaws.com/%EB%B2%BC%EB%9D%BD%EC%9D%B4.png";
          else imagePath = s3Service.uploadFile(dto.getTeamImage());
 
 
