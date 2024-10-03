@@ -147,13 +147,15 @@ public class TeamService {
         String imagPath=null;
         if(dto.getTeamImage().isEmpty()){
             if(team.getTeamImage()!=null) imagPath=team.getTeamImage();
+
         }
         else{
             if(team.getTeamImage()!=null) s3Service.deleteFile(team.getTeamImage());
             imagPath = s3Service.uploadFile(dto.getTeamImage());
         }
 
-        team.changeTeam(dto.getTeamName(), imagPath);
+        if(imagPath==null) team.changeTeamName(dto.getTeamName());
+        else{team.changeTeam(dto.getTeamName(), imagPath);}
         teamRepository.save(team);
     }
 
