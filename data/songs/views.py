@@ -16,16 +16,16 @@ from rest_framework.response import Response
 def recommend_songs_api(request):
     input_data = request.data
     song_numbers = input_data.get('song_numbers', [])
-
-    # df, df_encoded, X_scaled = preprocess_data()
+    
+    df, df_encoded, X_scaled = preprocess_data()
     # if df.isnull().values.any():
     #     return Response({'error': 'Input contains NaN.'}, status=400)
 
     # # 이곳에서 추천 알고리즘 호출 (예: 코사인 유사도)
-    # recommended_songs = get_recommendations_cosine(song_numbers, df, df_encoded, X_scaled)
+    recommended_songs = get_recommendations_cosine(song_numbers, df, df_encoded, X_scaled)
 
     # # 추천 곡을 리스트 형태로 변환하여 반환
-    # recommended_songs_list = recommended_songs.to_dict('records')
+    recommended_songs_list = recommended_songs.to_dict('records')
 
     recommended_songs_list = [
         {'number': 1, 'title': 'Song Title 1', 'singer': 'Singer 1', 'similarity_score': 0.95},
