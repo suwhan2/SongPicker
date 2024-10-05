@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,6 +30,12 @@ public class Team {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "team")
+    List<TeamMember> teamMembers = new ArrayList<>();
+
+    public void changeTeamName(String newName) {
+        this.name = newName;
+    }
     public void changeTeam(String name, String teamImage){
         this.name = name;
         this.teamImage = teamImage;

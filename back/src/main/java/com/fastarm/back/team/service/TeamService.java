@@ -95,7 +95,7 @@ public class TeamService {
             NotificationTeamInvite teamInvite = NotificationTeamInvite.builder()
                     .receiver(member)
                     .sender(sender)
-                    .content(team.getName() + " 팀에 초대되었습니다.")
+                    .content(team.getName() + " 팀 초대장이 왔어요!")
                     .type(Type.TEAM_INVITE)
                     .team(team)
                     .isDeleted(false)
@@ -116,8 +116,8 @@ public class TeamService {
     @Transactional
     public Long createTeam(TeamAddDto dto) throws IOException {
 
-        if(dto.getTeamImage().isEmpty()) throw new TeamImageUploadException();
-        String imagePath = s3Service.uploadFile(dto.getTeamImage());
+        String imagePath = null;
+        if(!dto.getTeamImage().isEmpty()) imagePath = s3Service.uploadFile(dto.getTeamImage());
 
 
         Team team = dto.toEntity(imagePath);
@@ -144,16 +144,18 @@ public class TeamService {
 
         checkPermission(member,team);
 
-        String imagPath;
-        if(dto.getTeamImage().isEmpty()) throw new TeamImageUploadException();
-        if (dto.getTeamImage() != null) {
-            s3Service.deleteFile(team.getTeamImage());
+        String imagPath=null;
+        if(dto.getTeamImage().isEmpty() || dto.getTeamImage()==null){
+            if(team.getTeamImage()!=null) imagPath=team.getTeamImage();
+
+        }
+        else{
+            if(team.getTeamImage()!=null) s3Service.deleteFile(team.getTeamImage());
             imagPath = s3Service.uploadFile(dto.getTeamImage());
-        } else {
-            imagPath=team.getTeamImage();
         }
 
-        team.changeTeam(dto.getTeamName(), imagPath);
+        if(imagPath==null) team.changeTeamName(dto.getTeamName());
+        else{team.changeTeam(dto.getTeamName(), imagPath);}
         teamRepository.save(team);
     }
 

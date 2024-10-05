@@ -2,6 +2,7 @@ import axiosInstance from './axiosInstance';
 
 // 최근 부른 곡 인터페이스
 export interface RecentSong {
+  songId(arg0: string, songId: unknown): unknown;
   number: number;
   coverImage: string;
   title: string;
@@ -22,3 +23,10 @@ export const getMyRecentSongs = async (): Promise<RecentSong[]> => {
 };
 
 // 최근 노래 조회(그룹) API
+export const getGroupRecentSongs = async (teamId: number) => {
+  const response = await axiosInstance({
+    method: 'GET',
+    url: `/api/histories/team/recent-songs?teamId=${teamId}`,
+  });
+  return response.data;
+};
