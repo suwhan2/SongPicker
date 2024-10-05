@@ -1,17 +1,16 @@
 # 사용할 베이스 이미지 설정
 FROM python:3.11-slim
 
+# 작업 디렉토리 생성 및 설정
+WORKDIR /app
+
 # 별도로 필요한 추가 패키지 설치
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     gcc \
-    libmysqlclient-dev \
+    libmariadb-dev \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
-
-
-# 작업 디렉토리 생성 및 설정
-WORKDIR /app
 
 # requirements.txt 복사 및 패키지 설치
 COPY requirements.txt .
