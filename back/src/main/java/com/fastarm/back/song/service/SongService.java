@@ -31,38 +31,44 @@ public class SongService {
     private final SongRepository songRepository;
     private final MemberRepository memberRepository;
     private final RestTemplate restTemplate;
-    private static final String DJANGO_API_URL = "http://localhost:8000/api/recommend_songs/";
-
+//    private static final String DJANGO_API_URL = "http://localhost:8000/api/recommend_songs/";
+    private static final String DJANGO_API_URL = "https://songpicker.kro.kr/api/data/individual/recommends";
     @Transactional
-//    public List<SongDto> recommendMySong(String loginId){
-    public void recommendMySong(String loginId){
+    public List<SongDto> recommendMySong(String loginId){
 
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        List<Integer> songNumbers = new ArrayList<>(Arrays.asList(1, 2, 4, 3, 5, 6, 7, 8, 9, 10));
+        List<Song> randomSongs = songRepository.findRandomSongs();
+        List<Long> songIds = randomSongs.stream().map(Song::getId).collect(Collectors.toList());
 
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("song_numbers", songNumbers);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        List<SongDto> songDtoList = songRepository.findSongsWithLikeStatus(songIds, member.getId());
 
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+        return songDtoList;
 
-        ResponseEntity<List> responseEntity = restTemplate.postForEntity(DJANGO_API_URL, entity, List.class);
+    }
+
+    @Transactional
+    public void recommendMySongTest(String loginId) {
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(MemberNotFoundException::new);
+
+        List<Integer> songNumbers = Arrays.asList(1, 2, 4, 3, 5, 6, 7, 8, 9, 10);
+
+        String songNumbersParam = songNumbers.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining("&song_numbers="));
+
+        String djangoApiUrl = DJANGO_API_URL + "?song_numbers=" + songNumbersParam;
+
+        ResponseEntity<List> responseEntity = restTemplate.getForEntity(djangoApiUrl, List.class);
+
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             List songs = responseEntity.getBody();
             System.out.println("응답 받은 노래 리스트: " + songs);
         } else {
             System.out.println("API 호출 실패: " + responseEntity.getStatusCode());
         }
-
-
-//        List<Object> songs = responseEntity.getBody();
-//        List<Long> songIds = songs.stream().map(Song::getId).collect(Collectors.toList());
-//        List<SongDto> songDtoList = songRepository.findSongsWithLikeStatus(songIds, member.getId());
-//        return songDtoList;
-
     }
 
     @Transactional
