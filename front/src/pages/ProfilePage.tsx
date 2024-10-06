@@ -3,7 +3,7 @@ import MainLayout from '../layouts/MainLayout';
 import useAuthStore from '../stores/useAuthStore'; // useAuthStore 가져오기
 import MyCalendar from '../components/organisms/profile/MyCalendar';
 import { useQuery } from '@tanstack/react-query';
-import { getSingingDay, getSongList } from '../services/profileService';
+import { getSingingDay } from '../services/profileService';
 import CalendarModal from '../components/organisms/profile/CalendarModal';
 
 const ProfilePage = () => {
@@ -52,7 +52,11 @@ const ProfilePage = () => {
         임시로그아웃버튼
       </button>
       <div className="flex w-full justify-center">
-        <MyCalendar singingDayData={singingDayData || []} handleSelectedDate={handleSelectedDate} />
+        <MyCalendar
+          singingDayData={singingDayData || []}
+          handleSelectedDate={handleSelectedDate}
+          currentYear={currentYear}
+        />
       </div>
       {openCalendarModal && (
         <CalendarModal
