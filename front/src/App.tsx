@@ -14,6 +14,8 @@ import FindAccountPage from './pages/FindAccountPage';
 import SongSelectPage from './pages/SongsSelectPage';
 import useAuthStore from './stores/useAuthStore';
 import './App.css';
+import { onMessage } from 'firebase/messaging';
+import { messaging } from './firebaseConfig';
 import { requestNotificationPermission } from './pushNotifications';
 
 interface PrivateRouteProps {
@@ -52,8 +54,30 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
 const App = () => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isSongSelected = useAuthStore(state => state.isSongSelected);
+
   useEffect(() => {
-    requestNotificationPermission();
+    if (isAuthenticated) {
+      requestNotificationPermission();
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    const unsubscribe = onMessage(messaging, payload => {
+      console.log('Received foreground message ', payload);
+      // 포그라운드 알림 표시 로직
+      if (Notification.permission === 'granted' && payload.notification) {
+        const title = payload.notification.title || 'New Notification';
+        const body = payload.notification.body || 'You have a new message';
+        new Notification(title, {
+          body: body,
+          icon: '/songPickerLogo_favicon.png',
+        });
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -159,18 +183,6 @@ const App = () => {
               </PrivateRoute>
             }
           />
-
-          {/* 기타 모든 라우트는 조건에 따라 리다이렉트 */}
-          {/* <Route
-            path="*"
-            element={
-              isAuthenticated && !isSongSelected ? (
-                <Navigate to="/song-select" replace />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          /> */}
         </Routes>
       </div>
     </Router>

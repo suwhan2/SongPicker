@@ -69,7 +69,7 @@ const refreshAccessToken = async (): Promise<string> => {
         return formattedToken;
       }
     }
-    throw new Error('Failed to refresh token');
+    throw new Error('Failed to refresh token ');
   } catch (error) {
     useAuthStore.getState().setAccessToken('');
     throw error;
@@ -109,6 +109,7 @@ axiosInstance.interceptors.response.use(
       } else if (response.data.code === 'AU007') {
         // 리프레시 토큰 만료 처리
         clearAuthState();
+        window.location.href = '/login';
         return Promise.reject(new Error('Refresh token expired'));
       }
     }
