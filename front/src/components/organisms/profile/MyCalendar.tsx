@@ -7,6 +7,7 @@ type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 type MyCalendarProps = {
   singingDayData: Date[];
+  handleSelectedDate: (value: Date) => void;
 };
 
 const MyCalendar = (props: MyCalendarProps) => {
@@ -18,6 +19,7 @@ const MyCalendar = (props: MyCalendarProps) => {
         className="bg-white text-black"
         value={value}
         onChange={onChange}
+        calendarType="gregory"
         tileClassName={'relative'}
         tileContent={({ date }) => {
           return props.singingDayData.map(item => {
@@ -30,6 +32,10 @@ const MyCalendar = (props: MyCalendarProps) => {
               </div>
             ) : null;
           });
+        }}
+        onClickDay={(value, event) => {
+          console.log('clicked');
+          props.handleSelectedDate(value);
         }}
       />
     </div>

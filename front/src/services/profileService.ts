@@ -16,3 +16,22 @@ export const getSingingDay = (currentYear: number) => {
       console.log(err);
     });
 };
+
+export const getSongList = (selectedYear: number, selectedMonth: number, selectedDay: number) => {
+  return axiosInstance({
+    method: 'GET',
+    url: '/api/histories/date/songs',
+    params: {
+      year: selectedYear,
+      month: selectedMonth,
+      day: selectedDay,
+    },
+  })
+    .then(res => {
+      return res.data.data;
+    })
+    .catch(err => {
+      console.log(err);
+      return [];
+    });
+};
