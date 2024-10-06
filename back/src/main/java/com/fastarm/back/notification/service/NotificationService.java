@@ -1,10 +1,14 @@
 package com.fastarm.back.notification.service;
 
+import com.fastarm.back.common.constants.RedisConstants;
+import com.fastarm.back.common.constants.RedisFieldConstants;
+import com.fastarm.back.common.service.RedisService;
 import com.fastarm.back.member.entity.Member;
 import com.fastarm.back.member.exception.MemberNotFoundException;
 import com.fastarm.back.member.repository.MemberRepository;
 import com.fastarm.back.notification.controller.dto.NotificationDetailRequest;
 import com.fastarm.back.notification.controller.dto.NotificationResponse;
+import com.fastarm.back.notification.dto.FCMTokenDto;
 import com.fastarm.back.notification.dto.NotificationDetailDto;
 import com.fastarm.back.notification.dto.NotificationDto;
 import com.fastarm.back.notification.dto.TeamInviteNotificationDto;
@@ -12,7 +16,6 @@ import com.fastarm.back.notification.entity.Notification;
 import com.fastarm.back.notification.entity.NotificationTeamInvite;
 import com.fastarm.back.notification.enums.Type;
 import com.fastarm.back.notification.exception.AlreadyInviteException;
-import com.fastarm.back.notification.exception.FirebaseMessagingException;
 import com.fastarm.back.notification.exception.NotificationNotFoundException;
 import com.fastarm.back.notification.repository.NotificationRepository;
 import com.fastarm.back.notification.repository.NotificationTeamInviteRepository;
@@ -45,8 +48,8 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationTeamInviteRepository notificationTeamInviteRepository;
     private final MemberRepository memberRepository;
-    private final TeamRepository teamRepository;
-    private final TeamService teamService;
+    private final RedisService redisService;
+
 
     @Transactional(readOnly = true)
     public List<NotificationResponse> findNotificationList(String loginId){
@@ -159,6 +162,11 @@ public class NotificationService {
                 .build();
             String response = FirebaseMessaging.getInstance().sendAsync(message).get();
             log.info("Successfully sent message: {}", response);
+    }
+
+    @Transactional
+    public void saveFcmToken(FCMTokenDto dto){
+        redisService.setHashData(RedisConstants.TOKEN+dto.getLoginId(), RedisFieldConstants.FCM, dto.getToken());
     }
 
 

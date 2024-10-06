@@ -1,10 +1,10 @@
 package com.fastarm.back.team.service;
 
 
-import com.fastarm.back.common.service.FcmTokenService;
-import com.fastarm.back.common.constants.S3Constants;
+import com.fastarm.back.common.constants.RedisConstants;
+import com.fastarm.back.common.constants.RedisFieldConstants;
+import com.fastarm.back.common.service.RedisService;
 import com.fastarm.back.common.service.S3Service;
-import com.fastarm.back.notification.entity.Notification;
 import com.fastarm.back.notification.entity.NotificationTeamInvite;
 import com.fastarm.back.notification.enums.Status;
 import com.fastarm.back.notification.enums.Type;
@@ -16,7 +16,6 @@ import com.fastarm.back.team.controller.dto.TeamInviteResponse;
 import com.fastarm.back.team.dto.*;
 import com.fastarm.back.team.entity.Team;
 import com.fastarm.back.team.entity.TeamMember;
-import com.fastarm.back.team.exception.TeamImageUploadException;
 import com.fastarm.back.team.exception.TeamMemberNotFoundException;
 import com.fastarm.back.team.repository.TeamRepository;
 import com.fastarm.back.team.repository.TeamMemberRepository;
@@ -47,7 +46,7 @@ public class TeamService {
     private final NotificationTeamInviteRepository notificationTeamInviteRepository;
     private final NotificationRepository notificationRepository;
     private final S3Service s3Service;
-    private final FcmTokenService fcmTokenService;
+    private final RedisService redisService;
     private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
@@ -115,7 +114,7 @@ public class TeamService {
             notificationTeamInviteRepository.save(teamInvite);
 
 
-            String fcmToken = fcmTokenService.getFcmToken(member.getLoginId());
+            String fcmToken = (String) redisService.getHashData(RedisConstants.TOKEN+member.getLoginId(), RedisFieldConstants.FCM);
             if(fcmToken != null){
                 String message = team.getName() + "팀에 초대되었습니다.";
                 notificationService.sendNotification(fcmToken, "팀 초대", message);
