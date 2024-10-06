@@ -5,6 +5,7 @@ import com.fastarm.back.common.controller.dto.ApiResponse;
 import com.fastarm.back.song.controller.dto.SongDetailRequest;
 import com.fastarm.back.song.controller.dto.SongSearchRequest;
 import com.fastarm.back.song.controller.dto.SongSearchResponse;
+import com.fastarm.back.song.controller.dto.TeamSongsRecommendRequest;
 import com.fastarm.back.song.dto.SongDetailDto;
 import com.fastarm.back.song.dto.SongDto;
 
@@ -31,7 +32,21 @@ public class SongController {
     }
     @GetMapping("/my/recommendations")
     public ResponseEntity<?> mySongsRecommend(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
+        songService.recommendMySong(loginMemberInfo.getLoginId());
         List<SongDto> songRecommendDtos = songService.recommendMySong(loginMemberInfo.getLoginId());
+        return ResponseEntity.ok(new ApiResponse<>("SO102","선곡 추천 성공",songRecommendDtos));
+    }
+
+    @GetMapping("/my/recommendations/test")
+    public ResponseEntity<?> mySongsRecommendTest(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
+        List<Object> results = songService.recommendMySongTest(loginMemberInfo.getLoginId());
+        return ResponseEntity.ok(new ApiResponse<>("SO102","선곡 추천 성공",results));
+    }
+
+    @GetMapping("/team/recommendations")
+    public ResponseEntity<?> teamSongsRecommend(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo,
+                                                @RequestParam("teamId") Long teamId){
+        List<SongDto> songRecommendDtos = songService.recommendTeamSong(TeamSongsRecommendRequest.from(loginMemberInfo.getLoginId(),teamId));
         return ResponseEntity.ok(new ApiResponse<>("SO102","선곡 추천 성공",songRecommendDtos));
     }
 

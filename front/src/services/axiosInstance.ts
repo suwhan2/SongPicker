@@ -34,6 +34,17 @@ const onRefreshed = (token: string) => {
   refreshSubscribers = [];
 };
 
+const clearAuthState = () => {
+  useAuthStore.setState({
+    isAuthenticated: false,
+    accessToken: null,
+    loginId: null,
+    role: null,
+    isSongSelected: false,
+  });
+  localStorage.removeItem('auth-storage');
+};
+
 const refreshAccessToken = async (): Promise<string> => {
   try {
     const response = await axios.post<ApiResponse>(
@@ -67,31 +78,38 @@ const refreshAccessToken = async (): Promise<string> => {
 
 axiosInstance.interceptors.response.use(
   async (response: AxiosResponse<ApiResponse>) => {
-    if ('code' in response.data && response.data.code === 'AU005') {
-      const originalRequest = response.config;
-      if (!isRefreshing) {
-        isRefreshing = true;
-        try {
-          const newToken = await refreshAccessToken();
-          isRefreshing = false;
-          onRefreshed(newToken);
-          if (originalRequest.headers) {
-            originalRequest.headers['Authorization'] = newToken;
-          }
-          return axiosInstance(originalRequest);
-        } catch (error) {
-          isRefreshing = false;
-          return Promise.reject(error);
-        }
-      } else {
-        return new Promise(resolve => {
-          refreshSubscribers.push((token: string) => {
+    if ('code' in response.data) {
+      if (response.data.code === 'AU005') {
+        // 기존의 액세스 토큰 갱신 로직
+        const originalRequest = response.config;
+        if (!isRefreshing) {
+          isRefreshing = true;
+          try {
+            const newToken = await refreshAccessToken();
+            isRefreshing = false;
+            onRefreshed(newToken);
             if (originalRequest.headers) {
-              originalRequest.headers['Authorization'] = token;
+              originalRequest.headers['Authorization'] = newToken;
             }
-            resolve(axiosInstance(originalRequest));
+            return axiosInstance(originalRequest);
+          } catch (error) {
+            isRefreshing = false;
+            return Promise.reject(error);
+          }
+        } else {
+          return new Promise(resolve => {
+            refreshSubscribers.push((token: string) => {
+              if (originalRequest.headers) {
+                originalRequest.headers['Authorization'] = token;
+              }
+              resolve(axiosInstance(originalRequest));
+            });
           });
-        });
+        }
+      } else if (response.data.code === 'AU007') {
+        // 리프레시 토큰 만료 처리
+        clearAuthState();
+        return Promise.reject(new Error('Refresh token expired'));
       }
     }
     return response;

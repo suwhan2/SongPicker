@@ -4,7 +4,6 @@ package com.fastarm.back.team.service;
 import com.fastarm.back.common.service.FcmTokenService;
 import com.fastarm.back.common.constants.S3Constants;
 import com.fastarm.back.common.service.S3Service;
-
 import com.fastarm.back.notification.entity.Notification;
 import com.fastarm.back.notification.entity.NotificationTeamInvite;
 import com.fastarm.back.notification.enums.Status;
@@ -17,6 +16,7 @@ import com.fastarm.back.team.controller.dto.TeamInviteResponse;
 import com.fastarm.back.team.dto.*;
 import com.fastarm.back.team.entity.Team;
 import com.fastarm.back.team.entity.TeamMember;
+import com.fastarm.back.team.exception.TeamImageUploadException;
 import com.fastarm.back.team.exception.TeamMemberNotFoundException;
 import com.fastarm.back.team.repository.TeamRepository;
 import com.fastarm.back.team.repository.TeamMemberRepository;
@@ -61,7 +61,6 @@ public class TeamService {
     @Transactional(readOnly = true)
     public TeamDetailDto getTeamDetail(TeamDetailRequest dto) {
 
-
         Team team = teamRepository.findById(dto.getTeamId()).orElseThrow(TeamNotFoundException::new);
         Member member = memberRepository.findByLoginId(dto.getLoginId()).orElseThrow(MemberNotFoundException::new);
         checkPermission(member,team);
@@ -95,26 +94,26 @@ public class TeamService {
                 continue;
             }
 
-            if (notificationTeamInviteRepository.existsByTypeAndReceiverIdAndStatus(Type.TEAM_INVITE,member.getId(), Status.WAIT)) {
+            if (notificationTeamInviteRepository.existsByTeamAndReceiverIdAndStatus(team,member.getId(), Status.WAIT)) {
                 previouslyInvited.add(receiverNickName);
                 continue;
             }
 
             successfulInvites.add(receiverNickName);
 
-            Notification notification = Notification.builder()
-                    .receiver(member)
-                    .sender(sender)
-                    .content(team.getName() + " 팀에 초대되었습니다.")
-                    .type(Type.TEAM_INVITE)
-                    .build();
-            notificationRepository.save(notification);
 
             NotificationTeamInvite teamInvite = NotificationTeamInvite.builder()
+                    .receiver(member)
+                    .sender(sender)
+                    .content(team.getName() + " 팀 초대장이 왔어요!")
+                    .type(Type.TEAM_INVITE)
                     .team(team)
-                    .notification(notification)
+                    .isDeleted(false)
+                    .isRead(false)
+                    .status(Status.WAIT)
                     .build();
             notificationTeamInviteRepository.save(teamInvite);
+
 
             String fcmToken = fcmTokenService.getFcmToken(member.getLoginId());
             if(fcmToken != null){
@@ -135,12 +134,10 @@ public class TeamService {
 
     @Transactional
     public Long createTeam(TeamAddDto dto) throws IOException {
-        String imagePath;
-        if (dto.getTeamImage().isEmpty()) {
-            imagePath = S3Constants.DEFAULT_IMAGE;
-        } else {
-            imagePath = s3Service.uploadFile(dto.getTeamImage());
-        }
+
+        String imagePath = null;
+        if(!dto.getTeamImage().isEmpty()) imagePath = s3Service.uploadFile(dto.getTeamImage());
+
 
         Team team = dto.toEntity(imagePath);
         Team savedTeam = teamRepository.save(team);
@@ -166,28 +163,29 @@ public class TeamService {
 
         checkPermission(member,team);
 
-        String imagPath;
-        if (dto.getTeamImage() != null) {
-            s3Service.deleteFile(team.getTeamImage());
+        String imagPath=null;
+        if(dto.getTeamImage().isEmpty() || dto.getTeamImage()==null){
+            if(team.getTeamImage()!=null) imagPath=team.getTeamImage();
+
+        }
+        else{
+            if(team.getTeamImage()!=null) s3Service.deleteFile(team.getTeamImage());
             imagPath = s3Service.uploadFile(dto.getTeamImage());
-        } else {
-            imagPath=team.getTeamImage();
         }
 
-        team.changeTeam(dto.getTeamName(), imagPath);
+        if(imagPath==null) team.changeTeamName(dto.getTeamName());
+        else{team.changeTeam(dto.getTeamName(), imagPath);}
         teamRepository.save(team);
     }
-
 
     @Transactional
     public void checkPermission(Member member, Team team) {
         boolean isMember = teamMemberRepository.existsByTeamAndMember(team,member);
-
         if (!isMember) throw new TeamMemberNotFoundException();
     }
 
     @Transactional
-    public void withdrawTeam(TeamWithdrawDto dto){
+    public void withdrawTeam(TeamWithdrawDto dto) throws URISyntaxException {
         Member member = memberRepository.findByLoginId(dto.getLoginId()).orElseThrow(MemberNotFoundException::new);
         Team team = teamRepository.findById(dto.getTeamId()).orElseThrow(TeamNotFoundException :: new);
         TeamMember teamMember = teamMemberRepository.findByTeamIdAndMemberId(dto.getTeamId(),member.getId())
@@ -196,7 +194,9 @@ public class TeamService {
         teamMemberRepository.delete(teamMember);
 
         int remainingMembers = teamMemberRepository.countByTeamId(dto.getTeamId());
-        if (remainingMembers==0) teamRepository.delete(team);
+        if (remainingMembers==0){
+            s3Service.deleteFile(team.getTeamImage());
+            teamRepository.delete(team);
+        }
     }
-
 }

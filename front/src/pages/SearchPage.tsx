@@ -1,27 +1,60 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import MainLayout from '../layouts/MainLayout';
 import SearchMain from '../components/template/SearchMain';
 import SearchBar from '../components/molecules/search/SearchBar';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { searchSongs } from '../services/songservices';
+import { getSongDetail, searchSongs, SongDetail } from '../services/songService';
 import axios from 'axios';
 import MusicDetailModal from '../components/template/commons/MusicDetailModal';
 import CustomAlert from '../components/template/commons/CustomAlertModal';
+import { checkConnectionStatus } from '../services/connectionService';
+import ConnectionModal from '../components/template/commons/ConnectionModal';
 
 type Tab = 'all' | 'song' | 'singer';
 
+interface Music {
+  songId: number;
+  number: string;
+  title: string;
+  singer: string;
+  coverImage: string;
+  isLike: boolean;
+  likeId: number | null;
+}
+
 const SearchPage = () => {
   const [searchKeyword, setSearchKeyword] = useState<string>('');
-  const [songSearchResults, setSongSearchResults] = useState<any[]>([]);
-  const [singerSearchResults, setSingerSearchResults] = useState<any[]>([]);
+  const [songSearchResults, setSongSearchResults] = useState<unknown[]>([]);
+  const [singerSearchResults, setSingerSearchResults] = useState<unknown[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('all');
   const navigate = useNavigate();
   const location = useLocation();
-  const [isDetailModalOpen, setDetailModalOpen] = useState(false);
   const [isAlertModalOpen, setAlertModalOpen] = useState(false);
-  const [selectedMusic, setSelectedMusic] = useState(null);
+  const [selectedSongDetail, setSelectedSongDetail] = useState<SongDetail | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [showConnectionModal, setShowConnectionModal] = useState(false);
+  const [connectionModalMessage, setConnectionModalMessage] = useState('');
+  const [modalIcon, setModalIcon] = useState<'link' | 'spinner' | 'reservation'>('link');
+  const [autoCloseDelay, setAutoCloseDelay] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchConnectionStatus = async () => {
+      try {
+        const response = await checkConnectionStatus();
+        setIsConnected(response.data);
+      } catch (error) {
+        console.error('Failed to fetch connection status:', error);
+        setIsConnected(false);
+      }
+    };
+
+    fetchConnectionStatus();
+    // 필요에 따라 주기적으로 상태를 체크하는 로직을 추가할 수 있습니다.
+  }, []);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -70,24 +103,24 @@ const SearchPage = () => {
     }
   };
 
-  const handleShowConnectionModal = (message: string) => {
-    // Implement the logic to show the connection modal
-    console.log('Show connection modal:', message);
-  };
-
-  const handleItemClick = (music: {
-    id: string;
-    title: string;
-    artist: string;
-    imageUrl: string;
-  }) => {
-    setSelectedMusic(music);
-    setDetailModalOpen(true);
-  };
-
-  const handleWishlistClick = () => {
-    setAlertModalOpen(true);
-  };
+  const handleItemClick = useCallback(async (music: Music) => {
+    setIsDetailLoading(true);
+    try {
+      const response = await getSongDetail(music.songId);
+      console.log('Song detail response:', response);
+      if (response.code === 'SO100') {
+        setSelectedSongDetail(response.data);
+        setIsDetailModalOpen(true);
+      } else {
+        throw new Error(response.message || '노래 상세 정보를 불러오는데 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Failed to fetch song details:', error);
+      // 에러 처리 (예: 알림 표시)
+    } finally {
+      setIsDetailLoading(false);
+    }
+  }, []);
 
   const TabButton = ({ tab, label }: { tab: Tab; label: string }) => (
     <button
@@ -102,6 +135,20 @@ const SearchPage = () => {
     setActiveTab(tab);
     navigate(`/search?keyword=${encodeURIComponent(searchKeyword)}&tab=${tab}`);
   };
+
+  const handleShowConnectionModal = useCallback(
+    (message: string, icon: 'link' | 'spinner' | 'reservation' = 'link', delay?: number) => {
+      setConnectionModalMessage(message);
+      setModalIcon(icon);
+      setAutoCloseDelay(delay);
+      setShowConnectionModal(true);
+    },
+    []
+  );
+
+  const handleCloseConnectionModal = useCallback(() => {
+    setShowConnectionModal(false);
+  }, []);
 
   return (
     <MainLayout title="노래 검색">
@@ -127,17 +174,18 @@ const SearchPage = () => {
             onItemClick={handleItemClick}
             activeTab={activeTab}
             onTabChange={handleTabChange}
+            isConnected={isConnected}
           />
         </div>
       </div>
 
       {/* MusicDetailModal */}
-      {isDetailModalOpen && selectedMusic && (
+      {isDetailModalOpen && selectedSongDetail && (
         <MusicDetailModal
           isOpen={isDetailModalOpen}
-          onClose={() => setDetailModalOpen(false)}
-          songDetail={selectedMusic}
-          isLoading={false}
+          onClose={() => setIsDetailModalOpen(false)}
+          songDetail={selectedSongDetail}
+          isLoading={isDetailLoading}
           height="80vh"
         />
       )}
@@ -150,6 +198,14 @@ const SearchPage = () => {
           onClose={() => setAlertModalOpen(false)}
         />
       )}
+
+      <ConnectionModal
+        isVisible={showConnectionModal}
+        onClose={handleCloseConnectionModal}
+        message={connectionModalMessage}
+        icon={modalIcon}
+        autoCloseDelay={autoCloseDelay}
+      />
     </MainLayout>
   );
 };

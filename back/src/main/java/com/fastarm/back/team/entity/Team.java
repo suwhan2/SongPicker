@@ -1,15 +1,18 @@
 package com.fastarm.back.team.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Team {
 
@@ -27,6 +30,12 @@ public class Team {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "team")
+    List<TeamMember> teamMembers = new ArrayList<>();
+
+    public void changeTeamName(String newName) {
+        this.name = newName;
+    }
     public void changeTeam(String name, String teamImage){
         this.name = name;
         this.teamImage = teamImage;
