@@ -122,6 +122,7 @@ public class TeamService {
             }else{
                 log.warn("사용자 {}의 FCM 토큰이 없습니다.", receiverNickName);
             }
+
         }
 
         return TeamInviteResponse.builder()

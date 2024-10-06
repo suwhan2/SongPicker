@@ -12,6 +12,7 @@ import com.fastarm.back.notification.entity.Notification;
 import com.fastarm.back.notification.entity.NotificationTeamInvite;
 import com.fastarm.back.notification.enums.Type;
 import com.fastarm.back.notification.exception.AlreadyInviteException;
+import com.fastarm.back.notification.exception.FirebaseMessagingException;
 import com.fastarm.back.notification.exception.NotificationNotFoundException;
 import com.fastarm.back.notification.repository.NotificationRepository;
 import com.fastarm.back.notification.repository.NotificationTeamInviteRepository;
@@ -156,9 +157,8 @@ public class NotificationService {
                         .setBody(body)
                         .build())
                 .build();
-
-        String response = FirebaseMessaging.getInstance().sendAsync(message).get();
-        log.info("Successfully sent message: {}", response);
+            String response = FirebaseMessaging.getInstance().sendAsync(message).get();
+            log.info("Successfully sent message: {}", response);
     }
 
 
