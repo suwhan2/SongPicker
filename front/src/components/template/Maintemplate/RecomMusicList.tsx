@@ -66,13 +66,28 @@ const RecomMusicList = ({ onShowNotification, onShowConnectionModal, isConnected
 
   // 세션 스토리지에서 추천 곡 목록을 가져오는 함수
   const getStoredRecommendations = useCallback(() => {
-    const storedRecommendations = sessionStorage.getItem('recommendedSongs');
-    return storedRecommendations ? JSON.parse(storedRecommendations) : null;
+    const storedData = sessionStorage.getItem('recommendedSongs');
+    if (storedData) {
+      const { songs, timestamp } = JSON.parse(storedData);
+      const now = new Date().getTime();
+      const hoursPassed = (now - timestamp) / (1000 * 60 * 60);
+
+      // 24시간이 지났다면 null을 반환하여 새로운 데이터를 fetch하도록 함
+      if (hoursPassed > 24) {
+        return null;
+      }
+      return songs;
+    }
+    return null;
   }, []);
 
   // 세션 스토리지에 추천 곡 목록을 저장하는 함수
   const storeRecommendations = useCallback((songs: RecommendedSong[]) => {
-    sessionStorage.setItem('recommendedSongs', JSON.stringify(songs));
+    const data = {
+      songs,
+      timestamp: new Date().getTime(),
+    };
+    sessionStorage.setItem('recommendedSongs', JSON.stringify(data));
   }, []);
 
   // 추천 곡 목록을 가져오는 함수
