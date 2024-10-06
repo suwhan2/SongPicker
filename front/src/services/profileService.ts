@@ -20,7 +20,7 @@ export const getSingingDay = (currentYear: number) => {
 export const getSongList = (selectedYear: number, selectedMonth: number, selectedDay: number) => {
   return axiosInstance({
     method: 'GET',
-    url: '/api/histories/date/songs',
+    url: '/histories/date/songs',
     params: {
       year: selectedYear,
       month: selectedMonth,
